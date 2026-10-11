@@ -1,0 +1,899 @@
+"""
+Check a sanitized document (redactor.py) before any of it is sent to
+an LLM.
+
+    python -m src.pii.validator output/risk_policy.json [output/risk_policy_pii.json]
+
+reads the extracted document <name>.json, its PII report <name>_pii.json
+and <name>_sanitized.json, and writes <name>_validation.json.
+
+Checks, in order:
+
+    provenance      the report and the sanitized copy belong to this
+                    document, and the copy was made from this report
+    report          the report's offsets point at its values in the
+                    original; overlapping findings are listed
+    replacements    every finding meant for redaction was replaced: the
+                    redactor recorded a tag for it, and its value is
+                    gone from its block
+    ocr             OCR words over a redacted value hold only tags;
+                    OCR text too unreliable to scan and images never
+                    read are listed for review
+    rescan          the scanner finds no PII in the sanitized copy
+    known_values    no value found anywhere in the document is left
+                    anywhere in the sanitized copy, nor part of a name
+    structure       pages, blocks, tables, word boxes and reading order
+                    are unchanged, and text differs only where a
+                    redaction tag stands
+
+Each check, and the verdict, is one of:
+
+    PASS            nothing found
+    FAIL            PII is known to remain, or the sanitized copy does
+                    not match its document and report
+    NEEDS_REVIEW    nothing known to remain, but something could not be
+                    confirmed: part of a name, OCR text too unreliable
+                    to scan, an image never read
+
+The verdict is the worst of the checks. Only a PASS document may be
+sent to an LLM.
+
+Issues name the block, finding and rule, never the PII itself, so the
+validation report can be shared. Look a finding_id up in the PII report
+to see the value.
+"""
+
+import json
+import re
+import sys
+from collections import Counter, defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
+
+from src.pii.detectors import NAME_WORD, LocalNLPDetector, lowercase_words
+from src.pii.document_scanner import LOW_OCR_CONFIDENCE, findings_path, scan_document
+from src.pii.redactor import (
+    REDACTION_TAG, check_finding, merge_spans, output_paths, save_json,
+    text_slots, walk, word_lists
+)
+
+
+# Change whenever the checks change
+VALIDATOR_VERSION = "1.0.0"
+
+PASS, NEEDS_REVIEW, FAIL = "PASS", "NEEDS_REVIEW", "FAIL"
+SEVERITY = {PASS: 0, NEEDS_REVIEW: 1, FAIL: 2}
+
+EXIT_CODES = {PASS: 0, FAIL: 1, NEEDS_REVIEW: 2}
+
+# Issues kept per check (issues_total counts them all), and places kept
+# per issue (occurrences counts them all)
+MAX_ISSUES = 100
+MAX_LOCATIONS = 10
+
+
+def issue(severity, reason, **where):
+    """
+    One problem a check found. where: block_id, finding_id, page_number,
+    occurrences, locations. Never the PII value itself.
+    """
+
+    return {
+        "severity": severity,
+        **{key: value for key, value in where.items() if value is not None},
+        "reason": reason,
+    }
+
+
+def worst(statuses):
+    return max(statuses, key=SEVERITY.get, default=PASS)
+
+
+def is_false_positive(item):
+    return item.get("review_status") == "false_positive"
+
+
+# --------------------------------------------------
+# TEXT HELPERS
+# --------------------------------------------------
+
+def normalise(text):
+    return " ".join(text.split())
+
+
+def only_tags(text):
+    """
+    True if text is one or more redaction tags and nothing else.
+    """
+
+    return bool(text) and not REDACTION_TAG.sub("", text)
+
+
+def only_tags_differ(original, sanitized):
+    """
+    True if sanitized is original with some parts (each at least one
+    character) replaced by redaction tags, and nothing else changed.
+
+    The text between tags is matched, in order, at its first place
+    after the previous one. For a pattern of fixed parts and gaps this
+    first place is always a safe choice, so no backtracking is needed.
+    """
+
+    parts = REDACTION_TAG.split(sanitized)
+
+    if len(parts) == 1:
+        return original == sanitized
+
+    first, *middle, last = parts
+
+    if not original.startswith(first):
+        return False
+
+    position = len(first)
+
+    for part in middle:
+        found = original.find(part, position + 1)
+
+        if found < 0:
+            return False
+
+        position = found + len(part)
+
+    return len(original) - len(last) > position and original.endswith(last)
+
+
+def value_pattern(value):
+    """
+    A regex for value with any whitespace between its words, not as part
+    of a longer word: "Fir" is not found in "First".
+    """
+
+    words = value.split()
+
+    if not words:
+        return re.escape(value)
+
+    pattern = r"\s+".join(re.escape(word) for word in words)
+
+    if re.match(r"\w", words[0][0]):
+        pattern = r"(?<!\w)" + pattern
+
+    if re.match(r"\w", words[-1][-1]):
+        pattern += r"(?!\w)"
+
+    return pattern
+
+
+def alternation(values):
+    """
+    One regex matching any of values, longest first. None if no values.
+    """
+
+    if not values:
+        return None
+
+    return re.compile("|".join(
+        f"(?:{value_pattern(value)})"
+        for value in sorted(values, key=len, reverse=True)
+    ))
+
+
+def strings(node, block_id=None, path=""):
+    """
+    Every string in a document, as (block_id, path, text): the block it
+    belongs to (a word belongs to the block it is part of; None outside
+    blocks) and its path inside that block.
+    """
+
+    if isinstance(node, str):
+        yield block_id, path, node
+
+    elif isinstance(node, dict):
+        if "block_id" in node and node.get("block_type") != "word":
+            block_id, path = node["block_id"], ""
+
+        for key, value in node.items():
+            yield from strings(value, block_id, f"{path}.{key}" if path else key)
+
+    elif isinstance(node, list):
+        for index, value in enumerate(node):
+            yield from strings(value, block_id, f"{path}[{index}]")
+
+
+def blocks_by_id(document):
+    return {
+        block["block_id"]: (page["page_number"], block)
+        for page in document["pages"]
+        for block in walk(page["blocks"])
+    }
+
+
+def findings_to_redact(document, report):
+    """
+    The report's findings that should be redacted and can be: not
+    reviewed as false positives, and with valid offsets. By block_id.
+    """
+
+    slots = text_slots(document)
+    by_block = defaultdict(list)
+
+    for item in report.get("findings", []):
+        if not is_false_positive(item) and check_finding(item, slots) is None:
+            by_block[item["block_id"]].append(item)
+
+    return by_block
+
+
+# --------------------------------------------------
+# CHECKS
+# Each returns (issues, notes).
+# --------------------------------------------------
+
+def check_provenance(document, report, sanitized):
+    """
+    The report and the sanitized copy belong to this document, and the
+    copy is the sanitized one, made from this run of the report.
+    """
+
+    issues = []
+    notes = []
+
+    if report.get("status") == "failed":
+        issues.append(issue(FAIL, "the PII scan failed: there are no findings to check against"))
+
+    for field in ("document_id", "file_name"):
+        for source, data in (("PII report", report), ("sanitized copy", sanitized)):
+            if data.get(field) != document.get(field):
+                issues.append(issue(
+                    FAIL, f"the {source} is for {field} {data.get(field)!r}, "
+                          f"not {document.get(field)!r}"
+                ))
+
+    redaction = sanitized.get("metadata", {}).get("redaction")
+
+    if redaction is None:
+        issues.append(issue(FAIL, "the sanitized copy has no redaction record: redactor.py did not make it"))
+        return issues, notes
+
+    if redaction.get("variant") != "sanitized":
+        issues.append(issue(FAIL, f"this is the {redaction.get('variant')} copy, not the sanitized one"))
+
+    if redaction.get("report_scan_timestamp") != report.get("scan_timestamp"):
+        issues.append(issue(FAIL, "the sanitized copy was made from another run of the PII report"))
+
+    # Errors about one finding are checked under replacements
+    for error in redaction.get("errors", []):
+        if not error.get("finding_id"):
+            issues.append(issue(
+                NEEDS_REVIEW, f"redactor: {error['reason']}", block_id=error.get("block_id")
+            ))
+
+    notes.append(f"redactor status: {redaction.get('status')}")
+
+    if redaction.get("warnings"):
+        notes.append(
+            f"{len(redaction['warnings'])} blocks had OCR words that could not be placed: "
+            "all their words were hidden"
+        )
+
+    return issues, notes
+
+
+def check_report_findings(document, report):
+    """
+    Every finding's offsets point at its value in the original text.
+    Overlapping findings are listed: the redactor replaces each group
+    as one span.
+    """
+
+    issues = []
+    notes = []
+    findings = report.get("findings", [])
+    slots = text_slots(document)
+
+    for finding_id, count in Counter(item.get("finding_id") for item in findings).items():
+        if count > 1:
+            issues.append(issue(FAIL, f"{count} findings share this finding_id", finding_id=finding_id))
+
+    for item in findings:
+        problem = check_finding(item, slots)
+
+        if problem:
+            issues.append(issue(
+                FAIL, problem, block_id=item.get("block_id"), finding_id=item.get("finding_id")
+            ))
+
+    groups = [
+        f"{block_id} ({', '.join(item['finding_id'] for item in span['items'])})"
+        for block_id, items in findings_to_redact(document, report).items()
+        for span in merge_spans(items)
+        if len(span["items"]) > 1
+    ]
+
+    if groups:
+        notes.append(
+            f"{len(groups)} groups of overlapping findings, each redacted as one span: "
+            + ", ".join(groups[:MAX_LOCATIONS])
+        )
+
+    false_positives = sum(1 for item in findings if is_false_positive(item))
+
+    if false_positives:
+        notes.append(f"{false_positives} findings were reviewed as false positives and are kept")
+
+    notes.append(f"{len(findings)} findings checked")
+
+    return issues, notes
+
+
+def check_replacements(report, sanitized):
+    """
+    Every finding meant for redaction has a successful replacement: the
+    redactor recorded a tag for it, the tag is in its block, and the
+    value is no longer there.
+    """
+
+    issues = []
+    redaction = sanitized.get("metadata", {}).get("redaction") or {}
+    audit = {entry.get("finding_id"): entry for entry in redaction.get("audit", [])}
+    slots = text_slots(sanitized)
+    replaced = 0
+
+    for item in report.get("findings", []):
+
+        if is_false_positive(item):
+            continue
+
+        where = {"block_id": item.get("block_id"), "finding_id": item.get("finding_id")}
+        entry = audit.get(item.get("finding_id"))
+
+        if entry is None:
+            issues.append(issue(FAIL, "no redaction is recorded for this finding", **where))
+            continue
+
+        if entry.get("status") != "redacted":
+            issues.append(issue(
+                FAIL, f"not redacted: {entry.get('reason') or entry.get('status')}", **where
+            ))
+            continue
+
+        if item.get("block_id") not in slots:
+            issues.append(issue(FAIL, "the block is not in the sanitized copy", **where))
+            continue
+
+        holder, key = slots[item["block_id"]]
+        text = holder.get(key) or ""
+        replacement = entry.get("replacement") or ""
+
+        if not REDACTION_TAG.fullmatch(replacement) or replacement not in text:
+            issues.append(issue(FAIL, "the recorded redaction tag is not in the block", **where))
+
+        elif re.search(value_pattern(item["text"]), text):
+            issues.append(issue(FAIL, "the value is still in its block", **where))
+
+        else:
+            replaced += 1
+
+    return issues, [f"{replaced} findings replaced"]
+
+
+def check_ocr(document, report, sanitized):
+    """
+    OCR content the redaction cannot vouch for:
+
+        a word (PDF word child, image OCR word) over a redacted value
+        that still holds text: FAIL
+        a block read by OCR with low confidence: misread PII ("Passpon
+        TK4820013") escapes detection, so a person must read it
+        an image that could not be OCR'd: its text was never scanned
+    """
+
+    issues = []
+    notes = []
+    original_blocks = blocks_by_id(document)
+    sanitized_blocks = blocks_by_id(sanitized)
+    images_with_values = 0
+    words_hidden = 0
+
+    for block_id, items in findings_to_redact(document, report).items():
+
+        # File properties and comment authors have no words
+        if block_id not in original_blocks or block_id not in sanitized_blocks:
+            continue
+
+        page_number, original = original_blocks[block_id]
+        _, sanitized_block = sanitized_blocks[block_id]
+
+        if original["block_type"] == "image_ocr":
+            images_with_values += 1
+
+        tokens = list(re.finditer(r"\S+", original["text"]))
+
+        for words, sanitized_words in zip(word_lists(original), word_lists(sanitized_block)):
+
+            # Words that do not match the text cannot be placed: all must be hidden
+            placed = [token.group() for token in tokens] == [word.get("text") for word in words]
+
+            for index, sanitized_word in enumerate(sanitized_words):
+                covering = None
+
+                if placed and index < len(tokens):
+                    token = tokens[index]
+                    covering = [
+                        item for item in items
+                        if item["start"] < token.end() and token.start() < item["end"]
+                    ]
+
+                    if not covering:
+                        continue
+
+                if only_tags(sanitized_word.get("text")):
+                    words_hidden += 1
+                    continue
+
+                issues.append(issue(
+                    FAIL,
+                    f"word {index + 1} is over a redacted value but still holds text"
+                    if covering else
+                    f"word {index + 1} could not be placed in the block text and was not hidden",
+                    block_id=block_id, page_number=page_number,
+                    finding_id=covering[0]["finding_id"] if covering else None
+                ))
+
+    for block_id, (page_number, block) in original_blocks.items():
+        confidence = block.get("metadata", {}).get("ocr_confidence")
+
+        if (
+            block["block_type"] != "word"
+            and confidence is not None
+            and confidence < LOW_OCR_CONFIDENCE
+            and normalise(block.get("text") or "")
+        ):
+            issues.append(issue(
+                NEEDS_REVIEW,
+                f"OCR confidence {confidence} is below {LOW_OCR_CONFIDENCE}: "
+                "misread PII cannot be detected",
+                block_id=block_id, page_number=page_number
+            ))
+
+        if block["block_type"] == "image":
+            issues.append(issue(
+                NEEDS_REVIEW, "the image could not be OCR'd: text in it was never scanned",
+                block_id=block_id, page_number=page_number
+            ))
+
+    notes.append(f"{words_hidden} OCR words over redacted values hold only tags")
+
+    if images_with_values:
+        notes.append(
+            f"{images_with_values} images held redacted values: the image files themselves "
+            "still show them (see image.word_boxes in the PII report)"
+        )
+
+    return issues, notes
+
+
+def check_rescan(report, sanitized, nlp_detector):
+    """
+    Run the scanner over the sanitized copy. Anything it finds is PII
+    the redaction left behind, except a value a reviewer already marked
+    as a false positive in that block: it was kept on purpose.
+    """
+
+    issues = []
+    nlp_error = "no NLP detector was given" if nlp_detector is None else getattr(nlp_detector, "error", None)
+
+    if nlp_error:
+        issues.append(issue(NEEDS_REVIEW, f"person names were not rescanned: {nlp_error}"))
+
+    kept = {
+        (item.get("block_id"), normalise(item.get("text") or ""))
+        for item in report.get("findings", [])
+        if is_false_positive(item)
+    }
+
+    rescan = scan_document(sanitized, nlp_detector)
+    excused = 0
+
+    for item in rescan["findings"]:
+        if (item["block_id"], normalise(item["text"])) in kept:
+            excused += 1
+            continue
+
+        issues.append(issue(
+            FAIL, f"{item['type']} found by {item['rule_id']}",
+            block_id=item["block_id"], page_number=item["page_number"]
+        ))
+
+    notes = [f"{rescan['summary']['blocks_scanned']} blocks rescanned"]
+
+    if excused:
+        notes.append(f"{excused} detections are values reviewed as false positives")
+
+    return issues, notes
+
+
+def check_known_values(document, report, sanitized):
+    """
+    The scan finds a value in one place but can miss it in another: a
+    table without the header that gave it away, OCR text, a name split
+    across blocks. Every string of the sanitized copy (text, words,
+    metadata) is searched for:
+
+        every value the report found: FAIL
+        each word of a name the report found ("Ifeoma" of "Ifeoma C.
+        Adeyemi"): NEEDS_REVIEW, as a word alone may not identify
+        anyone. Words the document also uses in lowercase are ordinary
+        words and are not searched.
+    """
+
+    findings = [
+        item for item in report.get("findings", [])
+        if not is_false_positive(item) and normalise(item.get("text") or "")
+    ]
+
+    # Each value and name part -> the first finding it came from
+    values = {}
+
+    for item in findings:
+        values.setdefault(normalise(item["text"]), item["finding_id"])
+
+    vocabulary = lowercase_words(
+        block.get("text") or ""
+        for _, block in blocks_by_id(document).values()
+    )
+
+    name_parts = {}
+
+    for item in findings:
+        if item["type"] != "PERSON_NAME":
+            continue
+
+        for word in item["text"].split():
+            part = word.strip(".,;:()[]")
+
+            if NAME_WORD.fullmatch(part) and part.lower() not in vocabulary and part not in values:
+                name_parts.setdefault(part, item["finding_id"])
+
+    value_regex = alternation(values)
+    part_regex = alternation(name_parts)
+    found = defaultdict(list)       # (severity, finding_id) -> locations
+    searched = 0
+
+    for block_id, path, text in strings(sanitized):
+        searched += 1
+        location = f"{block_id}.{path}" if block_id else path
+        full = []
+
+        if value_regex:
+            for match in value_regex.finditer(text):
+                full.append((match.start(), match.end()))
+                found[(FAIL, values[normalise(match.group())])].append(location)
+
+        if part_regex:
+            for match in part_regex.finditer(text):
+                if not any(start < match.end() and match.start() < end for start, end in full):
+                    found[(NEEDS_REVIEW, name_parts[match.group()])].append(location)
+
+    issues = [
+        issue(
+            severity,
+            "a value the scan found elsewhere is still in the sanitized copy"
+            if severity == FAIL else
+            "part of a name the scan found elsewhere is still in the sanitized copy",
+            finding_id=finding_id,
+            occurrences=len(locations),
+            locations=list(dict.fromkeys(locations))[:MAX_LOCATIONS]
+        )
+        for (severity, finding_id), locations in found.items()
+    ]
+
+    issues.sort(key=lambda item: (-SEVERITY[item["severity"]], -item["occurrences"]))
+
+    return issues, [
+        f"{len(values)} values and {len(name_parts)} name parts searched "
+        f"in {searched} strings"
+    ]
+
+
+def metadata_matches(key, original, sanitized):
+    """
+    Block metadata may only differ where redaction rewrites text: a
+    comment's author, OCR words, a continued table's column headers.
+    """
+
+    if original == sanitized:
+        return True
+
+    if key == "author":
+        return isinstance(original, str) and isinstance(sanitized, str) and only_tags_differ(original, sanitized)
+
+    if key == "words":
+        return (
+            isinstance(original, list) and isinstance(sanitized, list)
+            and len(original) == len(sanitized)
+            and all(
+                set(old) == set(new)
+                and all(old[field] == new[field] for field in old if field != "text")
+                and only_tags_differ(old.get("text") or "", new.get("text") or "")
+                for old, new in zip(original, sanitized)
+            )
+        )
+
+    if key == "column_headers":
+        return (
+            isinstance(original, dict) and isinstance(sanitized, dict)
+            and set(original) == set(sanitized)
+            and all(only_tags_differ(original[column], sanitized[column]) for column in original)
+        )
+
+    return False
+
+
+def block_differences(original, sanitized):
+    """
+    The fields of a block that changed other than by redaction.
+    """
+
+    differences = [
+        key
+        for key in sorted(set(original) | set(sanitized))
+        if key not in ("text", "metadata", "children") and original.get(key) != sanitized.get(key)
+    ]
+
+    if not only_tags_differ(original.get("text") or "", sanitized.get("text") or ""):
+        differences.append("text")
+
+    original_metadata = original.get("metadata", {})
+    sanitized_metadata = sanitized.get("metadata", {})
+
+    for key in sorted(set(original_metadata) | set(sanitized_metadata)):
+        if not metadata_matches(key, original_metadata.get(key), sanitized_metadata.get(key)):
+            differences.append(f"metadata.{key}")
+
+    return differences
+
+
+def compare_blocks(original_blocks, sanitized_blocks, issues, parent_id=None):
+    """
+    Compare two block lists position by position, children included,
+    so a block that moved is reported as well as one that changed.
+    Returns the number of blocks compared.
+    """
+
+    if len(original_blocks) != len(sanitized_blocks):
+        issues.append(issue(
+            FAIL, f"{len(sanitized_blocks)} blocks where the original has {len(original_blocks)}",
+            block_id=parent_id
+        ))
+        return 0
+
+    compared = 0
+
+    for original, sanitized in zip(original_blocks, sanitized_blocks):
+        differences = block_differences(original, sanitized)
+
+        if differences:
+            issues.append(issue(
+                FAIL, f"changed: {', '.join(differences)}", block_id=original.get("block_id")
+            ))
+
+        compared += 1 + compare_blocks(
+            original.get("children", []), sanitized.get("children", []),
+            issues, original.get("block_id")
+        )
+
+    return compared
+
+
+def check_structure(document, sanitized):
+    """
+    The sanitized copy is the original document with only redaction
+    tags in place of values: the same pages, blocks, tables and cells
+    in the same reading order, with the same boxes and metadata.
+    """
+
+    issues = []
+
+    for field in ("document_id", "file_name", "source_type", "extraction_method"):
+        if document.get(field) != sanitized.get(field):
+            issues.append(issue(FAIL, f"{field} changed"))
+
+    original_metadata = document.get("metadata", {})
+    sanitized_metadata = {
+        key: value
+        for key, value in sanitized.get("metadata", {}).items()
+        if key != "redaction"
+    }
+
+    for key in sorted(set(original_metadata) | set(sanitized_metadata)):
+        original, new = original_metadata.get(key), sanitized_metadata.get(key)
+
+        if key == "properties" and isinstance(original, dict) and isinstance(new, dict):
+            unchanged = set(original) == set(new) and all(
+                only_tags_differ(value, new[name]) if isinstance(value, str) else value == new[name]
+                for name, value in original.items()
+            )
+        else:
+            unchanged = original == new
+
+        if not unchanged:
+            issues.append(issue(FAIL, f"document metadata.{key} changed"))
+
+    original_pages, sanitized_pages = document["pages"], sanitized["pages"]
+
+    if len(original_pages) != len(sanitized_pages):
+        issues.append(issue(FAIL, f"{len(sanitized_pages)} pages where the original has {len(original_pages)}"))
+        return issues, []
+
+    compared = 0
+
+    for original, new in zip(original_pages, sanitized_pages):
+        if original["page_number"] != new["page_number"] or original.get("metadata") != new.get("metadata"):
+            issues.append(issue(FAIL, "page number or page metadata changed", page_number=original["page_number"]))
+
+        compared += compare_blocks(original["blocks"], new["blocks"], issues)
+
+    return issues, [f"{compared} blocks compared on {len(original_pages)} pages"]
+
+
+# --------------------------------------------------
+# VALIDATION
+# --------------------------------------------------
+
+def validate_document(document, report, sanitized, nlp_detector=None):
+    """
+    Run every check on a sanitized copy, against the document and PII
+    report it was made from.
+
+    document is the extractor's JSON: a dictionary, or the
+    ExtractedDocument an extraction pipeline still holds in memory.
+    nlp_detector is LocalNLPDetector for the rescan; without it, person
+    names are not rescanned and the rescan needs review.
+
+    Returns the validation report: verdict, a summary of check
+    statuses, and each check with its issues and notes.
+    """
+
+    if hasattr(document, "to_dict"):
+        document = document.to_dict()
+
+    checks = []
+
+    for name, run in (
+        ("provenance", lambda: check_provenance(document, report, sanitized)),
+        ("report", lambda: check_report_findings(document, report)),
+        ("replacements", lambda: check_replacements(report, sanitized)),
+        ("ocr", lambda: check_ocr(document, report, sanitized)),
+        ("rescan", lambda: check_rescan(report, sanitized, nlp_detector)),
+        ("known_values", lambda: check_known_values(document, report, sanitized)),
+        ("structure", lambda: check_structure(document, sanitized)),
+    ):
+        # A check that cannot run has not confirmed anything: FAIL, and
+        # the other checks still run so the report shows everything
+        try:
+            issues, notes = run()
+        except Exception as error:
+            issues, notes = [issue(FAIL, f"the check could not run: {type(error).__name__}: {error}")], []
+
+        checks.append({
+            "name": name,
+            "status": worst(item["severity"] for item in issues),
+            "issues_total": len(issues),
+            "notes": notes,
+            "issues": issues[:MAX_ISSUES],
+        })
+
+    verdict = worst(check["status"] for check in checks)
+
+    return {
+        "validator_version": VALIDATOR_VERSION,
+        "validated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "document_id": document.get("document_id"),
+        "file_name": document.get("file_name"),
+        "report_scan_timestamp": report.get("scan_timestamp"),
+        "verdict": verdict,
+        "summary": {check["name"]: check["status"] for check in checks},
+        "checks": checks,
+    }
+
+
+# --------------------------------------------------
+# FILES
+# --------------------------------------------------
+
+def validation_path(json_path):
+    """
+    Where the validation report for an extracted JSON file goes: next
+    to it, as <name>_validation.json.
+    """
+
+    json_path = Path(json_path)
+
+    return json_path.with_name(f"{json_path.stem}_validation.json")
+
+
+def validate_file(json_path, report_path=None, nlp_detector=None):
+    """
+    Validate <name>_sanitized.json against the extracted JSON file and
+    its PII report (by default <name>_pii.json), and save the result.
+    """
+
+    report_path = report_path or findings_path(json_path)
+    _, sanitized_path = output_paths(json_path)
+
+    loaded = []
+
+    for path in (json_path, report_path, sanitized_path):
+        with open(path, "r", encoding="utf-8") as file:
+            loaded.append(json.load(file))
+
+    validation = validate_document(*loaded, nlp_detector=nlp_detector)
+    validation["files"] = {
+        "document": str(json_path),
+        "report": str(report_path),
+        "sanitized": str(sanitized_path),
+    }
+
+    output_path = validation_path(json_path)
+    save_json(validation, output_path)
+
+    return validation, output_path
+
+
+def print_validation(validation):
+    """
+    Print the verdict, and each check with its notes and first issues.
+    """
+
+    print(f"\nVerdict: {validation['verdict']}\n")
+
+    for check in validation["checks"]:
+        print(f"  {check['status']:13} {check['name']:13} {check['issues_total']} issues")
+
+        for note in check["notes"]:
+            print(f"  {'':13} {'':13} {note}")
+
+        for item in check["issues"][:5]:
+            where = " ".join(
+                str(item[key]) for key in ("finding_id", "block_id") if key in item
+            )
+            count = f" ({item['occurrences']}x)" if "occurrences" in item else ""
+            print(f"  {'':13} {'':13} - {item['severity']}: {where} {item['reason']}{count}")
+
+        if check["issues_total"] > 5:
+            print(f"  {'':13} {'':13}   ... and {check['issues_total'] - 5} more in the report")
+
+
+def main():
+    """
+    Exit code: 0 PASS, 1 FAIL, 2 NEEDS_REVIEW, so a script can refuse to
+    send anything that did not pass.
+    """
+
+    if len(sys.argv) > 1:
+        json_path = Path(sys.argv[1])
+    else:
+        json_path = Path(input("Extracted JSON file: ").strip().strip('"'))
+
+    report_path = Path(sys.argv[2]) if len(sys.argv) > 2 else findings_path(json_path)
+
+    for path in (json_path, report_path, output_paths(json_path)[1]):
+        if not path.is_file():
+            sys.exit(f"File not found: {path}")
+
+    nlp = LocalNLPDetector()
+
+    if nlp.error:
+        print(f"Warning: {nlp.error} Person names will not be rescanned.")
+
+    validation, output_path = validate_file(json_path, report_path, nlp)
+
+    print(f"Validation report: {output_path}")
+    print_validation(validation)
+
+    sys.exit(EXIT_CODES[validation["verdict"]])
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,135 @@
+{
+  "validator_version": "1.0.0",
+  "validated_at": "2026-10-11T16:42:59+00:00",
+  "document_id": "organizational_pack",
+  "file_name": "organizational_pack.pptx",
+  "report_scan_timestamp": "2026-10-11T16:39:16+00:00",
+  "verdict": "NEEDS_REVIEW",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "rescan": "PASS",
+    "known_values": "NEEDS_REVIEW",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 OCR words over redacted values hold only tags"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "409 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "NEEDS_REVIEW",
+      "issues_total": 5,
+      "notes": [
+        "66 values and 28 name parts searched in 2966 strings"
+      ],
+      "issues": [
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0087",
+          "occurrences": 2,
+          "locations": [
+            "slide2_text21_p1.text",
+            "slide3_text22_p1.text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0090",
+          "occurrences": 2,
+          "locations": [
+            "slide2_text36_p1.text",
+            "slide3_text40_p1.text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0007",
+          "occurrences": 1,
+          "locations": [
+            "slide2_text11_p1.text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0013",
+          "occurrences": 1,
+          "locations": [
+            "slide2_text31_p1.text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0096",
+          "occurrences": 1,
+          "locations": [
+            "slide4_text16_p1.text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        }
+      ]
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "413 blocks compared on 9 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "output\\organizational_pack.json",
+    "report": "output\\organizational_pack_pii.json",
+    "sanitized": "output\\organizational_pack_sanitized.json"
+  }
+}

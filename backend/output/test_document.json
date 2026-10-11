@@ -1,0 +1,35 @@
+{
+  "document_id": "TEST001",
+  "file_name": "test.pdf",
+  "source_type": "PDF",
+  "extraction_method": "test",
+  "pages": [
+    {
+      "page_number": 1,
+      "metadata": {
+        "content_type": "page"
+      },
+      "blocks": [
+        {
+          "block_id": "B001",
+          "block_type": "paragraph",
+          "text": "Contact John Smith at john@example.com.",
+          "order": 1,
+          "metadata": {},
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "B002",
+          "block_type": "heading",
+          "text": "Employee Information",
+          "order": 2,
+          "metadata": {},
+          "bounding_box": null,
+          "children": []
+        }
+      ]
+    }
+  ],
+  "metadata": {}
+}

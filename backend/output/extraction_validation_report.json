@@ -1,0 +1,78 @@
+[
+  {
+    "file_type": "PPTX",
+    "file_path": "output/organizational_pack.json",
+    "status": "WARN",
+    "errors": [],
+    "warnings": [
+      "Blocks without a bounding box, by type: {'table_cell': 229}"
+    ],
+    "metrics": {
+      "empty_blocks_by_type": {
+        "table_cell": 5
+      },
+      "intentional_blank_table_cells_preserved": 5,
+      "pages": 9,
+      "blocks_including_children": 390,
+      "block_types": {
+        "image": 9,
+        "heading": 9,
+        "paragraph": 140,
+        "table": 3,
+        "table_cell": 229
+      }
+    }
+  },
+  {
+    "file_type": "PDF",
+    "file_path": "output/risk_policy.json",
+    "status": "WARN",
+    "errors": [],
+    "warnings": [
+      "451 of 17606 OCR words have confidence below 50."
+    ],
+    "metrics": {
+      "empty_blocks_by_type": {
+        "table_cell": 12
+      },
+      "intentional_blank_table_cells_preserved": 12,
+      "ocr_words": 17606,
+      "ocr_mean_confidence": 92.5,
+      "ocr_low_confidence_words": 451,
+      "pages": 35,
+      "blocks_including_children": 20639,
+      "block_types": {
+        "paragraph": 418,
+        "word": 17606,
+        "table": 65,
+        "table_cell": 2396,
+        "heading": 154
+      }
+    }
+  },
+  {
+    "file_type": "DOCX",
+    "file_path": "output/tprm_training_complete.json",
+    "status": "WARN",
+    "errors": [],
+    "warnings": [
+      "Blocks without a bounding box, by type: {'paragraph': 297, 'table_cell': 995, 'image_ocr': 38}",
+      "540 of 3016 OCR words have confidence below 50.",
+      "Known extractor limitations: ['Paragraphs and tables are extracted separately', 'Embedded image text is not extracted yet', 'Headers and footers are not extracted yet']"
+    ],
+    "metrics": {
+      "empty_blocks_by_type": {},
+      "intentional_blank_table_cells_preserved": 0,
+      "ocr_words": 3016,
+      "ocr_mean_confidence": 76.8,
+      "ocr_low_confidence_words": 540,
+      "pages": 1,
+      "blocks_including_children": 1330,
+      "block_types": {
+        "paragraph": 297,
+        "table_cell": 995,
+        "image_ocr": 38
+      }
+    }
+  }
+]
