@@ -615,6 +615,17 @@
     "note": "A name with letters outside A-Z."
   },
   {
+    "id": "DEV-060",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Vendor Risk Analyst _ v_t 87% 3.1% k.marchetti @\nQuarterly attestation",
+    "expected": [
+      {"text": "k.marchetti @", "type": "EMAIL"}
+    ],
+    "note": "OCR'd table row: the email's domain was lost after the @."
+  },
+  {
     "id": "DEV-058",
     "split": "dev",
     "source_type": "DOCX",
@@ -1029,6 +1040,16 @@
     "expected": [
       {"text": "Agnieszka Dąbrowska", "type": "PERSON_NAME"},
       {"text": "Søren Østergaard", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-042",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Send the attestation to l.brennan @ example.org by Friday.",
+    "expected": [
+      {"text": "l.brennan @ example.org", "type": "EMAIL"}
     ]
   }
 ]

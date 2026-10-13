@@ -87,7 +87,7 @@ PDF pages with at least `NATIVE_TEXT_MIN_CHARS` of text-layer text are read nati
 
 `main.py` (the command line) and `src/web/jobs.py` (the web UI, through `app.py`) only connect the steps. All extraction, detection, redaction and validation logic lives in `src/` and must be reused, never reimplemented in either entry point.
 
-- Call `scan_file`/`scan_document`, not `detect_pii` directly. The scanner adds table header context, surname mentions and extraction warnings that the raw detectors lack.
+- Call `scan_file`/`scan_document`, not `detect_pii` directly. The scanner adds table header context, names widened over first names, surname mentions, values found elsewhere (`known_value_mentions`) and extraction warnings that the raw detectors lack. `evaluate_detector` scores through the scanner's `detect_units()` for the same reason.
 - Build one `LocalNLPDetector` and pass it to both `scan_file` and `validate_file`, because the validator rescans the sanitized copy and loading the model is slow. The web UI loads it once, in `Jobs.detector()`, and runs one job at a time.
 - `jobs.py` runs the same steps as `main.py`, so a change to the order or the failure handling in one must be made in the other.
 - Known debt: `jobs.py` imports shared helpers from `main.py`: `input_problem`, `load_extracted`, `extract_document`/`EXTRACTORS`/`SUPPORTED_TYPES`, `pipeline_outputs`, `delete` and `format_summary`. They should move into `src/` so that `main.py` is only the CLI. `src/extractors/dispatch.py` already holds copies of `extract_document`, `EXTRACTORS`, `SUPPORTED_TYPES` and `extract_pdf_document` (that copy also takes `ocr_pages`), but nothing imports it yet. Until `main.py` and `jobs.py` switch to it, make every change to extraction dispatch in both files.
@@ -103,7 +103,7 @@ PDF pages with at least `NATIVE_TEXT_MIN_CHARS` of text-layer text are read nati
 - **False positives.** A finding with `review_status: "false_positive"` in `_pii.json` is left unredacted.
 - **Version constants.** Outputs record `SCHEMA_VERSION`/`SCANNER_VERSION` (`document_scanner.py`), `REDACTOR_VERSION`, `VALIDATOR_VERSION` and `EXPOSURE_VERSION`. Bump the matching one when you change rules.
 - **Word children.** Word-level `children` are not scanned separately, because they repeat their parent's text. If you add a block type with children, check `collect_units()` in `document_scanner.py`.
-- **Tunable constants.** Thresholds are module-level constants with comments: `ZOOM` and `NATIVE_TEXT_MIN_CHARS` in `pdf_extractor.py`; `LOW_OCR_CONFIDENCE`, `LOW_OCR_WORD_CONFIDENCE` and `VALUE_LIKE_WORD` in `document_scanner.py`; `MAX_NAME_TOKENS`, `TITLE_WORDS`, `TEAM_WORDS` and `MAX_LABEL_GAP_WORDS` in `detectors.py`; `HEADER_BAND`/`FOOTER_BAND`, `MIN_GUTTER` and `CENTRE_ZONE` in `page_layout.py`; `LARGE_LINE_RATIO` in `heading_classifier.py`.
+- **Tunable constants.** Thresholds are module-level constants with comments: `ZOOM` and `NATIVE_TEXT_MIN_CHARS` in `pdf_extractor.py`; `LOW_OCR_CONFIDENCE`, `LOW_OCR_WORD_CONFIDENCE`, `VALUE_LIKE_WORD` and `MIN_KNOWN_VALUE_CHARS` in `document_scanner.py`; `MAX_NAME_TOKENS`, `TITLE_WORDS`, `TEAM_WORDS` and `MAX_LABEL_GAP_WORDS` in `detectors.py`; `HEADER_BAND`/`FOOTER_BAND`, `MIN_GUTTER` and `CENTRE_ZONE` in `page_layout.py`; `LARGE_LINE_RATIO` in `heading_classifier.py`.
 - **Shared word lists.** `word_lists()` lives in `document_scanner.py` (the redactor imports it from there, since the redactor already imports the scanner): the scanner, redactor and validator must read OCR words the same way.
 
 ### Adding a PII type
@@ -112,11 +112,11 @@ PDF pages with at least `NATIVE_TEXT_MIN_CHARS` of text-layer text are read nati
 2. Add cases to `test_pii_accuracy.py` and examples in both splits of `archive/tests/data/pii_ground_truth.json`. Add the type to `PII_TYPES` in `evaluate_detector.py` and to `TYPE_LABELS` in `backend/static/app.js`.
 3. Run `evaluate_detector` and bump `SCANNER_VERSION`. Add a labelled case to `evaluation/build_corpus.py` so the whole pipeline is scored on it.
 
-## Known issues (evaluation run 2026-10-13, `evaluation/results/20261013-231322`)
+## Known issues (evaluation run 2026-10-13, `evaluation/results/20261013-233436`)
 
-On the synthetic corpus (9 documents, 98 labelled values, 152 structure elements) every headline score is 1.000: detection, redaction, release gate, structure and reading order. No unsafe release, no over-block. Snippet benchmark F1: dev 0.956, eval 0.959. Scanner 1.3.1, validator 1.3.0.
+On the synthetic corpus (9 documents, 98 labelled values, 152 structure elements) every headline score is 1.000: detection, redaction, release gate, structure and reading order. No unsafe release, no over-block. Snippet benchmark F1: dev 0.957, eval 0.962. Scanner 1.5.0, validator 1.3.0.
 
-The validator rescans with the same detector, so it cannot catch a value the detector misses. A PASS verdict means "no PII the detector can see", not "no PII". The corpus is small and synthetic: these scores do not show coverage on the real samples, which have not been rerun since these changes.
+The validator rescans with the same detector, so it cannot catch a value the detector misses. A PASS verdict means "no PII the detector can see", not "no PII". The corpus is small and synthetic; see "Real samples" below for the case-study files.
 
 - **A name with one garbled character inside is missed**: "Tomasz Zieli·ski" (a PDF font without "ń", or OCR damage) is not name-shaped, so neither spaCy's span nor the label rule survives `plausible_name()`. Accented names themselves are found (`UPPER`/`LOWER` in `detectors.py` cover the Latin scripts). The corpus builder embeds a TrueType font in `multipage_report.pdf` for this reason: PyMuPDF's built-in Helvetica writes "ń" as "·".
 - **Minor over-redaction.** The spaCy span "Remind Arun Pillai" includes the leading verb, so one word of context is redacted (context around redactions 0.985). Nothing leaks.
@@ -125,18 +125,15 @@ The validator rescans with the same detector, so it cannot catch a value the det
 - **Not measured on real files:** the low-confidence OCR word check (`LOW_OCR_WORD_CONFIDENCE`) may hold back noisy scans more often (the 11-Oct report found 18% of the DOCX sample's screenshot words below 50); DOCX embedded objects now lead to NEEDS_REVIEW; the new heading and two-column rules may relabel or reorder blocks in the samples.
 - Team mailboxes (DEV-039) are redacted as EMAIL though the benchmark labels them not PII: a policy choice, left as it is.
 
-**Real samples** (`archive/samples/`, run 2026-10-13 with scanner 1.4.0 and validator 1.3.0; jobs `20261013-232035_*` and `20261013-232039_*` in `backend/output/`):
+**Real samples** (`archive/samples/`, 2026-10-13, scanner 1.5.0 and validator 1.3.0; jobs `20261013-232035_*` and `20261013-232039_*` in `backend/output/`; compared with the 12-13 Oct runs):
 
 - `organizational_pack.pptx`: PASS (was NEEDS_REVIEW: five first names left beside "Led by [REDACTED]"). All six "Led by" lines hold only a tag.
-- `tprm_training.docx`: NEEDS_REVIEW, as before. 4 OCR blocks below confidence 60, and 13 blocks with low-confidence value-like words (new check). Its name-part issues went from 3 to 0.
-- `risk_policy.pdf`: FAIL, as before. Now also finds 4 home addresses, 3 national IDs, 1 date of birth, 1 card number.
-  - `known_values` FAIL: an EMPLOYEE_ID found under an "EMP ID" column on p28 is still in `p25_t3_row_3_cell_2`, under a "VENDOR ID" column that names no type. The scanner reports a value only where its own context says what it is.
-  - 7 name-part NEEDS_REVIEW (was 10): a first name beside a name redacted by another rule (`p27_t3_row_2_cell_3`, `p23_t2_row_2_cell_4`); surnames inside emails that OCR broke with a space before "@" (`p12_b6`); and three single words whose use as a name is unclear.
+- `tprm_training.docx`: NEEDS_REVIEW, as before, for OCR only: 4 blocks below confidence 60 and 13 blocks with low-confidence value-like words. Name-part issues went from 3 to 0. A person has to look at those images; only better OCR input changes this.
+- `risk_policy.pdf`: NEEDS_REVIEW (was FAIL). Now also finds 4 home addresses, 3 national IDs, 1 date of birth, 1 card number, 4 OCR-broken emails, and 1 known value (the EMPLOYEE_ID under a "VENDOR ID" header in `p25_t3_row_3_cell_2` that failed before). Left for review: 23 low-confidence OCR blocks, 19 blocks with low-confidence value-like words, and 4 name parts (was 10): three single words whose use as a name is unclear, and an initial glued to a surname without a space ("J.Surname", `p12_b6`), which the surname rule skips because a dot before it usually means an email address.
 
 ### Proposed, not done (waiting for the user's approval)
 
-- Propagate known values in the scanner: a value found as PII in one place (at least 6 characters with a digit or "@") is reported wherever else it stands, as `surname_mentions()` does for surnames. Fixes the `risk_policy.pdf` FAIL above. Risk: an over-short or common value spreads; hence the length rule.
-- Accept OCR spaces around "@" in emails ("j.smith @cadence...") and look into the two first names left beside a name another rule redacted (`risk_policy.pdf`).
+- Find a surname glued to an initial ("J.Surname") when no "@" follows it.
 - Trim a leading verb from spaCy PERSON spans using the part-of-speech tags already computed ("Remind Arun Pillai").
 - OCR the scanned pages of a PDF in parallel. Tesseract runs as a subprocess, so threads work; set `OMP_THREAD_LIMIT=1`. Output would be identical.
 - Load spaCy without `parser` and `lemmatizer`, which nothing uses. Keep this only if detection results are identical, because NER may respect the sentence breaks the parser sets.

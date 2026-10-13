@@ -120,6 +120,18 @@ CASES = [
         {("IP_ADDRESS", "192.168.1.10")},
     ),
     (
+        "OCR email with a space beside the @",
+        "Owner r.achterberg @ cadencefg.com for questions",
+        "",
+        {("EMAIL", "r.achterberg @ cadencefg.com")},
+    ),
+    (
+        "OCR email whose domain was lost: the line ends at the @",
+        "Escalation | r.achterberg @\nRisk team",
+        "",
+        {("EMAIL", "r.achterberg @")},
+    ),
+    (
         "Card numbers with a known prefix and a valid Luhn digit",
         "Corporate card 4111 1111 1111 1111; refund to 5555-5555-5555-4444; Amex 3782 822463 10005",
         "",
@@ -279,6 +291,12 @@ CASES = [
     (
         "Label in an earlier sentence does not carry over",
         "Mobile: none. Account 9876543210",
+        "",
+        set(),
+    ),
+    (
+        "An @ between words or prices is not an email",
+        "Meet the team @ noon; item 12 @ 4.99 each; see @mention",
         "",
         set(),
     ),

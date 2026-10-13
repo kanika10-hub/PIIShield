@@ -154,6 +154,20 @@ EMAIL = re.compile(
     re.IGNORECASE
 )
 
+# OCR breaks addresses: a space or line break beside the "@"
+# ("j.okafor @ example.com"), or the domain lost, so the text ends at the
+# "@" ("j.okafor @"). Without a domain, the part before the "@" must look
+# like one: four characters or more, with a letter and a dot or digit.
+EMAIL_SPACED = re.compile(
+    r"\b[A-Z0-9._%+-]+(?:\s@\s?|\s?@\s)[A-Z0-9.-]+\.[A-Z]{2,}\b",
+    re.IGNORECASE
+)
+EMAIL_DANGLING = re.compile(
+    r"(?<![\w.%+@-])(?=[A-Z0-9._%+-]*[A-Z])(?=[A-Z0-9._%+-]*[.\d])"
+    r"[A-Z0-9][A-Z0-9._%+-]{2,}[A-Z0-9] ?@(?![\w.-])",
+    re.IGNORECASE
+)
+
 # Phone candidates. Separators are limited to one line, and a candidate
 # cannot start inside an ID ("ISS-2026-0112"), date ("18/04/2026"),
 # version ("10.0.19041") or a longer number.
@@ -371,6 +385,21 @@ def regex_detector(text, context=""):
             "EMAIL", text, start, match.end(), 0.99, "regex",
             "EMAIL_REGEX", "regex", "EMAIL"
         ))
+
+    for pattern, name, confidence in (
+        (EMAIL_SPACED, "EMAIL_SPACED", 0.95), (EMAIL_DANGLING, "EMAIL_DANGLING", 0.85)
+    ):
+        for match in pattern.finditer(text):
+            start = match.start() + len(match.group()) - len(match.group().lstrip("._%+-_"))
+
+            if not any(
+                item["type"] == "EMAIL" and item["start"] < match.end() and start < item["end"]
+                for item in findings
+            ):
+                findings.append(finding(
+                    "EMAIL", text, start, match.end(), confidence, "regex",
+                    "EMAIL_OCR", "regex", name
+                ))
 
     for match in PHONE.finditer(text):
         start = match.start()

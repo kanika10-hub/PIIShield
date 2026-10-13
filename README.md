@@ -437,7 +437,7 @@ detectors, and their results are merged:
 
 | Type | Example (fake) | How it's found |
 |---|---|---|
-| `EMAIL` | `jane.doe@example.com` | Regex |
+| `EMAIL` | `jane.doe@example.com` | Regex, plus OCR-broken forms: a space or line break beside the `@`, or a local part ending at a dangling `@` whose domain OCR lost |
 | `PHONE` | `+1 (212) 555-0100` | Regex, plus rules that reject look-alikes: dates, year ranges, version numbers, IP addresses. A bare run of digits only counts if a label like "Tel" or "Mobile" is next to it |
 | `US_SSN` | `123-45-6789` | Regex plus the official SSN validity rules. An "SSN" label overrides the rules (test data often uses invalid numbers) |
 | `INDIAN_PAN` | `ABCPE1234F` | Regex |
@@ -456,6 +456,13 @@ Things to know about detection:
 - **Labels matter.** `find_label()` looks a short distance before a value, in
   the same line or clause, for words like "Tel", "SSN" or "Passport No.". A
   label raises the confidence or turns a doubtful value into a finding.
+- **A value found once is found everywhere.** The scanner (`document_scanner.py`)
+  reports every other occurrence of a value it found, with the same type
+  (`KNOWN_VALUE`): an ID found under an "EMP ID" header is redacted under a
+  "VENDOR ID" header too. Only values of at least 6 characters with a digit
+  or `@`, and names of two words or more, spread. A name found without the
+  person's first names ("M. Okonjo" in "Marguerite M. Okonjo") is widened over
+  them when the document names the person in full.
 - **Confidence is a ranking, not a probability.** Each rule has a hand-picked
   number (0.75–0.99) used to choose between competing findings.
 - **spaCy's small model makes many mistakes**, for example tagging "Vendor Tier"

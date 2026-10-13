@@ -58,8 +58,8 @@ BACKEND = Path(__file__).resolve().parent.parent
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
-from src.pii.detectors import LocalNLPDetector, detect_pii
-from src.pii.document_scanner import SCANNER_VERSION, DocumentNLP, surname_mentions
+from src.pii.detectors import LocalNLPDetector
+from src.pii.document_scanner import SCANNER_VERSION, detect_units
 
 
 # Next to this file, whichever folder it is run from
@@ -142,12 +142,12 @@ def load_examples():
 def predict(example, nlp):
     """
     The findings in example["text"], found as a full document scan finds
-    them: spaCy and ordinary words for the whole document, the context
-    for the text, then surname mentions.
+    them (document_scanner.detect_units): spaCy and ordinary words for the
+    whole document, the context for the text, then names widened, surname
+    mentions and values found elsewhere.
     """
 
     texts = [example["text"], *example.get("document", [])]
-    detector = DocumentNLP(nlp, texts)
 
     # Units as document_scanner builds them: (page, block, table, context)
     units = [
@@ -156,13 +156,7 @@ def predict(example, nlp):
         for number, text in enumerate(texts)
     ]
 
-    found = [
-        (unit, item)
-        for unit in units
-        for item in detect_pii(unit[1]["text"], detector, context=unit[3])
-    ]
-
-    found.extend(surname_mentions(units, found, detector.parts_of_speech))
+    found, _ = detect_units(units, nlp)
 
     return [item for unit, item in found if unit is units[0]]
 

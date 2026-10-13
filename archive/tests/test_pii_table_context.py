@@ -59,6 +59,22 @@ CASES = [
         {
             ("PASSPORT_NUMBER", "TK4820913", 2, 1),
             ("EMPLOYEE_ID", "CFG-20931", 2, 2),
+            # Found under its header, so a passport number in free text too
+            ("PASSPORT_NUMBER", "TK4820913", 2, 3),
+        },
+    ),
+    (
+        "An ID found under its header is found under another header too",
+        make_document("t6", 3, 2, [
+            (1, 1, "EMP ID"), (1, 2, "VENDOR ID"),
+            (2, 1, "MER-IN-4488"), (2, 2, "VN-77"),
+            (3, 1, "MER-IN-5521"), (3, 2, "MER-IN-4488"),
+        ]),
+        [1],
+        {
+            ("EMPLOYEE_ID", "MER-IN-4488", 2, 1),
+            ("EMPLOYEE_ID", "MER-IN-5521", 3, 1),
+            ("EMPLOYEE_ID", "MER-IN-4488", 3, 2),
         },
     ),
     (

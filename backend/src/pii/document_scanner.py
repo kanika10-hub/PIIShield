@@ -32,7 +32,7 @@ from src.pii.detectors import NAME_WORD, UPPER, detect_pii, finding
 # SCANNER_VERSION whenever detection rules change, so reports made by
 # different code can be told apart.
 SCHEMA_VERSION = "1.2"
-SCANNER_VERSION = "1.4.0"
+SCANNER_VERSION = "1.5.0"
 
 # OCR'd blocks below this Tesseract confidence (0-100) are reported
 LOW_OCR_CONFIDENCE = 60
@@ -427,13 +427,14 @@ def introduces(word, names):
     True if word, just before a surname, belongs with it: a title
     ("Dr.", "Ms"), the person's first name or initials ("Caleb", "CA",
     "C.", "L.-E."), or any single initial ("J Smith": a name, if perhaps
-    another person's).
+    another person's). OCR reads an initial's full stop as a comma
+    ("Sneha M, Rao"), so "M," is an initial too.
     """
 
     if word.rstrip(".") in HONORIFICS:
         return True
 
-    letters = re.sub(r"[.-]", "", word)
+    letters = re.sub(r"[.,-]", "", word)
 
     if len(letters) == 1 and letters.isupper():
         return True
@@ -531,6 +532,142 @@ def name_start(text, start, names, covered):
         start = word_start
 
 
+def people_by_surname(found):
+    """
+    Surname -> the people it can stand for, each by their fullest name,
+    in document order, from the full names among found ((unit, finding)
+    pairs). "T. Lindqvist" and "Tobias Lindqvist" are one person (see
+    same_person).
+    """
+
+    full_names = {}
+
+    for _, item in found:
+        name = " ".join(item["text"].split())
+
+        if item["type"] == "PERSON_NAME" and len(name.split()) >= 2:
+            people = full_names.setdefault(name.split()[-1], [])
+
+            for index, other in enumerate(people):
+                if same_person(name, other):
+                    people[index] = max(other, name, key=len)
+                    break
+            else:
+                people.append(name)
+
+    return full_names
+
+
+def widen_names(found):
+    """
+    A name found without some of the person's first names or initials
+    before it ("M. Okonjo" in "Marguerite M. Okonjo": spaCy's span may
+    start late, OCR may write "M," for "M.") is widened over them, as a
+    surname mention is (see name_start), when the document names that
+    person in full. The findings are changed in place.
+    """
+
+    full_names = people_by_surname(found)
+    by_block = {}
+
+    for unit, item in found:
+        by_block.setdefault(id(unit[1]), []).append(item)
+
+    for unit, item in found:
+        words = item["text"].split()
+
+        if item["type"] != "PERSON_NAME" or not words or words[-1] not in full_names:
+            continue
+
+        text = unit[1]["text"]
+        others = [(other["start"], other["end"]) for other in by_block[id(unit[1])] if other is not item]
+        start = name_start(text, item["start"], full_names[words[-1]], others)
+
+        if start < item["start"]:
+            item["start"], item["text"] = start, text[start:item["end"]]
+
+
+# A value found as PII in one place is PII wherever it stands: an ID under
+# an "EMP ID" header is the same ID under a "VENDOR ID" one. Only values
+# distinctive enough are spread: at least this long and holding a digit or
+# an "@", or names of two words or more.
+MIN_KNOWN_VALUE_CHARS = 6
+KNOWN_VALUE_MARK = re.compile(r"[\d@]")
+
+
+def spreads(item):
+    value = " ".join(item["text"].split())
+
+    if len(value) < MIN_KNOWN_VALUE_CHARS:
+        return False
+
+    if item["type"] == "PERSON_NAME":
+        return len(value.split()) >= 2
+
+    return bool(KNOWN_VALUE_MARK.search(value))
+
+
+def value_regex(value):
+    """
+    A regex for value with any whitespace between its words, not inside
+    a longer word.
+    """
+
+    pattern = r"\s+".join(re.escape(word) for word in value.split())
+
+    if re.match(r"\w", value[0]):
+        pattern = r"(?<!\w)" + pattern
+
+    if re.match(r"\w", value[-1]):
+        pattern += r"(?!\w)"
+
+    return pattern
+
+
+def known_value_mentions(units, found):
+    """
+    Every other place a value found as PII stands (see spreads), where
+    no finding covers it yet: the value is reported there too, with the
+    type it was found as. context_trigger names the rule that found it
+    first. Returns new (unit, finding) pairs.
+    """
+
+    values = {}
+
+    for _, item in found:
+        if spreads(item):
+            values.setdefault(" ".join(item["text"].split()), item)
+
+    if not values:
+        return []
+
+    pattern = re.compile("|".join(value_regex(value) for value in sorted(values, key=len, reverse=True)))
+    covered = {}
+
+    for unit, item in found:
+        covered.setdefault(id(unit[1]), []).append((item["start"], item["end"]))
+
+    mentions = []
+
+    for unit in units:
+        text = unit[1]["text"]
+        block_covered = covered.setdefault(id(unit[1]), [])
+
+        for match in pattern.finditer(text):
+            if any(start < match.end() and match.start() < end for start, end in block_covered):
+                continue
+
+            source = values[" ".join(match.group().split())]
+            block_covered.append((match.start(), match.end()))
+            mentions.append((unit, finding(
+                source["type"], text, match.start(), match.end(), 0.80, "known_value",
+                "KNOWN_VALUE", "context_rule", "known_value_mentions",
+                f"{source['rule_id']} elsewhere"
+            )))
+
+    return mentions
+
+
 def surname_mentions(units, found, parts_of_speech=None):
     """
     A person named in full somewhere in the document ("Caleb A. Whitfield")
@@ -558,23 +695,7 @@ def surname_mentions(units, found, parts_of_speech=None):
     Returns new pairs.
     """
 
-    # Surname -> the people it can stand for, each by their fullest name,
-    # in document order
-    full_names = {}
-
-    for _, item in found:
-        name = " ".join(item["text"].split())
-
-        if item["type"] == "PERSON_NAME" and len(name.split()) >= 2:
-            people = full_names.setdefault(name.split()[-1], [])
-
-            for index, other in enumerate(people):
-                if same_person(name, other):
-                    people[index] = max(other, name, key=len)
-                    break
-            else:
-                people.append(name)
-
+    full_names = people_by_surname(found)
     covered = {}
 
     for unit, item in found:
@@ -826,7 +947,9 @@ def extraction_warnings(document):
 def detect_units(units, nlp_detector=None):
     """
     Run the detectors over scan units (page_number, block, table,
-    context; see collect_units), then look for surname mentions.
+    context; see collect_units), widen names over the person's own first
+    names (widen_names), then look for surname mentions and for values
+    found elsewhere in the document (known_value_mentions).
 
     Each unique (text, context) pair is scanned once, and person names
     are detected in one spaCy batch rather than one call per block.
@@ -855,9 +978,13 @@ def detect_units(units, nlp_detector=None):
         if key not in cache:
             cache[key] = detect_pii(block["text"], nlp, context=context)
 
-        found.extend((unit, item) for item in cache[key])
+        # Copies: a finding may change for one unit (widen_names), and
+        # units with the same text and context share the cached results
+        found.extend((unit, dict(item)) for item in cache[key])
 
+    widen_names(found)
     found.extend(surname_mentions(units, found, getattr(nlp, "parts_of_speech", None)))
+    found.extend(known_value_mentions(units, found))
 
     # Reading order: block by block, then by position in the block
     order = {id(unit): index for index, unit in enumerate(units)}

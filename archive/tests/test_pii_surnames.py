@@ -1,7 +1,7 @@
 import sys
 
-from src.pii.detectors import LocalNLPDetector
-from src.pii.document_scanner import same_person, scan_document, used_as_name
+from src.pii.detectors import LocalNLPDetector, finding
+from src.pii.document_scanner import same_person, scan_document, used_as_name, widen_names
 
 # Surname resolution (document_scanner.surname_mentions): a person named
 # in full somewhere in a document is also found where the document uses
@@ -155,6 +155,13 @@ CASES = [
         {},
     ),
     (
+        "An initial OCR'd with a comma is part of the name",
+        ["Approved by Ifeoma C. Adeyemi on 3 March.",
+         "Escalations: Ifeoma C, Adeyemi"],
+        {("b1", "Ifeoma C. Adeyemi"), ("b2", "Ifeoma C, Adeyemi")},
+        {},
+    ),
+    (
         "An accented surname alone after the full name",
         ["Owner: Łukasz Wiśniewski",
          "The plan was signed off by Wiśniewski in May."],
@@ -247,7 +254,34 @@ for description, texts, expected, triggers in CASES:
 # spaCy sometimes reads a surname after initials as a common noun
 # ("L.-E. Brannstrom"). The initials make it a name all the same; the
 # part of speech is given here, so the rule is tested without spaCy.
+def widened(text, start, end, full_text, full_start, full_end):
+    """
+    The name widen_names makes of a finding text[start:end], with the
+    person named in full elsewhere as full_text[full_start:full_end].
+    """
+
+    full_unit = (1, {"block_id": "b0", "text": full_text}, None, "")
+    unit = (1, {"block_id": "b1", "text": text}, None, "")
+    found = [
+        (full_unit, finding("PERSON_NAME", full_text, full_start, full_end, 0.9, "nlp", "PERSON_NER", "ner", "x")),
+        (unit, finding("PERSON_NAME", text, start, end, 0.85, "nlp", "PERSON_NER", "ner", "x")),
+    ]
+    widen_names(found)
+
+    return found[1][1]["text"]
+
+
 RULES = [
+    (
+        "A name spaCy found without its first name is widened over it",
+        widened("Ifeoma C. Adeyemi (EMP-52817)", 7, 17, "Owner: Ifeoma C. Adeyemi", 7, 24),
+        "Ifeoma C. Adeyemi",
+    ),
+    (
+        "A name is not widened over another person's first name",
+        widened("Cc: Tunde C. Adeyemi", 10, 20, "Owner: Ifeoma C. Adeyemi", 7, 24),
+        "C. Adeyemi",
+    ),
     (
         "Initials before a surname spaCy tagged as a noun: a name",
         used_as_name("J.-E. Sandvik", 6, 13, ["Jan-Erik Sandvik"], {6: "NOUN"}),
