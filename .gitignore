@@ -1,5 +1,14 @@
 # Python
 .venv/
 __pycache__/
-*.pyc 
+*.pyc
 
+# Uploaded files and each run's outputs (main.py) hold the PII being scanned for
+backend/uploads/
+backend/output/*/
+
+
+# Evaluation runs keep the pipeline's outputs, and real documents put in
+# evaluation/corpus/private/ hold real PII
+evaluation/results/
+evaluation/corpus/private/

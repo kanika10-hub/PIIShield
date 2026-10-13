@@ -20,7 +20,7 @@ every piece of personal data in it should be found and removed.
 2. [Setup](#2-setup)
 3. [Running it](#3-running-it)
 4. [Folder map](#4-folder-map)
-5. [The four steps in detail](#5-the-four-steps-in-detail)
+5. [The five steps in detail](#5-the-five-steps-in-detail)
 6. [The output files](#6-the-output-files)
 7. [Tests and helper scripts](#7-tests-and-helper-scripts)
 8. [Common tasks](#8-common-tasks)
@@ -33,38 +33,55 @@ every piece of personal data in it should be found and removed.
 
 ## 1. The big picture
 
-Every document goes through the same **four steps**. Each step writes one JSON
-file into `backend/output/`, and the next step reads that file.
+Every document goes through the same **five steps**. Your file is first copied
+into a folder of its own, `backend/uploads/<job_id>/`. Each step then writes one
+JSON file into the run's own folder, `backend/output/<job_id>/` (`<job>/`
+below), and the next step reads that file.
 
 ```
-   your file (.pdf / .pptx / .docx)
+   your file (.pdf / .pptx / .docx), from any folder, under any name
             │
             ▼
+  ┌──────────────────────┐  code: main.py, src/uploads.py
+  │ 0. CHECK and UPLOAD  │──►  uploads/<job_id>/<file>
+  └──────────────────────┘      A local copy (+ upload.json: origin, SHA-256).
+            │                   Every later step reads this copy
+            ▼
   ┌──────────────────────┐  code: src/extractors/  (+ src/ocr/, src/structure/)
-  │ 1. EXTRACT the text  │──►  output/<name>.json
+  │ 1. EXTRACT the text  │──►  <job>/<name>.json
   └──────────────────────┘      All the text, with its page, position, type
-            │                   (heading, table cell, ...) and how it was read
+            │                   (heading, table cell, ...) and how it was read.
+            │                   Checked against the common format before step 2
             ▼
   ┌──────────────────────┐  code: src/pii/detectors.py, src/pii/document_scanner.py
-  │ 2. SCAN for PII      │──►  output/<name>_pii.json
+  │ 2. SCAN for PII      │──►  <job>/<name>_pii.json
   └──────────────────────┘      One "finding" per PII value: what, where, how found
             │
             ▼
   ┌──────────────────────┐  code: src/pii/redactor.py
-  │ 3. TAG and REDACT    │──►  output/<name>_tagged.json     "[PERSON_NAME: Jane Doe]"  (still has PII)
-  └──────────────────────┘──►  output/<name>_sanitized.json  "[REDACTED: PERSON_NAME]"
+  │ 3. TAG and REDACT    │──►  <job>/<name>_tagged.json      "[PERSON_NAME: Jane Doe]"  (still has PII)
+  └──────────────────────┘──►  <job>/<name>_sanitized.json   "[REDACTED: PERSON_NAME]"
             │
             ▼
   ┌──────────────────────┐  code: src/pii/validator.py
-  │ 4. VALIDATE the copy │──►  output/<name>_validation.json
+  │ 4. VALIDATE the copy │──►  <job>/<name>_validation.json
   └──────────────────────┘      Verdict: PASS / NEEDS_REVIEW / FAIL
             │
             ▼
-   Only a sanitized copy with the verdict PASS may be sent to an LLM.
+  ┌──────────────────────┐  code: src/pii/exposure_report.py
+  │ 5. REPORT exposure   │──►  <job>/<name>_exposure.json    One row per finding: where, type,
+  └──────────────────────┘──►  output/exposure_report.md     detector, confidence, action.
+                          ──►  output/exposure_report.csv    No PII values: shareable
+            │
+            ▼
+   Only a sanitized copy with the verdict PASS may be sent to an LLM,
+   and approved_copy() in src/pii/validator.py is the way to load it.
 ```
 
-`backend/main.py` runs all four steps in a row. Each step can also be run
-on its own (see [Common tasks](#8-common-tasks)).
+`backend/main.py` runs all five steps in a row. Each step can also be run
+on its own (see [Common tasks](#8-common-tasks)). Before step 1 it checks
+the input file itself, and refuses an empty, renamed, password-protected or
+damaged file before anything is uploaded, extracted or deleted.
 
 ### Why is it built this way?
 
@@ -73,7 +90,8 @@ on its own (see [Common tasks](#8-common-tasks)).
   same "common JSON" format, so the PII steps only need to understand one format.
 - **Everything can be traced.** Every piece of text has an ID (`block_id`),
   and every finding records its block and its exact character offsets in that
-  block. You can always tell exactly where a redaction came from.
+  block. You can always tell exactly where a redaction came from. The
+  exposure report (step 5) keeps that trail without the values themselves.
 - **The project checks its own work.** The validator rescans the redacted copy
   and compares it with the original. It does not assume the redaction worked.
 - **Everything runs locally.** Detection uses regular expressions plus a local
@@ -108,6 +126,7 @@ pip install -r requirements.txt
 | `pytesseract` | The Python wrapper that calls Tesseract OCR |
 | `Pillow`, `numpy` | Image handling (cleaning images before OCR, finding PDF tables) |
 | `spacy` + `en_core_web_sm` | Finding **person names** (the small English model is downloaded by the URL in `requirements.txt`) |
+| `Flask` | The web interface (`app.py`), served on this computer only |
 
 ### 2.2 Tesseract OCR
 
@@ -130,38 +149,130 @@ documents. Install it separately:
 **Always run commands from inside `backend/`**, because the code imports
 `src....` and uses relative paths like `input/` and `output/`.
 
+### 3.1 Web interface
+
+```powershell
+cd backend
+python app.py
+```
+
+Then open **http://127.0.0.1:5000** in a browser. (`python app.py 5050` uses
+another port.)
+
+The page, **PII Exposure Scanner**, lets you:
+
+1. **Choose the input** in one of the two boxes under *Input file*, as with
+   `main.py` (drag and drop, or click to choose):
+   - **Document file** (PDF, PPTX or DOCX): a copy is stored, then extracted
+     into common JSON.
+   - **Extracted JSON**: a document already extracted, e.g. the *Extracted
+     JSON* download of an earlier scan. It is loaded and checked against the
+     common format, and extraction is skipped. A PII report, a tagged or
+     sanitized copy, or JSON that breaks the format is refused.
+
+   The file is checked in the browser (type, size up to 100 MB; a file in the
+   wrong box is refused with a pointer to the right one) and again on the
+   server (a document is really that type: not empty, renamed,
+   password-protected or damaged).
+2. **Follow the scan.** *Processing Status* shows each step as it runs: upload,
+   text extraction, extraction check, PII detection, tagging and sanitization,
+   validation, audit report. *PII Findings* shows the real counts by type once
+   detection has finished.
+3. **Review the results** in five tabs:
+   - **Extracted Text:** the document page by page, tables as tables, with
+     every finding highlighted. Select a highlight to open its finding.
+   - **PII Findings:** a searchable table (type, value, confidence, page or
+     slide, location, review status). Select a row to see the rule that found
+     it, what was done with it, and the surrounding text.
+   - **Tagged Text** and **Sanitized Text:** the two copies the redactor wrote,
+     side by side with the original.
+   - **Validation and Audit:** the verdict, whether the copy is **approved or
+     blocked for AI processing** (by `approved_copy()`, the same gate as
+     `main.py`), every check and issue, extraction warnings, redaction errors,
+     and downloads: extracted JSON, findings JSON, sanitized JSON, validation
+     report, and audit report (Markdown and JSON).
+4. **Scan another document**, or **delete this scan's files**.
+
+Each upload runs the same steps as `main.py` (`src/web/jobs.py`), in its own
+`uploads/<job_id>/` and `output/<job_id>/` folders, one scan at a time. The
+server listens on `127.0.0.1` only and the page loads nothing from the
+internet, so documents and findings stay on this computer.
+
+### 3.2 Command line
+
 ```powershell
 cd backend
 python main.py input/risk_policy.pdf
+python main.py "D:\anywhere\Q3 vendor review.docx"    # any PDF, PPTX or DOCX, from any folder
 ```
 
-If you run `python main.py` with no file name, it asks you for one.
+If you run `python main.py` with no file name, it opens a file chooser to pick
+the file. Where no window can be opened (for example over SSH), it asks you to
+type the path instead.
+
+**Each run gets its own folders.** The file is checked, then copied into
+`uploads/<job_id>/` under its original name, with an `upload.json` recording
+where it came from, its size and SHA-256. Every step reads that copy, and writes
+its outputs into `output/<job_id>/`. The job ID is the upload time, the file
+name and a random suffix, e.g. `20261012-143005_risk_policy_3f9a1c`. So no
+file name is fixed or special, and `report.pdf`, `report.docx` and a newer
+`report.pdf` never overwrite each other's outputs. The extractor is chosen from
+the file's type (`EXTRACTORS` in `main.py`), after the check has confirmed the
+content really is that type.
 
 What you will see (shortened):
 
 ```
-[1/4] Extracting risk_policy.pdf ...
-      Common JSON: output\risk_policy.json
-[2/4] Scanning for PII ...
-      PII report:  output\risk_policy_pii.json
+[0/5] Uploading risk_policy.pdf ...
+      Stored copy: uploads\20261012-143005_risk_policy_3f9a1c\risk_policy.pdf
+      Outputs:     output\20261012-143005_risk_policy_3f9a1c
+[1/5] Extracting risk_policy.pdf ...
+      Common JSON: output\20261012-143005_risk_policy_3f9a1c\risk_policy.json
+      Format:      OK (35 pages)
+[2/5] Scanning for PII ...
+      PII report:  output\20261012-143005_risk_policy_3f9a1c\risk_policy_pii.json
       Findings:    ... {'PERSON_NAME': ..., 'EMAIL': ..., 'PHONE': ...}
-[3/4] Tagging and redacting ...
-      Sanitized:   output\risk_policy_sanitized.json
-[4/4] Validating the sanitized copy ...
+[3/5] Tagging and redacting ...
+      Sanitized:   output\20261012-143005_risk_policy_3f9a1c\risk_policy_sanitized.json
+[4/5] Validating the sanitized copy ...
+[5/5] Reporting the PII exposure ...
+      Exposure:    output\20261012-143005_risk_policy_3f9a1c\risk_policy_exposure.json  (no PII values: shareable)
+      Findings:    ..., redacted ..., not redacted 0, flagged by validation ...
+      Combined:    output\exposure_report.md, output\exposure_report.csv (3 documents)
 Verdict: NEEDS_REVIEW
   PASS          provenance    0 issues
   ...
+Blocked: do not send output\20261012-143005_risk_policy_3f9a1c\risk_policy_sanitized.json to an LLM (the validation verdict is NEEDS_REVIEW: ...).
+A person must review the issues first.
 ```
+
+(The paths are printed in full; they are shortened here.)
+
+The last line is the **release decision**: `Approved` only for a PASS copy,
+otherwise `Blocked` with the reason.
 
 **Exit code:** `0` = PASS, `1` = FAIL or an error, `2` = NEEDS_REVIEW. This makes
 the script easy to call from other scripts.
 
+**When it stops early.** A bad input file is refused with one line saying why,
+and nothing is uploaded or changed. If the extracted JSON doesn't follow the common format,
+the run stops before the scan: the `_pii.json` is written with status `failed`,
+and no tagged or sanitized copy is made.
+
 **Re-running without re-extracting.** OCR on the 35-page PDF is slow. If you
 only changed detection, redaction or validation code, pass the already extracted
-JSON instead. Step 1 is then skipped:
+JSON instead. Step 1 is then skipped, and the outputs are written next to it:
 
 ```powershell
-python main.py output/risk_policy.json
+python main.py output/<job_id>/risk_policy.json
+```
+
+**Re-running a stored upload.** To extract the same file again (for example
+after changing an extractor), pass its stored copy. It is not copied again: the
+run reuses its job folder and replaces that job's outputs.
+
+```powershell
+python main.py uploads/<job_id>/risk_policy.pdf
 ```
 
 ### The three sample documents
@@ -195,13 +306,24 @@ optivcase2/
 ├── .venv/                        Local Python virtual environment (not project code)
 │
 └── backend/                      ★ ALL the code lives here
-    ├── main.py                   ★ ENTRY POINT: runs the 4-step pipeline on one file
-    ├── input/                    The files to process (the 3 samples)
-    ├── output/                   Everything the pipeline writes (generated files)
+    ├── main.py                   ★ ENTRY POINT: runs the 5-step pipeline on one file
+    ├── app.py                    ★ WEB INTERFACE: python app.py, then http://127.0.0.1:5000
+    ├── static/                   The page: index.html, app.css, app.js (no external libraries)
+    ├── input/                    The 3 sample files (any other file can be given from anywhere)
+    ├── uploads/                  A copy of every file given to main.py: uploads/<job_id>/ (not committed)
+    ├── output/                   Everything the pipeline writes: one folder per run, output/<job_id>/
+    │                             (not committed), plus the combined exposure report
     │
     ├── src/
+    │   ├── uploads.py            STEP 0: stores each input file in a job folder of its own
+    │   │
+    │   ├── web/                  Used by app.py
+    │   │   ├── jobs.py               Runs main.py's steps for each upload, in the background
+    │   │   └── views.py              Turns the output files into what the page shows
+    │   │
     │   ├── models/
-    │   │   └── document.py       The common JSON data model (Document → Page → Block)
+    │   │   ├── document.py       The common JSON data model (Document → Page → Block)
+    │   │   └── schema.py         Checks a document follows that format (run before the scan)
     │   │
     │   ├── extractors/           STEP 1: one extractor per file type
     │   │   ├── pdf_extractor.py      PDF: text layer if there is one, OCR if the page is scanned
@@ -219,11 +341,12 @@ optivcase2/
     │   │   ├── pdf_tables.py         Rebuilds tables on scanned pages (OCR only returns words)
     │   │   └── heading_classifier.py Labels OCR paragraphs as headings ("1. Purpose", "Appendix A")
     │   │
-    │   └── pii/                  STEPS 2-4
+    │   └── pii/                  STEPS 2-5
     │       ├── detectors.py          What counts as PII: regexes, label rules, spaCy names
     │       ├── document_scanner.py   STEP 2: runs the detectors over a whole document
     │       ├── redactor.py           STEP 3: writes the tagged and sanitized copies
-    │       └── validator.py          STEP 4: checks the sanitized copy and gives the verdict
+    │       ├── validator.py          STEP 4: checks the sanitized copy and gives the verdict
+    │       └── exposure_report.py    STEP 5: what was found, where, and what was done (no values)
     │
     └── tests/                    Test scripts, single-step scripts and inspection scripts
                                   (see section 7: they are NOT all tests)
@@ -231,7 +354,24 @@ optivcase2/
 
 ---
 
-## 5. The four steps in detail
+## 5. The five steps in detail
+
+### Step 0: Check and upload (`main.py`, `src/uploads.py`)
+
+**Goal:** accept any input file, and make the run independent of where the
+file is and what it is called.
+
+- **Check.** `input_problem()` in `main.py` refuses a file that is missing,
+  empty, of an unsupported type, or not what its extension says (a PDF renamed
+  to `.docx`, a password-protected or damaged Office file). Nothing has been
+  copied or deleted yet.
+- **Upload.** `store_upload()` copies the file into a new folder,
+  `uploads/<job_id>/`, under its original name (the extractors take
+  `document_id` and `file_name` from it), and writes `upload.json` beside it
+  with the SHA-256 of the copy. All outputs go to `output/<job_id>/`.
+- **Routing.** `EXTRACTORS` in `main.py` maps each supported extension to its
+  extractor. Adding a file type means adding an extractor there and its
+  content check in `input_problem()`.
 
 ### Step 1: Extract (`src/extractors/`, `src/ocr/`, `src/structure/`)
 
@@ -283,6 +423,13 @@ How each format is handled:
 
 File **metadata** (author, last modified by, ...) is also kept, because it often names people.
 
+**Format check.** Before the scan, `main.py` checks the extracted JSON with
+`format_problems()` in [`src/models/schema.py`](backend/src/models/schema.py):
+the required keys, block types, `location` and `source` on every text block,
+table and cell fields, OCR word lists, unique `block_id`s and so on. The scan,
+redaction and validation all rely on this structure, so a document that breaks
+it goes no further. The same check is used by `tests/test_extractor_format`.
+
 ### Step 2: Scan for PII (`src/pii/detectors.py`, `src/pii/document_scanner.py`)
 
 **`detectors.py`** decides *what is PII* in a single piece of text. It has three
@@ -319,7 +466,19 @@ adds the document-level logic:
   and passes them as *context*. Under a "Passport Number" header, the same
   value becomes a finding.
 - **Surname mentions.** If "Jane A. Doe" is found anywhere, a later "approved
-  by Doe" is also reported, at lower confidence.
+  by Doe" is also reported, at lower confidence (`surname_mentions()`). The
+  finding's `context_trigger` names the person it can stand for. Rules that
+  keep this precise:
+  - **Shared surnames.** If two different people share a surname, both are
+    named: `"Anna Park; James Park"`. The same person written two ways ("T. Doe"
+    and "Tom Doe") counts as one person, named in full.
+  - **Ordinary words.** A surname that is also a word only counts where spaCy
+    reads it as a proper noun: not "Read" in "Read the policy", and not "Green"
+    as a RAG status.
+  - **Other names.** A surname inside another capitalised name is skipped:
+    "Ford Motor Company", "the Treasure Hunt".
+  - **Initials and titles.** The person's own initials, first name or a title
+    before the surname always make it count: "CA Doe", "L.-E. Doe", "Dr. Doe".
 - **Speed.** Each unique text is scanned once, and spaCy runs in batches over
   the whole document.
 - **Extraction warnings.** The report lists anything that could hide PII from
@@ -353,7 +512,7 @@ Rules worth knowing:
 
 ### Step 4: Validate (`src/pii/validator.py`)
 
-Does not trust step 3: it **checks** the sanitized copy with seven checks:
+Does not trust step 3: it **checks** the sanitized copy with eight checks:
 
 | Check | Question it answers |
 |---|---|
@@ -361,6 +520,7 @@ Does not trust step 3: it **checks** the sanitized copy with seven checks:
 | `report` | Do the report's offsets really point at its values in the original? |
 | `replacements` | Was every finding replaced, and is its value gone from its block? |
 | `ocr` | Do OCR words over a redacted value hold only tags? Is any OCR text too unreliable to trust, or any image unread? |
+| `extraction` | Did the extractor miss anything? Its declared limitations, embedded objects it never opened, and pages with little or no text all need a person to check the original |
 | `rescan` | Does running the scanner again on the sanitized copy find **nothing**? |
 | `known_values` | Is any PII value found anywhere in the document, or part of a name, still present **anywhere** in the copy? |
 | `structure` | Are the pages, blocks, tables and reading order unchanged, with differences **only** where tags were inserted? |
@@ -373,11 +533,60 @@ The validation report never contains the PII values themselves. It only refers
 to `block_id`s and `finding_id`s, so it is safe to share. To see an actual value,
 look up the `finding_id` in the `_pii.json`.
 
+**The release gate.** `approved_copy(json_path)` in `validator.py` is **the only
+way code should load a sanitized copy to send to an LLM**. It returns the
+document only if its validation report says PASS **and** the file is byte for
+byte the one that was validated: the report records its SHA-256 fingerprint.
+Otherwise it raises `NotApproved` with the reason. So a FAIL, an unresolved
+NEEDS_REVIEW, a copy edited after validation, or a copy never validated are all
+blocked. `main.py` uses the same gate for its final `Approved`/`Blocked` line.
+
+### Step 5: Report the exposure (`src/pii/exposure_report.py`)
+
+Shows **what was found, where, how, and what was done with it**, without
+repeating any PII value. This is the report to share with whoever owns the
+documents. One row per finding:
+
+| Document | Location | PII Type | Detector | Confidence | Action |
+|---|---|---|---|---|---|
+| risk_policy.pdf | Page 2, table row 4, column 2 | PERSON_NAME | NER | 0.90 | Redacted |
+| risk_policy.pdf | Page 2, table row 4, column 2 | EMAIL | Regex | 0.99 | Redacted |
+| risk_policy.pdf | Page 2, table row 4, column 2 | EMPLOYEE_ID | Rule | 0.95 | Redacted |
+
+- **Location** is the page (PDF), slide (PPTX) or part (DOCX `Body`, `Header`,
+  ...), plus the table cell, picture, speaker notes, comment author or file
+  property the value was in.
+- **Detector** is `NER` (spaCy), `Regex`, or `Rule` (labels, table headers,
+  surname mentions). The exact `rule_id` is in its own column.
+- **Action** is `Redacted`, or why not (reviewed as a false positive, redaction
+  failed). The **Validation** column adds the worst validator issue naming the
+  finding: e.g. `FAIL` when the same value is still elsewhere in the copy.
+- **Traceability.** Each row keeps its `finding_id` (the value is in the
+  `_pii.json` under it), `block_id`, page, table cell and character offsets, and
+  the report records the scan, redaction and validation runs it was built from.
+  It refuses to build from files of different runs.
+- **Exposure summary.** Per document: findings by type, detector, action and
+  page; the verdict and whether the copy may go to an LLM; every validator issue
+  (the residual exposure); and the scan's coverage gaps (unread images, low OCR
+  confidence, ...).
+- **No values.** Fields that can hold a value are left out (`text`, `context`,
+  `context_trigger`, `matched_pattern`). Before anything is written, every string
+  in the report is searched for every value in the PII report, and a match
+  stops the report.
+
+After each document, `exposure_report.md` and `exposure_report.csv` are rebuilt
+over **every** `<name>_exposure.json` in `backend/output/` and its subfolders,
+so they always cover all processed documents.
+
 ---
 
 ## 6. The output files
 
-For an input called `<name>`, `backend/output/` gets:
+Step 0 stores your file as `backend/uploads/<job_id>/<file>`, with
+`upload.json` beside it (job ID, original name and path, size, SHA-256, upload
+time). The copy **has PII**, like the original.
+
+For an input called `<name>`, the run's folder `backend/output/<job_id>/` gets:
 
 | File | Written by | Contains | Has PII? |
 |---|---|---|---|
@@ -385,7 +594,9 @@ For an input called `<name>`, `backend/output/` gets:
 | `<name>_pii.json` | Step 2 | The PII report: `summary`, `tables`, `findings` | **Yes** (each finding's `text`) |
 | `<name>_tagged.json` | Step 3 | The document with values labelled in place | **Yes** |
 | `<name>_sanitized.json` | Step 3 | The document with values replaced by tags | Should not. Trust it only with a PASS verdict |
-| `<name>_validation.json` | Step 4 | The verdict, each check's result, and issues | No (designed to be shareable) |
+| `<name>_validation.json` | Step 4 | The verdict, each check's result, issues, and the fingerprint of the sanitized copy it approved | No (designed to be shareable) |
+| `<name>_exposure.json` | Step 5 | One row per finding (location, type, detector, confidence, action), the exposure summary and the validator's issues | No (checked before it is written) |
+| `exposure_report.md`, `exposure_report.csv` (in `backend/output/` itself) | Step 5 | The same rows and summaries for every processed document, combined | No |
 
 A single finding in `<name>_pii.json`:
 
@@ -421,7 +632,7 @@ how the pieces connect.
 
 ## 7. Tests and helper scripts
 
-`backend/tests/` holds **three kinds of scripts**. None of them use pytest:
+`backend/tests/` holds **four kinds of scripts**. None of them use pytest:
 each is a plain script you run from `backend/`:
 
 ```powershell
@@ -438,11 +649,14 @@ These build their own small documents in memory (or in a temp folder), print
 | Script | Checks |
 |---|---|
 | `test_pii_accuracy` | Detectors find what they should and ignore look-alikes (real text from the samples) |
-| `test_pii_names` | Person-name rules, labelled names, surname mentions |
+| `test_pii_names` | Person-name rules, labelled names, names like O'Brien and McDonald |
+| `test_pii_surnames` | Surname-only mentions: full names, initials, shared surnames, ordinary words, overlapping findings |
 | `test_pii_table_context` | Table title/header detection and context-based findings |
 | `test_redactor` | Redaction rules (offsets, overlaps, word lists, false positives, ...) |
-| `test_validator` | Each validation check and verdict, including tampered copies |
+| `test_validator` | Each validation check and verdict, including tampered copies, extraction gaps, and the release gate |
+| `test_exposure_report` | Exposure rows, locations, actions, the no-values check, refusal of mismatched runs, the combined CSV/Markdown |
 | `test_extractor_format --samples` | All three extractors produce valid common JSON for generated sample files (drop `--samples` to also check `input/`) |
+| `test_uploads` | Uploaded copies keep their name and bytes, same-named files get separate job folders, job IDs are safe folder names, stored copies are recognised when given again |
 
 ### 7.2 Scripts that REWRITE files in `output/`
 
@@ -472,6 +686,36 @@ Use these to look inside a file while debugging: `validate_pdf`, `validate_pptx`
 `try_scanner.py` is a scratchpad: edit the table cells in it and run it to see
 what the scanner finds.
 
+### 7.4 Detector accuracy evaluation
+
+```powershell
+python -m tests.evaluate_detector
+```
+
+Unlike the other scripts, this one also runs as a file, from any folder:
+`python tests/evaluate_detector.py`, or the editor's ▶ Run button.
+
+Instead of counting findings, this measures **how accurate detection is**. It
+compares the detector against hand-labelled examples in
+`tests/data/pii_ground_truth.json` and prints **precision** (how many findings
+were right), **recall** (how much of the PII was found) and **F1**. The results
+are broken down by PII type, source format (PDF/PPTX/DOCX) and extraction
+method (native/OCR). The metrics are saved to `output/detector_errors.json`
+with two lists to work from: `false_negatives` (labelled PII that was missed:
+improve recall) and `false_positives` (findings that are not PII, with the rule
+that reported each: improve precision).
+
+- **Two splits.** Examples marked `"split": "dev"` are for tuning rules. Never
+  tune a rule to fix an `"eval"` example. The eval split only tells you whether
+  a change also helps on text it wasn't fitted to.
+- **Adding examples.** The field list and labelling rules are in the docstring
+  at the top of `tests/evaluate_detector.py`. Use made-up values that keep the
+  *shape* of real text (OCR errors, line breaks, table headers), not values
+  copied from real documents. The script stops with a list of mistakes if a
+  label isn't in its text, an id is used twice, or a type is unknown.
+- **Scope.** This tests detection on text snippets. It can't tell you whether
+  the extractors missed text before it ever reached the detector.
+
 ---
 
 ## 8. Common tasks
@@ -480,19 +724,39 @@ what the scanner finds.
 
 ```powershell
 python main.py C:\path\to\some_file.docx
+python main.py                              # or pick it in a file chooser
 ```
 
-Outputs are named after the file name without its extension. `report.pdf` and
-`report.docx` would collide, so `main.py` refuses to overwrite and tells you to
-rename one.
+The file is copied to `uploads/<job_id>/` and its outputs go to
+`output/<job_id>/`; the job ID is printed at the start. Files with the same
+name, or the same file given twice, get separate job folders.
+
+**Clean up a run.** Delete its `uploads/<job_id>/` and `output/<job_id>/`
+folders. Then rebuild the combined exposure report so it no longer lists them:
+`python -c "from src.pii.exposure_report import write_combined; write_combined('output')"`.
+
+**Send a document's text to an LLM**
+
+```python
+from src.pii.validator import NotApproved, approved_copy
+
+try:
+    document = approved_copy("output/<job_id>/risk_policy.json")   # the sanitized copy
+except NotApproved as reason:
+    ...   # do not send anything: the reason says why
+```
+
+Never open `<name>_sanitized.json` directly for this: only `approved_copy()`
+checks that it passed validation and hasn't changed since.
 
 **Review findings and mark false positives**
 
-1. Open `output/<name>_pii.json` and set `"review_status": "false_positive"` on the wrong findings.
-2. Re-run **only** redaction and validation, so your edits are kept:
+1. Open `output/<job_id>/<name>_pii.json` and set `"review_status": "false_positive"` on the wrong findings.
+2. Re-run **only** redaction, validation and the exposure report, so your edits are kept:
    ```powershell
-   python -m src.pii.redactor output/<name>.json
-   python -m src.pii.validator output/<name>.json
+   python -m src.pii.redactor output/<job_id>/<name>.json
+   python -m src.pii.validator output/<job_id>/<name>.json
+   python -m src.pii.exposure_report output/<job_id>/<name>.json
    ```
    (Don't use `main.py` here: it rescans and replaces the `_pii.json`, losing your edits.)
 
@@ -501,7 +765,9 @@ rename one.
 1. In `src/pii/detectors.py`, add a regex and a loop in `regex_detector()` (or
    `custom_rule_detector()` for label-based rules) that calls `finding(...)`.
 2. If the type uses labels, add them to `LABEL_PATTERNS` at the top of the file.
-3. Add "must find" and "must not find" cases to `tests/test_pii_accuracy.py`.
+3. Add "must find" and "must not find" cases to `tests/test_pii_accuracy.py`,
+   and labelled examples to `tests/data/pii_ground_truth.json` (both splits).
+   Then run `python -m tests.evaluate_detector`.
 4. Bump `SCANNER_VERSION` in `src/pii/document_scanner.py`, so reports made by old and new code can be told apart.
 
 **Tune a threshold**
@@ -518,9 +784,20 @@ in `detectors.py`, and the table-detection constants in `structure/pdf_tables.py
 - **Run from `backend/`.** Running from anywhere else fails with
   `ModuleNotFoundError: No module named 'src'` or "file not found".
 - **Tesseract is a separate install** (see [Setup](#22-tesseract-ocr)).
-- **Treat `output/` as sensitive.** Everything except `_sanitized.json` (with a
-  PASS verdict) and `_validation.json` contains PII. The PDF and PPTX samples say
-  their data is synthetic. The DOCX does not, so treat its names as real.
+- **Treat `uploads/` and `output/` as sensitive.** `uploads/` holds a copy of
+  every file you processed. In `output/`, everything except `_sanitized.json`
+  (with a PASS verdict), `_validation.json`, `_exposure.json` and
+  `exposure_report.*` contains PII. `.gitignore` keeps `uploads/` and the
+  per-run `output/<job_id>/` folders out of git; delete a run's two folders when
+  you no longer need them (see [Common tasks](#8-common-tasks)). The PDF and PPTX
+  samples say their data is synthetic. The DOCX does not, so treat its names as real.
+- **The web interface keeps its scans in memory.** After `app.py` restarts, the
+  page no longer lists earlier scans, but their `uploads/<job_id>/` and
+  `output/<job_id>/` folders stay until you delete them (the page's **Delete
+  this scan's files** button does it for the current scan). Scans run one at a
+  time; a second upload waits for the first. The findings table, extracted
+  and tagged text show PII values on purpose, for the person reviewing them:
+  the server listens on this computer only.
 - **Pictures are only redacted in the JSON.** The sanitized JSON hides OCR'd
   text, but the original image files still show it. `image.word_boxes` in the
   PII report gives the pixel positions, so the images can be blacked out later.
@@ -528,8 +805,8 @@ in `detectors.py`, and the table-detection constants in `structure/pdf_tables.py
   `children` are not scanned separately, because they repeat their parent's
   text. If you add a new block type with children, check `collect_units()` in
   `document_scanner.py`.
-- **Versions.** `SCHEMA_VERSION`/`SCANNER_VERSION` (scanner), `REDACTOR_VERSION`
-  and `VALIDATOR_VERSION` are written into every output. Bump the right one when
+- **Versions.** `SCHEMA_VERSION`/`SCANNER_VERSION` (scanner), `REDACTOR_VERSION`,
+  `VALIDATOR_VERSION` and `EXPOSURE_VERSION` are written into every output. Bump the right one when
   you change rules.
 - **Not a git repository** (yet). There is no history to fall back on, so copy
   `output/` before experiments if you want to compare.
@@ -556,7 +833,7 @@ them**, and you can ignore them when learning the codebase:
 
 ## 11. Suggested reading order
 
-1. **`backend/main.py`** (≈250 lines). The docstring and `main()` show the whole flow.
+1. **`backend/main.py`** (≈440 lines). The docstring and `main()` show the whole flow.
 2. **`backend/src/models/document.py`**. The docstring describes the data format everything uses.
 3. **Run the pipeline once**, then open the output files side by side (see the tip in [section 6](#6-the-output-files)).
 4. **`src/pii/detectors.py`**. What counts as PII and why.
@@ -581,6 +858,7 @@ them**, and you can ignore them when learning the codebase:
 | **Tagged copy** | The document with PII labelled in place. For human review; still contains PII |
 | **Sanitized copy** | The document with PII replaced by `[REDACTED: TYPE]`. The only thing that may go to an LLM |
 | **Verdict** | The validator's overall result: PASS, NEEDS_REVIEW or FAIL |
+| **Release gate** | `approved_copy()`: hands out a sanitized copy only if it passed validation and is unchanged since; otherwise raises `NotApproved` |
 | **Provenance** | Proof that the report and the sanitized copy were made from this exact document and report |
 | **spaCy / NER** | The local language model used to recognise person names (Named Entity Recognition) |
 | **Tesseract** | The open-source OCR engine that reads text from images |

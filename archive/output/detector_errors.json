@@ -1,0 +1,367 @@
+{
+  "evaluated_at": "2026-10-12T07:53:39+00:00",
+  "scanner_version": "1.1.1",
+  "dataset": "tests/data/pii_ground_truth.json",
+  "examples": {
+    "dev": 50,
+    "eval": 30
+  },
+  "metrics": {
+    "dev": {
+      "overall": {
+        "all": {
+          "tp": 45,
+          "fp": 1,
+          "fn": 4,
+          "precision": 0.978,
+          "recall": 0.918,
+          "f1": 0.947
+        }
+      },
+      "type": {
+        "EMAIL": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.833,
+          "recall": 1.0,
+          "f1": 0.909
+        },
+        "EMPLOYEE_ID": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "INDIAN_PAN": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "IP_ADDRESS": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "PASSPORT_NUMBER": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "PERSON_NAME": {
+          "tp": 19,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1.0,
+          "recall": 0.826,
+          "f1": 0.905
+        },
+        "PHONE": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "US_SSN": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "source": {
+        "DOCX": {
+          "tp": 11,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1.0,
+          "recall": 0.786,
+          "f1": 0.88
+        },
+        "PDF": {
+          "tp": 25,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1.0,
+          "recall": 0.962,
+          "f1": 0.981
+        },
+        "PPTX": {
+          "tp": 9,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.947
+        }
+      },
+      "extraction": {
+        "native": {
+          "tp": 19,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.95,
+          "recall": 1.0,
+          "f1": 0.974
+        },
+        "ocr": {
+          "tp": 26,
+          "fp": 0,
+          "fn": 4,
+          "precision": 1.0,
+          "recall": 0.867,
+          "f1": 0.929
+        }
+      }
+    },
+    "eval": {
+      "overall": {
+        "all": {
+          "tp": 28,
+          "fp": 2,
+          "fn": 2,
+          "precision": 0.933,
+          "recall": 0.933,
+          "f1": 0.933
+        }
+      },
+      "type": {
+        "EMAIL": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "EMPLOYEE_ID": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "INDIAN_PAN": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "IP_ADDRESS": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "PASSPORT_NUMBER": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "PERSON_NAME": {
+          "tp": 12,
+          "fp": 2,
+          "fn": 2,
+          "precision": 0.857,
+          "recall": 0.857,
+          "f1": 0.857
+        },
+        "PHONE": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "US_SSN": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "source": {
+        "DOCX": {
+          "tp": 9,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.9,
+          "recall": 0.9,
+          "f1": 0.9
+        },
+        "PDF": {
+          "tp": 13,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.929,
+          "recall": 1.0,
+          "f1": 0.963
+        },
+        "PPTX": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1.0,
+          "recall": 0.857,
+          "f1": 0.923
+        }
+      },
+      "extraction": {
+        "native": {
+          "tp": 13,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.929,
+          "recall": 0.929,
+          "f1": 0.929
+        },
+        "ocr": {
+          "tp": 15,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.938,
+          "recall": 0.938,
+          "f1": 0.938
+        }
+      }
+    }
+  },
+  "false_negatives": [
+    {
+      "id": "DEV-004",
+      "split": "dev",
+      "source_type": "PDF",
+      "extraction": "ocr",
+      "type": "PERSON_NAME",
+      "value": "Helen Adeyemi",
+      "example_text": "Helen Adeyemi, Group Head of Compliance (EMP-52817) h.adeyemi@example.com | +1 (212) 555-0162 | mobile +1 (917) 555-0197",
+      "context": "",
+      "note": "Contact line from a policy's roles section."
+    },
+    {
+      "id": "DEV-021",
+      "split": "dev",
+      "source_type": "DOCX",
+      "extraction": "ocr",
+      "type": "PERSON_NAME",
+      "value": "Maren Holt",
+      "example_text": "Engineering 212 Maren Holt 03/14/2024 10:41 PM",
+      "context": "",
+      "note": "Screenshot of a user list: group, member count, date and time are not PII."
+    },
+    {
+      "id": "DEV-023",
+      "split": "dev",
+      "source_type": "DOCX",
+      "extraction": "ocr",
+      "type": "PERSON_NAME",
+      "value": "JR Hollamd",
+      "example_text": "Selected users\na JR Hollamd Teresa Quinn x",
+      "context": "",
+      "note": "OCR misspelling ('Hollamd' for 'Holland'), and two names on one line that only spacing separated in the image."
+    },
+    {
+      "id": "DEV-023",
+      "split": "dev",
+      "source_type": "DOCX",
+      "extraction": "ocr",
+      "type": "PERSON_NAME",
+      "value": "Teresa Quinn",
+      "example_text": "Selected users\na JR Hollamd Teresa Quinn x",
+      "context": "",
+      "note": "OCR misspelling ('Hollamd' for 'Holland'), and two names on one line that only spacing separated in the image."
+    },
+    {
+      "id": "EVAL-012",
+      "split": "eval",
+      "source_type": "DOCX",
+      "extraction": "ocr",
+      "type": "PERSON_NAME",
+      "value": "Victor Lang",
+      "example_text": "Admins 2 Victor Lang 11/02/2024 09:05 AM",
+      "context": "",
+      "note": null
+    },
+    {
+      "id": "EVAL-017",
+      "split": "eval",
+      "source_type": "PPTX",
+      "extraction": "native",
+      "type": "PERSON_NAME",
+      "value": "M. Okoro",
+      "example_text": "M. Okoro\nCFO",
+      "context": "",
+      "note": null
+    }
+  ],
+  "false_positives": [
+    {
+      "id": "DEV-039",
+      "split": "dev",
+      "source_type": "PPTX",
+      "extraction": "native",
+      "type": "EMAIL",
+      "value": "grc-team@example.org",
+      "rule_id": "EMAIL_REGEX",
+      "confidence": 0.99,
+      "context_trigger": null,
+      "example_text": "Send evidence to grc-team@example.org",
+      "context": "",
+      "note": "A team mailbox names no person. Policy choice: label it EMAIL instead if every address must be redacted."
+    },
+    {
+      "id": "EVAL-019",
+      "split": "eval",
+      "source_type": "DOCX",
+      "extraction": "native",
+      "type": "PERSON_NAME",
+      "value": "Artificial Intelligence",
+      "rule_id": "PERSON_LABELLED",
+      "confidence": 0.8,
+      "context_trigger": "Officer",
+      "example_text": "Data Protection Officer approval is required for Artificial Intelligence use cases.",
+      "context": "",
+      "note": null
+    },
+    {
+      "id": "EVAL-024",
+      "split": "eval",
+      "source_type": "PDF",
+      "extraction": "ocr",
+      "type": "PERSON_NAME",
+      "value": "Service Desk",
+      "rule_id": "PERSON_LABELLED",
+      "confidence": 0.8,
+      "context_trigger": "Contact",
+      "example_text": "Contact the Service Desk on extension 4471",
+      "context": "",
+      "note": null
+    }
+  ]
+}

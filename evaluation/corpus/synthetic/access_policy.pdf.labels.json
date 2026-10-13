@@ -1,0 +1,97 @@
+{
+  "file": "access_policy.pdf",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "PDF with a text layer: paragraphs, a phone number the layout breaks over two lines, a ruled table, an image with text and the file properties.",
+  "pii": [
+    {
+      "text": "Elena Varga",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "elena.varga@example.com",
+      "type": "EMAIL",
+      "where": "body"
+    },
+    {
+      "text": "+1 (646) 555-0119",
+      "type": "PHONE",
+      "where": "body"
+    },
+    {
+      "text": "198.51.100.23",
+      "type": "IP_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "+44 7700\n900218",
+      "type": "PHONE",
+      "where": "body (line break)"
+    },
+    {
+      "text": "Yusuf Demir",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "Tomasz Nowak",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "EMP-61234",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "+1 (415) 555-0172",
+      "type": "PHONE",
+      "where": "table"
+    },
+    {
+      "text": "Ines Duarte",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "EMP-61290",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "+1 (415) 555-0193",
+      "type": "PHONE",
+      "where": "table"
+    },
+    {
+      "text": "Rafael Costa",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "EMP-61377",
+      "type": "EMPLOYEE_ID",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "Mateo Alvarez",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "GRP-POL-007",
+      "why": "policy reference"
+    },
+    {
+      "text": "ISS-2026-0233",
+      "why": "ticket reference"
+    },
+    {
+      "text": "10.0.19041",
+      "why": "version number"
+    }
+  ]
+}

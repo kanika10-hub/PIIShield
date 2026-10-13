@@ -25,14 +25,14 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.pii.detectors import detect_pii, finding
+from src.pii.detectors import NAME_WORD, detect_pii, finding
 
 
 # Version of the report format, and of the detection code. Change
 # SCANNER_VERSION whenever detection rules change, so reports made by
 # different code can be told apart.
 SCHEMA_VERSION = "1.2"
-SCANNER_VERSION = "1.0.0"
+SCANNER_VERSION = "1.1.1"
 
 # OCR'd blocks below this Tesseract confidence (0-100) are reported
 LOW_OCR_CONFIDENCE = 60
@@ -48,6 +48,16 @@ MAX_LABEL_CHARS = 60
 MAX_LABEL_WORDS = 8
 MAX_LABEL_DIGITS = 4        # allows years as column headers
 MAX_HEADER_ROWS = 3
+
+# Titles that may stand before a surname: "Dr. Haddad", "Ms Okafor"
+HONORIFICS = {"Mr", "Mrs", "Ms", "Mx", "Miss", "Dr", "Prof", "Sir", "Dame"}
+
+# The word just before or just after a value, on the same line
+WORD_BEFORE = re.compile(r"(\S+)[ \t]+$")
+WORD_AFTER = re.compile(r"^[ \t]+(\S+)")
+
+# Initials written as one word: "C.", "CA", "F.L.", "L.-E."
+INITIALS = re.compile(r"(?:[A-Z]\.?-?){1,3}")
 
 
 def clean(text):
@@ -360,7 +370,9 @@ class DocumentNLP:
 
     def __init__(self, detector, texts):
         self.detector = detector
-        self.spans = dict(zip(texts, detector.entity_spans(texts)))
+        analysed = dict(zip(texts, detector.analyse(texts)))
+        self.spans = {text: spans for text, (spans, _) in analysed.items()}
+        self.parts_of_speech = {text: tags for text, (_, tags) in analysed.items()}
         self.common_words = detector.common_words(texts)
 
     def detect(self, text, context=""):
@@ -371,23 +383,138 @@ class DocumentNLP:
         )
 
 
-def surname_mentions(units, found):
+def initials_of(name):
+    """
+    The initials of every name but the surname: "CA" for "Caleb A.
+    Whitfield" and "C.A. Whitfield", "LE" for "Lars-Erik Brannstrom".
+    """
+
+    return "".join(
+        re.sub(r"[.-]", "", part) if INITIALS.fullmatch(part)
+        else "".join(piece[0] for piece in part.split("-") if piece)
+        for part in name.split()[:-1]
+    )
+
+
+def same_person(first, second):
+    """
+    True if two full names with the same surname can name one person:
+    the initials of one begin the other's, and the first names agree
+    where both are written out ("Tobias Lindqvist", "T. Lindqvist").
+    "Anna Park" and "Alan Park" are two people.
+    """
+
+    a, b = initials_of(first), initials_of(second)
+    given = [name.split()[0] for name in (first, second)]
+
+    return (
+        (a.startswith(b) or b.startswith(a))
+        and (given[0] == given[1] or any(INITIALS.fullmatch(name) for name in given))
+    )
+
+
+def introduces(word, names):
+    """
+    True if word, just before a surname, belongs with it: a title
+    ("Dr.", "Ms"), the person's first name or initials ("Caleb", "CA",
+    "C.", "L.-E."), or any single initial ("J Smith": a name, if perhaps
+    another person's).
+    """
+
+    if word.rstrip(".") in HONORIFICS:
+        return True
+
+    letters = re.sub(r"[.-]", "", word)
+
+    if len(letters) == 1 and letters.isupper():
+        return True
+
+    return any(
+        word in name.split()[:-1]
+        or (letters.isalpha() and letters.isupper() and initials_of(name).startswith(letters))
+        for name in names
+    )
+
+
+def used_as_name(text, start, end, names, tags):
+    """
+    True if the surname at text[start:end] stands for one of the full
+    names here, and is not one word of another capitalised name ("Ford
+    Motor Company", "the Treasure Hunt") or an ordinary word ("Read the
+    policy"). tags: spaCy's part of speech for the text, by word offset.
+    """
+
+    before = WORD_BEFORE.search(text[:start])
+    after = WORD_AFTER.match(text[end:])
+
+    # A title, first name or initials before it: "Dr. Haddad", "CA Whitfield"
+    if before and introduces(before.group(1), names):
+        return True
+
+    name_parts = {part for name in names for part in name.split()}
+
+    if after:
+        word = after.group(1).rstrip(".,;:)]")
+
+        if NAME_WORD.fullmatch(word) and word not in name_parts:
+            return False
+
+    if before:
+        word = before.group(1)
+
+        # Punctuation ends a phrase: "Approved: Haddad"
+        if word[0].isupper() and not word.endswith((".", ",", ";", ":", ")", "]")):
+            # A word that starts a sentence is capitalised for that reason
+            # alone: "Contact Hunt"
+            earlier = text[:before.start()].rstrip(" \t")
+
+            if earlier and not earlier.endswith(("\n", ".", "!", "?", ":", ";")):
+                return False
+
+    return tags.get(start, "PROPN") == "PROPN"
+
+
+def surname_mentions(units, found, parts_of_speech=None):
     """
     A person named in full somewhere in the document ("Caleb A. Whitfield")
     is often named by surname alone elsewhere ("owned by Whitfield").
     Those mentions identify the person too, so they are reported, at a
-    lower confidence.
+    lower confidence. The people it can stand for are the reason
+    (context_trigger): "Anna Park; James Park" if two people share it.
+    Each person is named in their fullest form: "T. Lindqvist" and
+    "Tobias Lindqvist" are one person (see same_person).
 
-    found: (unit, finding) pairs so far. Returns new pairs.
+    A surname that is also an ordinary word is only a name where it is
+    used as one (see used_as_name). Skipped:
+
+        a word of another capitalised name: "Ford Motor Company"
+        a word spaCy reads as something other than a proper noun:
+        "Read" in "Read the policy", "Green" as a RAG status
+
+    unless the person's title, first name or initials stand before it.
+
+    found: (unit, finding) pairs so far. parts_of_speech: spaCy's part
+    of speech for each text, by word offset (DocumentNLP.parts_of_speech);
+    without it, every mention outside another name is reported.
+    Returns new pairs.
     """
 
-    # Surname -> the first full name it came from, which is reported as
-    # the reason the surname alone is PII
+    # Surname -> the people it can stand for, each by their fullest name,
+    # in document order
     full_names = {}
 
     for _, item in found:
-        if item["type"] == "PERSON_NAME" and len(item["text"].split()) >= 2:
-            full_names.setdefault(item["text"].split()[-1], item["text"])
+        name = " ".join(item["text"].split())
+
+        if item["type"] == "PERSON_NAME" and len(name.split()) >= 2:
+            people = full_names.setdefault(name.split()[-1], [])
+
+            for index, other in enumerate(people):
+                if same_person(name, other):
+                    people[index] = max(other, name, key=len)
+                    break
+            else:
+                people.append(name)
 
     covered = {}
 
@@ -408,16 +535,25 @@ def surname_mentions(units, found):
     mentions = []
 
     for unit in units:
+        text = unit[1]["text"]
         block_covered = covered.get(id(unit[1]), [])
+        tags = (parts_of_speech or {}).get(text, {})
 
-        for match in pattern.finditer(unit[1]["text"]):
-            if not any(start < match.end() and match.start() < end for start, end in block_covered):
-                mentions.append((unit, finding(
-                    "PERSON_NAME", unit[1]["text"], match.start(), match.end(),
-                    0.75, "surname",
-                    "PERSON_SURNAME", "context_rule", "surname_mentions",
-                    full_names[match.group()]
-                )))
+        for match in pattern.finditer(text):
+            names = full_names[match.group()]
+
+            if (
+                any(start < match.end() and match.start() < end for start, end in block_covered)
+                or not used_as_name(text, match.start(), match.end(), names, tags)
+            ):
+                continue
+
+            mentions.append((unit, finding(
+                "PERSON_NAME", text, match.start(), match.end(),
+                0.75, "surname",
+                "PERSON_SURNAME", "context_rule", "surname_mentions",
+                "; ".join(names)
+            )))
 
     return mentions
 
@@ -557,6 +693,90 @@ def extraction_warnings(document):
     return warnings
 
 
+def detect_units(units, nlp_detector=None):
+    """
+    Run the detectors over scan units (page_number, block, table,
+    context; see collect_units), then look for surname mentions.
+
+    Each unique (text, context) pair is scanned once, and person names
+    are detected in one spaCy batch rather than one call per block.
+
+    Returns (found, unique_scans): (unit, finding) pairs in reading
+    order, and the number of unique (text, context) pairs scanned.
+    """
+
+    unique_texts = list(dict.fromkeys(block["text"] for _, block, _, _ in units))
+
+    nlp = None
+
+    if nlp_detector is not None:
+        if hasattr(nlp_detector, "analyse"):
+            nlp = DocumentNLP(nlp_detector, unique_texts)
+        else:
+            nlp = nlp_detector
+
+    cache = {}
+    found = []
+
+    for unit in units:
+        _, block, _, context = unit
+        key = (block["text"], context)
+
+        if key not in cache:
+            cache[key] = detect_pii(block["text"], nlp, context=context)
+
+        found.extend((unit, item) for item in cache[key])
+
+    found.extend(surname_mentions(units, found, getattr(nlp, "parts_of_speech", None)))
+
+    # Reading order: block by block, then by position in the block
+    order = {id(unit): index for index, unit in enumerate(units)}
+    found.sort(key=lambda pair: (
+        order[id(pair[0])], pair[1]["start"], pair[1]["end"], pair[1]["type"]
+    ))
+
+    # Redaction replaces text[start:end], so the offsets must point at
+    # exactly the reported value
+    for (_, block, _, _), item in found:
+        if block["text"][item["start"]:item["end"]] != item["text"]:
+            raise ValueError(
+                f"{item['type']} offsets {item['start']}-{item['end']} do not "
+                f"match the text of block {block['block_id']}"
+            )
+
+    return found, len(cache)
+
+
+def scan_texts(texts, nlp_detector=None):
+    """
+    Detect PII in text found outside an extracted document: the parts of
+    a file the extractors do not read (slide masters, custom XML, alt
+    text, link targets, PDF annotations...). The original-format
+    redactor and validator (src/original_format) use it.
+
+    texts: (key, text, context) triples, each key unique. context labels
+    the text as a table header labels a cell ("Company Phone",
+    "author"), so a bare value under a label is recognised.
+
+    Returns the findings (detector fields: type, text, start, end, ...)
+    by key, for the keys with any.
+    """
+
+    units = [
+        (None, property_block(key, context, text), None, context)
+        for key, text, context in texts
+        if clean(text)
+    ]
+
+    found, _ = detect_units(units, nlp_detector)
+    by_key = {}
+
+    for (_, block, _, _), item in found:
+        by_key.setdefault(block["block_id"], []).append(item)
+
+    return by_key
+
+
 def scan_document(document, nlp_detector=None):
     """
     Detect PII in every text block and table cell of a document.
@@ -596,45 +816,7 @@ def scan_document(document, nlp_detector=None):
         document = document.to_dict()
 
     units, tables = collect_units(document)
-
-    unique_texts = list(dict.fromkeys(block["text"] for _, block, _, _ in units))
-
-    nlp = None
-
-    if nlp_detector is not None:
-        if hasattr(nlp_detector, "entity_spans"):
-            nlp = DocumentNLP(nlp_detector, unique_texts)
-        else:
-            nlp = nlp_detector
-
-    cache = {}
-    found = []
-
-    for unit in units:
-        _, block, _, context = unit
-        key = (block["text"], context)
-
-        if key not in cache:
-            cache[key] = detect_pii(block["text"], nlp, context=context)
-
-        found.extend((unit, item) for item in cache[key])
-
-    found.extend(surname_mentions(units, found))
-
-    # Reading order: block by block, then by position in the block
-    order = {id(unit): index for index, unit in enumerate(units)}
-    found.sort(key=lambda pair: (
-        order[id(pair[0])], pair[1]["start"], pair[1]["end"], pair[1]["type"]
-    ))
-
-    # Redaction replaces text[start:end], so the offsets must point at
-    # exactly the reported value
-    for (_, block, _, _), item in found:
-        if block["text"][item["start"]:item["end"]] != item["text"]:
-            raise ValueError(
-                f"{item['type']} offsets {item['start']}-{item['end']} do not "
-                f"match the text of block {block['block_id']}"
-            )
+    found, unique_scans = detect_units(units, nlp_detector)
 
     # item holds the detector's fields, type to context_trigger
     findings = [
@@ -665,7 +847,7 @@ def scan_document(document, nlp_detector=None):
         ),
         "summary": {
             "blocks_scanned": len(units),
-            "unique_texts_scanned": len(cache),
+            "unique_texts_scanned": unique_scans,
             "total_findings": len(findings),
             "by_type": dict(Counter(item["type"] for item in findings)),
             "pages_scanned": len(document["pages"]),

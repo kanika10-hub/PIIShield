@@ -2,10 +2,15 @@
 import copy
 import json
 import sys
+import tempfile
+from pathlib import Path
 
 from src.pii.detectors import LocalNLPDetector
 from src.pii.redactor import redact_document
-from src.pii.validator import FAIL, NEEDS_REVIEW, PASS, only_tags_differ, validate_document
+from src.pii.validator import (
+    FAIL, NEEDS_REVIEW, PASS, NotApproved, approved_copy, only_tags_differ,
+    validate_document, validate_file
+)
 
 # Validation of a sanitized copy before it may go to an LLM. Each case
 # redacts a hand-built document with the real redactor, sometimes
@@ -337,6 +342,100 @@ def case_check_that_cannot_run_fails():
     ], validation
 
 
+def case_extraction_gaps_need_review():
+    original = document(
+        block("b1", CONTACT),
+        block("b2", "", "embedded_object", metadata={"location": "body"}),
+    )
+    original["metadata"]["limitations"] = ["Text inside SmartArt was not read"]
+    original["pages"][0]["metadata"]["low_text"] = True
+    pii_report = report(finding(1, "b1", "PERSON_NAME", CONTACT, "Jane Doe"),
+                        finding(2, "b1", "EMAIL", CONTACT, "jane@example.com"))
+    validation = validate_document(original, pii_report, redact(original, pii_report), nlp)
+    extraction = next(check for check in validation["checks"] if check["name"] == "extraction")
+
+    return [
+        validation["verdict"] == NEEDS_REVIEW,
+        statuses(validation) == {"extraction": NEEDS_REVIEW},
+        extraction["issues_total"] == 3,
+    ], validation
+
+
+def case_surname_left_in_another_name_needs_review():
+    # The scan reported "Doe" where it names the person, not inside "Doe Run"
+    owner = "Owner: Jane Doe"
+    approval = "Approved by Doe in May."
+    other = "Samples went to the Doe Run Company."
+    original = document(block("b1", owner), block("b2", approval), block("b3", other))
+    pii_report = report(
+        finding(1, "b1", "PERSON_NAME", owner, "Jane Doe"),
+        finding(2, "b2", "PERSON_NAME", approval, "Doe"),
+    )
+    validation = validate_document(original, pii_report, redact(original, pii_report), nlp)
+
+    return [
+        validation["verdict"] == NEEDS_REVIEW,
+        statuses(validation) == {"known_values": NEEDS_REVIEW},
+    ], validation
+
+
+def saved_case(folder, pii_report_findings):
+    """
+    Write a document, its PII report and its sanitized copy as the
+    pipeline names them, validate them, and return the document's path.
+    """
+
+    original = document(block("b1", CONTACT))
+    pii_report = report(*pii_report_findings)
+    json_path = folder / "validator_test.json"
+
+    for path, data in (
+        (json_path, original),
+        (folder / "validator_test_pii.json", pii_report),
+        (folder / "validator_test_sanitized.json", redact(original, pii_report)),
+    ):
+        path.write_text(json.dumps(data), encoding="utf-8")
+
+    validate_file(json_path, nlp_detector=nlp)
+
+    return json_path
+
+
+def released(json_path):
+    try:
+        approved_copy(json_path)
+        return True
+    except NotApproved:
+        return False
+
+
+def case_release_gate():
+    with tempfile.TemporaryDirectory() as folder:
+        folder = Path(folder)
+        both = [finding(1, "b1", "PERSON_NAME", CONTACT, "Jane Doe"),
+                finding(2, "b1", "EMAIL", CONTACT, "jane@example.com")]
+
+        json_path = saved_case(folder, both)
+        passed = released(json_path)
+        text = first_block(approved_copy(json_path))["text"] if passed else None
+
+        # Edited after it was validated
+        sanitized_path = folder / "validator_test_sanitized.json"
+        sanitized_path.write_text(sanitized_path.read_text(encoding="utf-8") + " ", encoding="utf-8")
+        edited = released(json_path)
+
+        # The email was never found: the rescan fails the copy
+        failed = released(saved_case(folder, both[:1]))
+
+        (folder / "validator_test_validation.json").unlink()
+        unvalidated = released(json_path)
+
+    return [
+        passed, text is not None and "Jane" not in text,
+        not edited, not failed, not unvalidated,
+    ], None
+
+
 def case_only_tags_differ():
     tag = "[REDACTED: PERSON_NAME]"
 
@@ -372,6 +471,9 @@ CASES = [
     ("Without spaCy, the rescan needs review", case_without_nlp_needs_review),
     ("A check that cannot run fails; the others still run", case_check_that_cannot_run_fails),
     ("Text may differ only where a tag stands", case_only_tags_differ),
+    ("Limitations, embedded objects and empty pages need review", case_extraction_gaps_need_review),
+    ("A surname left inside another name needs review, not FAIL", case_surname_left_in_another_name_needs_review),
+    ("Only a validated, unchanged PASS copy is released for an LLM", case_release_gate),
 ]
 
 failures = 0

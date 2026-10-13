@@ -1,0 +1,8 @@
+{
+  "file": "empty.pdf",
+  "synthetic": true,
+  "expected_outcome": "rejected",
+  "description": "An empty file.",
+  "pii": [],
+  "not_pii": []
+}

@@ -1,0 +1,153 @@
+{
+  "file": "hr_onboarding.docx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "New-starter record: PII in body text, a table whose headers give the context, the header and footer, a comment's author, an image and the file properties, and a person later named by surname alone.",
+  "pii": [
+    {
+      "text": "Marta Kowalczyk",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Kenji Arakawa",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Laura Okonjo",
+      "type": "PERSON_NAME",
+      "where": "header"
+    },
+    {
+      "text": "samuel.brandt@example.org",
+      "type": "EMAIL",
+      "where": "footer"
+    },
+    {
+      "text": "Grace Holloway",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "Omar Siddiqui",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "EMP-48213",
+      "type": "EMPLOYEE_ID",
+      "where": "body"
+    },
+    {
+      "text": "Ingrid Solberg",
+      "type": "PERSON_NAME",
+      "where": "comment"
+    },
+    {
+      "text": "grace.holloway@example.com",
+      "type": "EMAIL",
+      "where": "body"
+    },
+    {
+      "text": "+44 7700 900481",
+      "type": "PHONE",
+      "where": "body"
+    },
+    {
+      "text": "078-05-1120",
+      "type": "US_SSN",
+      "where": "body"
+    },
+    {
+      "text": "K8203917",
+      "type": "PASSPORT_NUMBER",
+      "where": "body"
+    },
+    {
+      "text": "Holloway",
+      "type": "PERSON_NAME",
+      "where": "surname mention"
+    },
+    {
+      "text": "Nadia Rahman",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "nadia.rahman@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "020 7946 0123",
+      "type": "PHONE",
+      "where": "table"
+    },
+    {
+      "text": "EMP-55102",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "Felix Moreau",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "f.moreau@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "+33 1 99 00 12 34",
+      "type": "PHONE",
+      "where": "table"
+    },
+    {
+      "text": "CFG-7731",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "Daniel Osei",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "+44 7700 900733",
+      "type": "PHONE",
+      "where": "image (OCR)"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "New Starter Record",
+      "why": "document title"
+    },
+    {
+      "text": "Risk Analytics",
+      "why": "team name"
+    },
+    {
+      "text": "London",
+      "why": "city"
+    },
+    {
+      "text": "2026-03-02",
+      "why": "date"
+    },
+    {
+      "text": "ISS-2026-0417",
+      "why": "ticket reference"
+    },
+    {
+      "text": "4500018832",
+      "why": "cost centre"
+    },
+    {
+      "text": "HR-POL-014",
+      "why": "policy reference"
+    }
+  ]
+}

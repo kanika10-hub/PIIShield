@@ -1,0 +1,111 @@
+{
+  "file": "vendor_review.pptx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "Vendor review deck: PII in the title slide, bullets, a table whose header says 'Passport No.', speaker notes, an image and the file properties.",
+  "pii": [
+    {
+      "text": "Aisha Bello",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Lucas Ferreira",
+      "type": "PERSON_NAME",
+      "where": "title slide"
+    },
+    {
+      "text": "Hannah Becker",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "hannah.becker@example.net",
+      "type": "EMAIL",
+      "where": "bullet"
+    },
+    {
+      "text": "+1 (212) 555-0186",
+      "type": "PHONE",
+      "where": "bullet"
+    },
+    {
+      "text": "192.0.2.44",
+      "type": "IP_ADDRESS",
+      "where": "bullet"
+    },
+    {
+      "text": "Arun Pillai",
+      "type": "PERSON_NAME",
+      "where": "speaker notes"
+    },
+    {
+      "text": "ABCPK1234F",
+      "type": "INDIAN_PAN",
+      "where": "speaker notes"
+    },
+    {
+      "text": "Victor Nakamura",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "TN4471902",
+      "type": "PASSPORT_NUMBER",
+      "where": "table"
+    },
+    {
+      "text": "Sofia Ricci",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "YB2208815",
+      "type": "PASSPORT_NUMBER",
+      "where": "table"
+    },
+    {
+      "text": "Chloe Dubois",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "Vendor Risk Review",
+      "why": "document title"
+    },
+    {
+      "text": "Vendor Management Office",
+      "why": "team name"
+    },
+    {
+      "text": "VND-2026-0042",
+      "why": "contract reference"
+    },
+    {
+      "text": "99.9%",
+      "why": "service level"
+    },
+    {
+      "text": "Northwind Traders",
+      "why": "company"
+    },
+    {
+      "text": "Rotterdam",
+      "why": "city"
+    },
+    {
+      "text": "Site lead",
+      "why": "job title"
+    },
+    {
+      "text": "Auditor",
+      "why": "job title"
+    },
+    {
+      "text": "2026-08-19",
+      "why": "date"
+    }
+  ]
+}

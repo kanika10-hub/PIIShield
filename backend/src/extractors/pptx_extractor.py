@@ -6,6 +6,9 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE, PP_PLACEHOLDER
 from pptx.util import Emu
 
 from src.extractors.common import combined_method, office_properties, page_text_metadata, text_method
+from src.extractors.text_sources import (
+    ImageSource, PartsSource, Sources, TextSource, pptx_paragraph_pieces
+)
 from src.models.document import (
     ExtractedDocument,
     DocumentPage,
@@ -21,6 +24,11 @@ DRAWING_NS = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
 # SmartArt text: each node's paragraphs in the diagram data part
 DIAGRAM_PARAGRAPHS = etree.XPath(".//a:p", namespaces=DRAWING_NS)
 PARAGRAPH_TEXT = etree.XPath(".//a:t/text()", namespaces=DRAWING_NS)
+
+# The drawing PowerPoint shows for a SmartArt diagram: a copy of its text,
+# named by relId in the data part and related from the slide
+DIAGRAM_DRAWING_IDS = etree.XPath(".//*[local-name()='dataModelExt']/@relId")
+BLIPS = etree.XPath(".//a:blip", namespaces=DRAWING_NS)
 
 # Placeholders whose paragraphs are bullets unless they say otherwise
 BULLET_PLACEHOLDERS = (PP_PLACEHOLDER.BODY, PP_PLACEHOLDER.OBJECT)
@@ -149,7 +157,7 @@ def is_bullet(paragraph, shape):
     return shape.is_placeholder and shape.placeholder_format.type in BULLET_PLACEHOLDERS
 
 
-def text_blocks(shape, base_id, block_type, transform, location):
+def text_blocks(shape, base_id, block_type, transform, location, sources=Sources()):
     """
     One block per non-empty paragraph of a shape's text frame.
     """
@@ -157,7 +165,9 @@ def text_blocks(shape, base_id, block_type, transform, location):
     blocks = []
 
     for number, paragraph in enumerate(shape.text_frame.paragraphs, start=1):
-        text = clean_text(paragraph.text).strip()
+        # clean_text(paragraph.text).strip(), piece by piece
+        source = TextSource([paragraph._p], pptx_paragraph_pieces)
+        text = source.text()
 
         if not text:
             continue
@@ -168,6 +178,8 @@ def text_blocks(shape, base_id, block_type, transform, location):
 
         if bullet:
             metadata["level"] = paragraph.level
+
+        sources.add(f"{base_id}_p{number}", source)
 
         blocks.append(DocumentBlock(
             block_id=f"{base_id}_p{number}",
@@ -180,7 +192,7 @@ def text_blocks(shape, base_id, block_type, transform, location):
     return blocks
 
 
-def table_block(shape, table_id, transform):
+def table_block(shape, table_id, transform, sources=Sources()):
     """
     A table block with one table_cell per cell. A merged cell is one
     cell at its top-left position, with the rows and columns it spans.
@@ -195,10 +207,18 @@ def table_block(shape, table_id, transform):
             if cell.is_spanned:
                 continue
 
+            # clean_text(cell.text), read without adding a text body to an empty cell
+            body = cell._tc.txBody
+            source = TextSource(
+                body.p_lst if body is not None else [], pptx_paragraph_pieces, strip=False
+            )
+            block_id = f"{table_id}_cell_{row_index}_{column_index}"
+            sources.add(block_id, source)
+
             cells.append(DocumentBlock(
-                block_id=f"{table_id}_cell_{row_index}_{column_index}",
+                block_id=block_id,
                 block_type="table_cell",
-                text=clean_text(cell.text),
+                text=source.text(),
                 order=len(cells) + 1,
                 metadata={
                     "source": "native",
@@ -223,7 +243,7 @@ def table_block(shape, table_id, transform):
     )
 
 
-def chart_block(shape, block_id, transform):
+def chart_block(shape, block_id, transform, sources=Sources()):
     """
     A chart's visible text: title, axis titles, series names and
     category labels. The values come from an embedded workbook that is
@@ -232,6 +252,12 @@ def chart_block(shape, block_id, transform):
 
     chart = shape.chart
     lines = []
+
+    # The chart part, and the parts it holds (the embedded workbook)
+    chart_part = shape.chart_part
+    sources.add(block_id, PartsSource([chart_part] + [
+        rel.target_part for rel in chart_part.rels.values() if not rel.is_external
+    ]))
 
     if chart.has_title and chart.chart_title.has_text_frame:
         lines.append(chart.chart_title.text_frame.text)
@@ -259,7 +285,7 @@ def chart_block(shape, block_id, transform):
     )
 
 
-def diagram_block(shape, block_id, transform):
+def diagram_block(shape, block_id, transform, sources=Sources()):
     """
     A SmartArt diagram's text, from its data part: one line per paragraph.
     """
@@ -268,12 +294,21 @@ def diagram_block(shape, block_id, transform):
     text = ""
 
     if relationship_ids:
-        data = etree.fromstring(shape.part.related_part(relationship_ids[0]).blob)
+        data_part = shape.part.related_part(relationship_ids[0])
+        data = etree.fromstring(data_part.blob)
         text = "\n".join(
             line
             for line in ("".join(PARAGRAPH_TEXT(paragraph)).strip() for paragraph in DIAGRAM_PARAGRAPHS(data))
             if line
         )
+
+        # The data, and the drawing PowerPoint shows: both hold the text
+        drawing_parts = [
+            shape.part.related_part(drawing_id)
+            for drawing_id in DIAGRAM_DRAWING_IDS(data)
+            if drawing_id in shape.part.rels
+        ]
+        sources.add(block_id, PartsSource([data_part, *drawing_parts]))
 
     return DocumentBlock(
         block_id=block_id,
@@ -284,7 +319,7 @@ def diagram_block(shape, block_id, transform):
     )
 
 
-def picture_block(shape, block_id, transform, reader):
+def picture_block(shape, block_id, transform, reader, sources=Sources()):
     """
     An image_ocr block with the picture's OCR text (word boxes in image
     pixels; bounding_box is the picture on the slide), or an image
@@ -298,6 +333,7 @@ def picture_block(shape, block_id, transform, reader):
         part = shape.part.related_part(shape._element.blip_rId)
         metadata["image_part"] = str(part.partname)
         image_bytes = part.blob
+        sources.add(block_id, ImageSource(part, BLIPS(shape._element)))
     except (KeyError, AttributeError, ValueError):
         pass                                # a linked picture: not in the file
 
@@ -310,7 +346,8 @@ def picture_block(shape, block_id, transform, reader):
     )
 
 
-def shape_blocks(shapes, slide_number, title_shape, reader, transform=SLIDE_TRANSFORM, prefix=""):
+def shape_blocks(shapes, slide_number, title_shape, reader, transform=SLIDE_TRANSFORM, prefix="",
+                 sources=Sources()):
     """
     Blocks for a slide's shapes, including shapes inside groups.
     Block IDs number the shapes in order; a shape inside a group is
@@ -326,7 +363,7 @@ def shape_blocks(shapes, slide_number, title_shape, reader, transform=SLIDE_TRAN
         if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
             blocks.extend(shape_blocks(
                 shape.shapes, slide_number, title_shape, reader,
-                group_transform(shape, transform), f"{path}_"
+                group_transform(shape, transform), f"{path}_", sources
             ))
 
         elif shape.has_text_frame and shape.text_frame.text.strip():
@@ -334,17 +371,18 @@ def shape_blocks(shapes, slide_number, title_shape, reader, transform=SLIDE_TRAN
                 shape, f"slide{slide_number}_text{path}",
                 "heading" if shape == title_shape else "paragraph",
                 transform,
-                "text_box" if shape.shape_type == MSO_SHAPE_TYPE.TEXT_BOX else "body"
+                "text_box" if shape.shape_type == MSO_SHAPE_TYPE.TEXT_BOX else "body",
+                sources
             ))
 
         elif getattr(shape, "has_table", False) and shape.has_table:
-            blocks.append(table_block(shape, f"slide{slide_number}_table{path}", transform))
+            blocks.append(table_block(shape, f"slide{slide_number}_table{path}", transform, sources))
 
         elif getattr(shape, "has_chart", False) and shape.has_chart:
-            blocks.append(chart_block(shape, f"slide{slide_number}_chart{path}", transform))
+            blocks.append(chart_block(shape, f"slide{slide_number}_chart{path}", transform, sources))
 
         elif uri and uri[0] == DIAGRAM_URI:
-            blocks.append(diagram_block(shape, f"slide{slide_number}_diagram{path}", transform))
+            blocks.append(diagram_block(shape, f"slide{slide_number}_diagram{path}", transform, sources))
 
         elif shape.shape_type in (MSO_SHAPE_TYPE.EMBEDDED_OLE_OBJECT, MSO_SHAPE_TYPE.LINKED_OLE_OBJECT):
             blocks.append(DocumentBlock(
@@ -357,12 +395,14 @@ def shape_blocks(shapes, slide_number, title_shape, reader, transform=SLIDE_TRAN
         elif shape.shape_type == MSO_SHAPE_TYPE.PICTURE or (
             shape.is_placeholder and hasattr(shape, "image")
         ):
-            blocks.append(picture_block(shape, f"slide{slide_number}_image{path}", transform, reader))
+            blocks.append(picture_block(
+                shape, f"slide{slide_number}_image{path}", transform, reader, sources
+            ))
 
     return blocks
 
 
-def notes_blocks(slide, slide_number):
+def notes_blocks(slide, slide_number, sources=Sources()):
     """
     The slide's speaker notes, one block per paragraph.
     """
@@ -373,15 +413,44 @@ def notes_blocks(slide, slide_number):
     blocks = []
 
     for number, paragraph in enumerate(slide.notes_slide.notes_text_frame.paragraphs, start=1):
-        text = clean_text(paragraph.text).strip()
+        source = TextSource([paragraph._p], pptx_paragraph_pieces)
+        text = source.text()
 
         if text:
+            sources.add(f"slide{slide_number}_notes_p{number}", source)
+
             blocks.append(DocumentBlock(
                 block_id=f"slide{slide_number}_notes_p{number}",
                 block_type="paragraph",
                 text=text,
                 metadata={"source": "native", "location": "notes", "paragraph": number}
             ))
+
+    return blocks
+
+
+def slide_blocks(slide, slide_number, reader, sources=Sources()):
+    """
+    The blocks of one slide, in reading order, then its speaker notes.
+    The original-format redactor calls this in locate mode, with a
+    SourceMap.
+    """
+
+    blocks = shape_blocks(
+        slide.shapes, slide_number, find_title_shape(slide), reader, sources=sources
+    )
+
+    # Reading order: top to bottom, then left to right. Paragraphs of
+    # one shape share its position and keep their order.
+    blocks.sort(key=lambda block: (
+        (round(block.bounding_box.y), block.bounding_box.x)
+        if block.bounding_box else (float("inf"), 0)
+    ))
+
+    blocks.extend(notes_blocks(slide, slide_number, sources))
+
+    for order, block in enumerate(blocks, start=1):
+        block.order = order
 
     return blocks
 
@@ -396,19 +465,7 @@ def extract_pptx(file_path: str) -> ExtractedDocument:
 
     for slide_number, slide in enumerate(presentation.slides, start=1):
 
-        blocks = shape_blocks(slide.shapes, slide_number, find_title_shape(slide), reader)
-
-        # Reading order: top to bottom, then left to right. Paragraphs of
-        # one shape share its position and keep their order.
-        blocks.sort(key=lambda block: (
-            (round(block.bounding_box.y), block.bounding_box.x)
-            if block.bounding_box else (float("inf"), 0)
-        ))
-
-        blocks.extend(notes_blocks(slide, slide_number))
-
-        for order, block in enumerate(blocks, start=1):
-            block.order = order
+        blocks = slide_blocks(slide, slide_number, reader)
 
         pages.append(
             DocumentPage(

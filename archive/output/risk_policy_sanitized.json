@@ -375424,8 +375424,8 @@
     "redaction": {
       "variant": "sanitized",
       "redactor_version": "1.0.0",
-      "redaction_timestamp": "2026-10-11T17:04:21+00:00",
-      "report_scan_timestamp": "2026-10-11T17:04:21+00:00",
+      "redaction_timestamp": "2026-10-11T21:09:56+00:00",
+      "report_scan_timestamp": "2026-10-11T21:09:55+00:00",
       "report_status": "completed_with_warnings",
       "status": "completed",
       "summary": {

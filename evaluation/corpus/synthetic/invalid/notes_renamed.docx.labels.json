@@ -1,0 +1,8 @@
+{
+  "file": "notes_renamed.docx",
+  "synthetic": true,
+  "expected_outcome": "rejected",
+  "description": "Text renamed to .docx.",
+  "pii": [],
+  "not_pii": []
+}

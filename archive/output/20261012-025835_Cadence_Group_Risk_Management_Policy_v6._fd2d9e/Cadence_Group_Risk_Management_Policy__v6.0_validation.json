@@ -1,15 +1,16 @@
 {
-  "validator_version": "1.0.0",
-  "validated_at": "2026-10-11T17:04:30+00:00",
-  "document_id": "risk_policy",
-  "file_name": "risk_policy.pdf",
-  "report_scan_timestamp": "2026-10-11T17:04:21+00:00",
+  "validator_version": "1.1.0",
+  "validated_at": "2026-10-11T21:30:25+00:00",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "report_scan_timestamp": "2026-10-11T21:30:15+00:00",
   "verdict": "FAIL",
   "summary": {
     "provenance": "PASS",
     "report": "PASS",
     "replacements": "PASS",
     "ocr": "NEEDS_REVIEW",
+    "extraction": "PASS",
     "rescan": "PASS",
     "known_values": "FAIL",
     "structure": "PASS"
@@ -192,6 +193,15 @@
       ]
     },
     {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "35 pages checked"
+      ],
+      "issues": []
+    },
+    {
       "name": "rescan",
       "status": "PASS",
       "issues_total": 0,
@@ -343,8 +353,9 @@
     }
   ],
   "files": {
-    "document": "D:\\optiv\\optivcase2\\backend\\output\\risk_policy.json",
-    "report": "D:\\optiv\\optivcase2\\backend\\output\\risk_policy_pii.json",
-    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\risk_policy_sanitized.json"
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261012-025835_Cadence_Group_Risk_Management_Policy_v6._fd2d9e\\Cadence_Group_Risk_Management_Policy__v6.0.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261012-025835_Cadence_Group_Risk_Management_Policy_v6._fd2d9e\\Cadence_Group_Risk_Management_Policy__v6.0_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261012-025835_Cadence_Group_Risk_Management_Policy_v6._fd2d9e\\Cadence_Group_Risk_Management_Policy__v6.0_sanitized.json",
+    "sanitized_sha256": "af1763b83ef2bd2a27f416bcc4c60e82447434fe8645d8cfd9629fb2b92d136f"
   }
 }

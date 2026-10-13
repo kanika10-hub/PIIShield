@@ -397,9 +397,9 @@ def custom_rule_detector(text, context=""):
 # into name-shaped parts and checked before they are reported.
 
 # Name parts: initials ("M.", "DK"), capitalised words ("Achebe",
-# "Okonkwo-Bell", "O'Brien") and lowercase particles ("van", "de")
+# "Okonkwo-Bell", "O'Brien", "McDonald") and lowercase particles ("van", "de")
 NAME_INITIAL = re.compile(r"(?:[A-Z]\.){1,2}|[A-Z]{1,2}")
-NAME_WORD = re.compile(r"[A-Z][a-z]+(?:[-'’][A-Z]?[a-z]+)*")
+NAME_WORD = re.compile(r"(?:[A-Z]['’]|Ma?c)?[A-Z][a-z]+(?:[-'’][A-Z]?[a-z]+)*")
 NAME_PARTICLES = {
     "van", "von", "de", "da", "del", "della", "di", "du",
     "bin", "ibn", "al", "el", "le", "la"
@@ -567,19 +567,31 @@ class LocalNLPDetector:
                 f"spaCy model '{model_name}' is unavailable: {exc}"
             )
 
-    def entity_spans(self, texts, batch_size=64):
+    def analyse(self, texts, batch_size=64):
         """
-        spaCy PERSON spans for each text. spaCy processes the texts in
+        For each text: spaCy's PERSON spans, and the part of speech of
+        each word by its start offset ("PROPN" for a proper noun, "VERB"
+        for "Read" in "Read the policy"). spaCy processes the texts in
         batches, which is much faster than one call per text.
         """
 
         if self.nlp is None:
-            return [[] for _ in texts]
+            return [([], {}) for _ in texts]
 
         return [
-            [(entity.start_char, entity.end_char) for entity in doc.ents if entity.label_ == "PERSON"]
+            (
+                [(entity.start_char, entity.end_char) for entity in doc.ents if entity.label_ == "PERSON"],
+                {token.idx: token.pos_ for token in doc}
+            )
             for doc in self.nlp.pipe(texts, batch_size=batch_size)
         ]
+
+    def entity_spans(self, texts, batch_size=64):
+        """
+        spaCy PERSON spans for each text.
+        """
+
+        return [spans for spans, _ in self.analyse(texts, batch_size)]
 
     def common_words(self, texts):
         return self.stop_words | lowercase_words(texts)

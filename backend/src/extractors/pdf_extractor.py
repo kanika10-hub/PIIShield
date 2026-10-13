@@ -416,12 +416,16 @@ def pdf_properties(pdf):
     })
 
 
-def extract_pdf(file_path):
+def extract_pdf(file_path, ocr_pages=()):
     """
     Extract a PDF into the common format. Each page is read from its
     text layer when it has one, and OCR'd when it is a scanned page.
     Tables on scanned pages are rebuilt afterwards by
     src/structure/pdf_tables.reconstruct_tables.
+
+    ocr_pages: page numbers to OCR even though they have a text layer.
+    A redacted scanned page has one, made of its redaction placeholders;
+    the original-format validator reads such pages again by OCR.
     """
 
     pdf = pymupdf.open(file_path)
@@ -433,7 +437,7 @@ def extract_pdf(file_path):
         page_number = page_index + 1
         native_chars = len("".join(page.get_text().split()))
 
-        if native_chars >= NATIVE_TEXT_MIN_CHARS:
+        if native_chars >= NATIVE_TEXT_MIN_CHARS and page_number not in ocr_pages:
             blocks = native_page_blocks(pdf, page, page_number, reader)
             method = text_method(blocks)
         else:

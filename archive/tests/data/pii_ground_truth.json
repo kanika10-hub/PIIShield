@@ -1,0 +1,834 @@
+[
+  {
+    "id": "DEV-001",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Contact Jane Smith at jane@example.com",
+    "expected": [
+      {"text": "Jane Smith", "type": "PERSON_NAME"},
+      {"text": "jane@example.com", "type": "EMAIL"}
+    ]
+  },
+  {
+    "id": "DEV-002",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Meeting date: 04-29-2026",
+    "expected": [],
+    "note": "A date is not a phone number."
+  },
+  {
+    "id": "DEV-003",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Employee ID: EMP-1042",
+    "expected": [
+      {"text": "EMP-1042", "type": "EMPLOYEE_ID"}
+    ],
+    "note": "EMP followed by 4-10 digits: the format the EMPLOYEE_ID rules expect."
+  },
+  {
+    "id": "DEV-004",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Helen Adeyemi, Group Head of Compliance (EMP-52817) h.adeyemi@example.com | +1 (212) 555-0162 | mobile +1 (917) 555-0197",
+    "expected": [
+      {"text": "Helen Adeyemi", "type": "PERSON_NAME"},
+      {"text": "EMP-52817", "type": "EMPLOYEE_ID"},
+      {"text": "h.adeyemi@example.com", "type": "EMAIL"},
+      {"text": "+1 (212) 555-0162", "type": "PHONE"},
+      {"text": "+1 (917) 555-0197", "type": "PHONE"}
+    ],
+    "note": "Contact line from a policy's roles section."
+  },
+  {
+    "id": "DEV-005",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "r.lindgren@example.com, +1 (212)\n555-0134 and +49 69\n5555 0182",
+    "expected": [
+      {"text": "r.lindgren@example.com", "type": "EMAIL"},
+      {"text": "+1 (212)\n555-0134", "type": "PHONE"},
+      {"text": "+49 69\n5555 0182", "type": "PHONE"}
+    ],
+    "note": "The page layout wraps the phone numbers; the line break is part of the value."
+  },
+  {
+    "id": "DEV-006",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Version 10.0.19041 released 2020-2024; effective 2026-04-29",
+    "expected": []
+  },
+  {
+    "id": "DEV-007",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Policy GRP-POL-007 supersedes ISS-2026-0233 (see page 14 of 35)",
+    "expected": []
+  },
+  {
+    "id": "DEV-008",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Purchase order 4500018832 approved",
+    "expected": [],
+    "note": "A bare digit run without a phone label."
+  },
+  {
+    "id": "DEV-009",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "9876501234",
+    "context": "Mobile",
+    "expected": [
+      {"text": "9876501234", "type": "PHONE"}
+    ],
+    "note": "Table cell: only the column header says it is a phone number."
+  },
+  {
+    "id": "DEV-010",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "M4827361",
+    "context": "Passport No.",
+    "expected": [
+      {"text": "M4827361", "type": "PASSPORT_NUMBER"}
+    ]
+  },
+  {
+    "id": "DEV-011",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "CFG-IN-2291",
+    "context": "EMP ID | Priya Natarajan",
+    "expected": [
+      {"text": "CFG-IN-2291", "type": "EMPLOYEE_ID"}
+    ],
+    "note": "Context is the column header and the row label. Only the cell text is labelled: context is never searched for PII."
+  },
+  {
+    "id": "DEV-012",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "1500",
+    "context": "Employee count",
+    "expected": [],
+    "note": "'Employee count' is not an ID label."
+  },
+  {
+    "id": "DEV-013",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Arjun Mehta",
+    "context": "Name",
+    "expected": [
+      {"text": "Arjun Mehta", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "DEV-014",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "+1 (555) 0147",
+    "context": "Phone",
+    "expected": [
+      {"text": "+1 (555) 0147", "type": "PHONE"}
+    ],
+    "note": "Short, non-standard number, as the directory slides use."
+  },
+  {
+    "id": "DEV-015",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Lucia Ferrante\nChief Risk Officer\nl.ferrante@example.org\n+1 (555) 0126",
+    "expected": [
+      {"text": "Lucia Ferrante", "type": "PERSON_NAME"},
+      {"text": "l.ferrante@example.org", "type": "EMAIL"},
+      {"text": "+1 (555) 0126", "type": "PHONE"}
+    ],
+    "note": "Org-chart card: the job title on the next line is not part of the name."
+  },
+  {
+    "id": "DEV-016",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "R. Castellano\nCRO",
+    "expected": [
+      {"text": "R. Castellano", "type": "PERSON_NAME"}
+    ],
+    "note": "RACI column header: initial and surname, then the role."
+  },
+  {
+    "id": "DEV-017",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "A",
+    "context": "R. Castellano CRO",
+    "expected": [],
+    "note": "A RACI letter is not PII, even under a person's column."
+  },
+  {
+    "id": "DEV-018",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Tom Becker\nAnita Rao\nLM Vance\nSofia Brennan",
+    "context": "USERS | Security Group",
+    "expected": [
+      {"text": "Tom Becker", "type": "PERSON_NAME"},
+      {"text": "Anita Rao", "type": "PERSON_NAME"},
+      {"text": "LM Vance", "type": "PERSON_NAME"},
+      {"text": "Sofia Brennan", "type": "PERSON_NAME"}
+    ],
+    "note": "User-group table cell: one name per line."
+  },
+  {
+    "id": "DEV-019",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Actions: Review questionnaire responses for Artificial Intelligence (AI), confidentiality, and data protection",
+    "expected": [],
+    "note": "Capitalised subject terms are not names."
+  },
+  {
+    "id": "DEV-020",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Trigger Name: On_Vendor_Assign Workflow\nTrigger Type: Vendor Created\nChange Workflow",
+    "context": "WORKFLOW RULE",
+    "document": [
+      "Rules can trigger a change to the workflow based on the vendor type.",
+      "A workflow starts when a vendor is created."
+    ],
+    "expected": [],
+    "note": "Workflow vocabulary: the same document uses these words in lowercase."
+  },
+  {
+    "id": "DEV-021",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "ocr",
+    "text": "Engineering 212 Maren Holt 03/14/2024 10:41 PM",
+    "expected": [
+      {"text": "Maren Holt", "type": "PERSON_NAME"}
+    ],
+    "note": "Screenshot of a user list: group, member count, date and time are not PII."
+  },
+  {
+    "id": "DEV-022",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "ocr",
+    "text": "Login history UK Finance 3 Paul Wright 06/11/2023 08:15 AM",
+    "expected": [
+      {"text": "Paul Wright", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "DEV-023",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "ocr",
+    "text": "Selected users\na JR Hollamd Teresa Quinn x",
+    "expected": [
+      {"text": "JR Hollamd", "type": "PERSON_NAME"},
+      {"text": "Teresa Quinn", "type": "PERSON_NAME"}
+    ],
+    "note": "OCR misspelling ('Hollamd' for 'Holland'), and two names on one line that only spacing separated in the image."
+  },
+  {
+    "id": "DEV-024",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "ocr",
+    "text": "1.6. W Whatis your company's registered address...",
+    "expected": [],
+    "note": "OCR merged 'What is' and kept a stray 'W'."
+  },
+  {
+    "id": "DEV-025",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "The control is owned by Daniel K. Mensah and reviewed quarterly.",
+    "expected": [
+      {"text": "Daniel K. Mensah", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "DEV-026",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Exceptions were approved by Mensah in March.",
+    "document": [
+      "The control is owned by Daniel K. Mensah and reviewed quarterly."
+    ],
+    "expected": [
+      {"text": "Mensah", "type": "PERSON_NAME"}
+    ],
+    "note": "Surname alone: the same document names the person in full."
+  },
+  {
+    "id": "DEV-027",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Items 21\n\n22\n\n23\n\n24",
+    "expected": [],
+    "note": "Numbered list on separate lines."
+  },
+  {
+    "id": "DEV-028",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Tel. 555-0153",
+    "expected": [
+      {"text": "555-0153", "type": "PHONE"}
+    ]
+  },
+  {
+    "id": "DEV-029",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "SSN 900-61-4410\nMobile 646-555-0172",
+    "expected": [
+      {"text": "900-61-4410", "type": "US_SSN"},
+      {"text": "646-555-0172", "type": "PHONE"}
+    ],
+    "note": "Test-data SSN in the invalid 900 range: the label makes it an SSN."
+  },
+  {
+    "id": "DEV-030",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "(EMP.30418, SSN 90061-4410) departed 28 Feb 2026",
+    "expected": [
+      {"text": "EMP.30418", "type": "EMPLOYEE_ID"},
+      {"text": "90061-4410", "type": "US_SSN"}
+    ],
+    "note": "OCR turned a hyphen into a dot and moved another."
+  },
+  {
+    "id": "DEV-031",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Certified to ISO27001 using SHA256 and TLS 1.3",
+    "expected": []
+  },
+  {
+    "id": "DEV-032",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Server 10.24.8.17 hosts the risk register",
+    "expected": [
+      {"text": "10.24.8.17", "type": "IP_ADDRESS"}
+    ],
+    "note": "IP addresses are redacted as PII in this project, even a server's."
+  },
+  {
+    "id": "DEV-033",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "PAN AKZPM4471Q held on file",
+    "expected": [
+      {"text": "AKZPM4471Q", "type": "INDIAN_PAN"}
+    ]
+  },
+  {
+    "id": "DEV-034",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "the passport number of the employee is RT5520184",
+    "expected": [
+      {"text": "RT5520184", "type": "PASSPORT_NUMBER"}
+    ]
+  },
+  {
+    "id": "DEV-035",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Passport: not provided. Ref AB12345",
+    "expected": [],
+    "note": "The passport label is in an earlier sentence."
+  },
+  {
+    "id": "DEV-036",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Vendors that process personal data must complete the privacy questionnaire before onboarding.",
+    "expected": [],
+    "note": "About personal data, but contains none."
+  },
+  {
+    "id": "DEV-037",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Nadia Rahman",
+    "context": "Prepared by",
+    "expected": [
+      {"text": "Nadia Rahman", "type": "PERSON_NAME"}
+    ],
+    "note": "Version-control table."
+  },
+  {
+    "id": "DEV-038",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "02/10/2024",
+    "context": "Date",
+    "expected": []
+  },
+  {
+    "id": "DEV-039",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Send evidence to grc-team@example.org",
+    "expected": [],
+    "note": "A team mailbox names no person. Policy choice: label it EMAIL instead if every address must be redacted."
+  },
+  {
+    "id": "DEV-040",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "+1 14 Mar 2021\n(212) 555-0175",
+    "expected": [
+      {"text": "(212) 555-0175", "type": "PHONE"}
+    ],
+    "note": "The '+1' before a date on the line above must not join the phone number."
+  },
+  {
+    "id": "DEV-041",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Call Omar Haddad on +44 20 7946 0321 before the board meeting",
+    "expected": [
+      {"text": "Omar Haddad", "type": "PERSON_NAME"},
+      {"text": "+44 20 7946 0321", "type": "PHONE"}
+    ],
+    "note": "Speaker notes."
+  },
+  {
+    "id": "DEV-042",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Comment by Lena Fischer: please confirm the vendor tier",
+    "expected": [
+      {"text": "Lena Fischer", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "DEV-043",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Open issues 14 Overdue 3 Owner: K. Delacroix",
+    "expected": [
+      {"text": "K. Delacroix", "type": "PERSON_NAME"}
+    ],
+    "note": "Dashboard figure read by OCR."
+  },
+  {
+    "id": "DEV-044",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Page 7 of 35 | Classification: Internal | v6.0",
+    "expected": []
+  },
+  {
+    "id": "DEV-045",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Database, Cloud and Network teams",
+    "expected": []
+  },
+  {
+    "id": "DEV-046",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Escalations go to Ana de la Cruz in Madrid.",
+    "expected": [
+      {"text": "Ana de la Cruz", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "DEV-047",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Sean O'Neill and Mei-Ling Chou attended the vendor review.",
+    "expected": [
+      {"text": "Sean O'Neill", "type": "PERSON_NAME"},
+      {"text": "Mei-Ling Chou", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "DEV-048",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Group CISO —_p.varga@example.com,",
+    "expected": [
+      {"text": "p.varga@example.com", "type": "EMAIL"}
+    ],
+    "note": "OCR punctuation stuck to the address."
+  },
+  {
+    "id": "DEV-049",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Approved by Dr. Elif Kaya, Chief Medical Officer",
+    "expected": [
+      {"text": "Elif Kaya", "type": "PERSON_NAME"}
+    ],
+    "note": "Titles are not part of the name."
+  },
+  {
+    "id": "DEV-050",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Q3 Board Pack\nPrepared for the Audit Committee",
+    "expected": []
+  },
+
+  {
+    "id": "EVAL-001",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Please email Ravi Kumar at ravi.kumar@example.com or call +91 22 5555 0143.",
+    "expected": [
+      {"text": "Ravi Kumar", "type": "PERSON_NAME"},
+      {"text": "ravi.kumar@example.com", "type": "EMAIL"},
+      {"text": "+91 22 5555 0143", "type": "PHONE"}
+    ]
+  },
+  {
+    "id": "EVAL-002",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Review date: 15/09/2025, next review 15/09/2026",
+    "expected": []
+  },
+  {
+    "id": "EVAL-003",
+    "split": "eval",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Staff ID: EMP-778201",
+    "expected": [
+      {"text": "EMP-778201", "type": "EMPLOYEE_ID"}
+    ]
+  },
+  {
+    "id": "EVAL-004",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Grace Mwangi, Head of Internal Audit (EMP-61734) g.mwangi@example.com | +1 (646) 555-0137",
+    "expected": [
+      {"text": "Grace Mwangi", "type": "PERSON_NAME"},
+      {"text": "EMP-61734", "type": "EMPLOYEE_ID"},
+      {"text": "g.mwangi@example.com", "type": "EMAIL"},
+      {"text": "+1 (646) 555-0137", "type": "PHONE"}
+    ]
+  },
+  {
+    "id": "EVAL-005",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Escalate to +44 20\n7946 0587 out of hours",
+    "expected": [
+      {"text": "+44 20\n7946 0587", "type": "PHONE"}
+    ]
+  },
+  {
+    "id": "EVAL-006",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "900-73-1186",
+    "context": "Social Security Number",
+    "expected": [
+      {"text": "900-73-1186", "type": "US_SSN"}
+    ]
+  },
+  {
+    "id": "EVAL-007",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "555 0141",
+    "context": "Phone",
+    "expected": [
+      {"text": "555 0141", "type": "PHONE"}
+    ]
+  },
+  {
+    "id": "EVAL-008",
+    "split": "eval",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "d.ivanova@example.org",
+    "context": "Email",
+    "expected": [
+      {"text": "d.ivanova@example.org", "type": "EMAIL"}
+    ]
+  },
+  {
+    "id": "EVAL-009",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Invoice INV-2025-00418 dated 2025-11-03 for 12 400 USD",
+    "expected": []
+  },
+  {
+    "id": "EVAL-010",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Case 912-44-7781 closed",
+    "expected": [],
+    "note": "SSN-shaped case number in an invalid SSN range, with no SSN label."
+  },
+  {
+    "id": "EVAL-011",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Ines Duarte\nKwame Boateng\nAB Sato",
+    "context": "USERS | Finance Group",
+    "expected": [
+      {"text": "Ines Duarte", "type": "PERSON_NAME"},
+      {"text": "Kwame Boateng", "type": "PERSON_NAME"},
+      {"text": "AB Sato", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-012",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "ocr",
+    "text": "Admins 2 Victor Lang 11/02/2024 09:05 AM",
+    "expected": [
+      {"text": "Victor Lang", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-013",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "ocr",
+    "text": "1.9. W Whereis your head office located...",
+    "expected": []
+  },
+  {
+    "id": "EVAL-014",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Sign-off by Mwangi is pending.",
+    "document": [
+      "Grace Mwangi, Head of Internal Audit, owns this policy."
+    ],
+    "expected": [
+      {"text": "Mwangi", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-015",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Accountable owner: Tomasz W. Nowak",
+    "expected": [
+      {"text": "Tomasz W. Nowak", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-016",
+    "split": "eval",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Sanjay Patel\nChief Operating Officer\ns.patel@example.org\n+1 (555) 0191",
+    "expected": [
+      {"text": "Sanjay Patel", "type": "PERSON_NAME"},
+      {"text": "s.patel@example.org", "type": "EMAIL"},
+      {"text": "+1 (555) 0191", "type": "PHONE"}
+    ]
+  },
+  {
+    "id": "EVAL-017",
+    "split": "eval",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "M. Okoro\nCFO",
+    "expected": [
+      {"text": "M. Okoro", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-018",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Vendors are rated Tier 1, Tier 2 or Tier 3 based on Inherent Risk Score",
+    "expected": []
+  },
+  {
+    "id": "EVAL-019",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Data Protection Officer approval is required for Artificial Intelligence use cases.",
+    "expected": []
+  },
+  {
+    "id": "EVAL-020",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "PAN BXQPS2290K",
+    "expected": [
+      {"text": "BXQPS2290K", "type": "INDIAN_PAN"}
+    ]
+  },
+  {
+    "id": "EVAL-021",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Emp ID: EMP_45120",
+    "expected": [
+      {"text": "EMP_45120", "type": "EMPLOYEE_ID"}
+    ],
+    "note": "OCR read the hyphen as an underscore."
+  },
+  {
+    "id": "EVAL-022",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Login from 203.0.113.45 was blocked",
+    "expected": [
+      {"text": "203.0.113.45", "type": "IP_ADDRESS"}
+    ]
+  },
+  {
+    "id": "EVAL-023",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Build 4.10.2 deployed to 3 regions",
+    "expected": []
+  },
+  {
+    "id": "EVAL-024",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Contact the Service Desk on extension 4471",
+    "expected": []
+  },
+  {
+    "id": "EVAL-025",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Reviewed by Hannah Schultz on 03/04/2025",
+    "expected": [
+      {"text": "Hannah Schultz", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-026",
+    "split": "eval",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Ask Diego Alvarez whether the Lisbon office is in scope",
+    "expected": [
+      {"text": "Diego Alvarez", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-027",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Mobile: none. Reference 9876543210",
+    "expected": [],
+    "note": "The mobile label is in an earlier sentence."
+  },
+  {
+    "id": "EVAL-028",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "ocr",
+    "text": "Selected users\nPriya Shah x Leo Grant x",
+    "expected": [
+      {"text": "Priya Shah", "type": "PERSON_NAME"},
+      {"text": "Leo Grant", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-029",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Chief Executive Officer; Group Risk Committee",
+    "expected": []
+  },
+  {
+    "id": "EVAL-030",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Passport No. YB7731042 (expires 2029)",
+    "expected": [
+      {"text": "YB7731042", "type": "PASSPORT_NUMBER"}
+    ]
+  }
+]

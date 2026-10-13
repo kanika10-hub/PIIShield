@@ -1,54 +1,171 @@
 """
 Run the whole pipeline on one file.
 
-    python main.py input/risk_policy.pdf
-    python main.py output/risk_policy.json      (already extracted: steps 2-4)
+    python main.py                                  (opens a file chooser)
+    python main.py D:/documents/any_report.docx
+    python main.py uploads/<job_id>/report.pdf      (a stored upload, again)
+    python main.py output/<job_id>/report.json      (already extracted: steps 2-5)
 
-With no file given, it asks for one.
+Any PDF, PPTX or DOCX file can be given, from any folder and under any
+name. It is uploaded first: copied into a new folder of its own,
+uploads/<job_id>/ (src/uploads.py). Every step after that reads the
+copy and writes to output/<job_id>/, written <job>/ below, so a run
+never depends on the file's name or place, and two files with the same
+name never overwrite each other's outputs.
 
-1. Extract the PDF, PPTX or DOCX   -> output/<name>.json             (common JSON)
-2. Scan the extracted document     -> output/<name>_pii.json         (PII report)
-3. Tag and redact the findings     -> output/<name>_tagged.json      (values labelled:
-                                                                      still holds PII)
-                                      output/<name>_sanitized.json   (values replaced by
-                                                                      redaction tags)
-4. Validate the sanitized copy     -> output/<name>_validation.json  (PASS, FAIL or
-                                                                      NEEDS_REVIEW)
+0. Check the input file: it exists, is not empty, and is the PDF, DOCX
+   or PPTX its name says (not renamed, password-protected or damaged),
+   then upload it                  -> uploads/<job_id>/<file>       (the copy, and
+                                                                     upload.json)
+1. Extract the PDF, PPTX or DOCX   -> <job>/<name>.json             (common JSON)
+   with the extractor for its type (EXTRACTORS), and check it follows
+   the common JSON format (src/models/schema.py)
+2. Scan the extracted document     -> <job>/<name>_pii.json         (PII report)
+3. Tag and redact the findings     -> <job>/<name>_tagged.json      (values labelled:
+                                                                     still holds PII)
+                                      <job>/<name>_sanitized.json   (values replaced by
+                                                                     redaction tags)
+4. Validate the sanitized copy     -> <job>/<name>_validation.json  (PASS, FAIL or
+                                                                     NEEDS_REVIEW)
+5. Report the exposure             -> <job>/<name>_exposure.json    (each finding: where,
+                                                                     type, detector,
+                                                                     confidence, action;
+                                                                     no PII values)
+                                      output/exposure_report.csv    (every document in
+                                      output/exposure_report.md      output/, combined)
 
-Only a sanitized copy whose verdict is PASS may be sent to an LLM.
+Only a sanitized copy whose verdict is PASS may be sent to an LLM, and
+src.pii.validator.approved_copy() is the way to load it for that: it
+refuses any other copy.
 
 Given an extracted JSON file, the outputs are written next to it.
 
 Each step reads the file the step before it wrote, exactly as the steps
-do when run on their own (src/pii/redactor.py, src/pii/validator.py),
+do when run on their own (src/pii/redactor.py, src/pii/validator.py,
+src/pii/exposure_report.py),
 so running a step again later gives the same result.
 
-The outputs of an earlier run of the same file are deleted first, so a
+An input file that fails its check is refused before anything is
+uploaded, extracted or deleted. Given a stored upload or an extracted
+JSON file again, the outputs of its earlier run are deleted first, so a
 run that stops part way never leaves an older sanitized copy beside a
-newer report. If extraction or the scan fails, the PII report is still
-written, with status "failed". If redaction or validation fails, the
-files they had written are deleted.
+newer report. If extraction, the format check or the scan fails, the
+PII report is still written, with status "failed", and nothing is
+tagged or redacted. If redaction or validation fails, the files they
+had written are deleted. The combined exposure report is rebuilt once
+the old outputs are deleted, so it never lists a document whose outputs
+are gone.
 
 Exit code: 0 PASS, 1 FAIL or an error, 2 NEEDS_REVIEW.
 """
 
 import json
 import sys
+import zipfile
 from pathlib import Path
 
 from src.extractors.docx_extractor import extract_docx
 from src.extractors.pdf_extractor import extract_pdf
 from src.extractors.pptx_extractor import extract_pptx
+from src.models.schema import format_problems
 from src.pii.detectors import LocalNLPDetector
 from src.pii.document_scanner import failed_report, findings_path, save_findings, scan_file
+from src.pii.exposure_report import (
+    combined_folder, exposure_file, exposure_path, print_exposure, write_combined
+)
 from src.pii.redactor import output_paths, redact_file
-from src.pii.validator import EXIT_CODES, FAIL, PASS, print_validation, validate_file, validation_path
+from src.pii.validator import (
+    EXIT_CODES, FAIL, NEEDS_REVIEW, PASS, NotApproved, approved_copy,
+    print_validation, validate_file, validation_path
+)
 from src.structure.heading_classifier import classify_headings
 from src.structure.pdf_tables import reconstruct_tables
+from src.uploads import store_upload, stored_job_id
 
 
+UPLOAD_DIR = Path(__file__).parent / "uploads"
 OUTPUT_DIR = Path(__file__).parent / "output"
-SUPPORTED_TYPES = (".pdf", ".pptx", ".docx")
+
+# A PDF starts with this (readers accept it within the first 1024 bytes).
+# A DOCX or PPTX is a zip file holding this part; a password-protected
+# one is not a zip file at all.
+PDF_SIGNATURE = b"%PDF-"
+OFFICE_PARTS = {".docx": "word/document.xml", ".pptx": "ppt/presentation.xml"}
+
+
+class PipelineStop(Exception):
+    """
+    A check stopped the pipeline: reported without a traceback.
+    """
+
+
+def input_problem(input_path):
+    """
+    Why the input file cannot be processed, or None.
+    """
+
+    file_type = input_path.suffix.lower()
+
+    if not input_path.is_file():
+        return f"File not found: {input_path}"
+
+    if file_type not in (*SUPPORTED_TYPES, ".json"):
+        return (
+            f"Unsupported file type '{input_path.suffix}'. "
+            "Use a PDF, PPTX or DOCX file, or an extracted JSON file."
+        )
+
+    if input_path.stat().st_size == 0:
+        return f"{input_path} is empty."
+
+    if file_type == ".pdf":
+        with open(input_path, "rb") as file:
+            if PDF_SIGNATURE not in file.read(1024):
+                return f"{input_path} is not a PDF file, or is damaged."
+
+    if file_type in OFFICE_PARTS:
+        kind = file_type[1:].upper()
+
+        try:
+            with zipfile.ZipFile(input_path) as archive:
+                if OFFICE_PARTS[file_type] not in archive.namelist():
+                    return f"{input_path} is not a {kind} file."
+
+        except zipfile.BadZipFile:
+            return f"{input_path} is not a {kind} file, or is password-protected or damaged."
+
+    return None
+
+
+def format_summary(problems):
+    """
+    The first few format problems, one per line.
+    """
+
+    lines = [f"  - {problem}" for problem in problems[:10]]
+
+    if len(problems) > 10:
+        lines.append(f"  ... and {len(problems) - 10} more")
+
+    return "\n".join(lines)
+
+
+def extract_pdf_document(input_path):
+    document = extract_pdf(input_path)
+    # Tables on scanned pages first, so table text is not classified as headings
+    document = reconstruct_tables(document, input_path)
+    return classify_headings(document)
+
+
+# The extractor for each supported file type. input_problem() has
+# checked that a file's content is the type its extension says.
+EXTRACTORS = {
+    ".pdf": extract_pdf_document,
+    ".pptx": extract_pptx,
+    ".docx": extract_docx,
+}
+
+SUPPORTED_TYPES = tuple(EXTRACTORS)
 
 
 def extract_document(input_path):
@@ -58,28 +175,89 @@ def extract_document(input_path):
     """
 
     input_path = Path(input_path)
-    file_type = input_path.suffix.lower()
+    extractor = EXTRACTORS.get(input_path.suffix.lower())
 
-    if file_type == ".pdf":
-        document = extract_pdf(str(input_path))
-        # Tables on scanned pages first, so table text is not classified as headings
-        document = reconstruct_tables(document, str(input_path))
-        document = classify_headings(document)
+    if extractor is None:
+        raise ValueError(f"No extractor for '{input_path.suffix}' files: {input_path.name}")
 
-    elif file_type == ".pptx":
-        document = extract_pptx(str(input_path))
-
-    else:
-        document = extract_docx(str(input_path))
-
-    return document
+    return extractor(str(input_path))
 
 
-def read_extracted(json_path):
+def ask_for_file():
     """
-    An extracted document given instead of a PDF, PPTX or DOCX. A PII
-    report, or a tagged or sanitized copy, given by mistake is refused:
-    the outputs would describe the wrong document.
+    The file to scan when none is given on the command line: chosen in a
+    file dialog, or typed where no window can be opened (no tkinter, or
+    no display, e.g. over SSH).
+    """
+
+    try:
+        import tkinter
+        from tkinter import filedialog
+    except ImportError:
+        tkinter = None
+
+    try:
+        root = tkinter.Tk() if tkinter else None
+    except tkinter.TclError:
+        root = None
+
+    if root is None:
+        return Path(input("File to scan (PDF, PPTX, DOCX or extracted JSON): ").strip().strip('"'))
+
+    root.withdraw()
+    # In front of the terminal, not behind it
+    root.attributes("-topmost", True)
+
+    chosen = filedialog.askopenfilename(
+        parent=root,
+        title="Choose a file to scan for PII",
+        filetypes=[
+            ("PDF, PowerPoint or Word", "*.pdf *.pptx *.docx"),
+            ("Extracted JSON", "*.json"),
+            ("All files", "*.*"),
+        ],
+    )
+    root.destroy()
+
+    if not chosen:
+        sys.exit("No file chosen.")
+
+    return Path(chosen)
+
+
+def upload(input_path):
+    """
+    Step 0: the stored copy of the file to extract, and the folder its
+    outputs go in, output/<job_id>/. A file given from uploads/ was
+    stored by an earlier run: it is not copied again, and that run's
+    outputs are replaced.
+    """
+
+    job_id = stored_job_id(input_path, UPLOAD_DIR)
+
+    if job_id is None:
+        print(f"[0/5] Uploading {input_path.name} ...")
+        job_id, stored_path = store_upload(input_path, UPLOAD_DIR)
+    else:
+        print(f"[0/5] Upload skipped: {input_path.name} is a stored upload")
+        stored_path = input_path
+
+    job_dir = OUTPUT_DIR / job_id
+    job_dir.mkdir(parents=True, exist_ok=True)
+
+    print(f"      Stored copy: {stored_path}")
+    print(f"      Outputs:     {job_dir}")
+
+    return stored_path, job_dir
+
+
+def load_extracted(json_path):
+    """
+    An extracted document given instead of a PDF, PPTX or DOCX, as
+    (document, None), or (None, why it cannot be used). A PII report, or
+    a tagged or sanitized copy, given by mistake is refused: the outputs
+    would describe the wrong document. The web interface (src/web/jobs.py)
+    checks uploaded JSON files with it too.
     """
 
     try:
@@ -87,42 +265,51 @@ def read_extracted(json_path):
             document = json.load(file)
 
     except (OSError, ValueError) as error:
-        sys.exit(f"Cannot read {json_path}: {error}")
+        return None, f"Cannot read {json_path}: {error}"
 
     if not isinstance(document, dict) or not {"document_id", "file_name", "pages"} <= document.keys():
-        sys.exit(f"{json_path} is not an extracted document (common JSON).")
+        return None, f"{json_path} is not an extracted document (common JSON)."
 
-    redaction = document.get("metadata", {}).get("redaction")
+    redaction = (document.get("metadata") or {}).get("redaction")
 
     if redaction is not None:
-        sys.exit(f"{json_path} is the {redaction.get('variant')} copy. Give the extracted document instead.")
+        return None, f"{json_path} is the {redaction.get('variant')} copy. Give the extracted document instead."
+
+    problems = format_problems(document)
+
+    if problems:
+        return None, f"{json_path} does not follow the common JSON format:\n{format_summary(problems)}"
+
+    return document, None
+
+
+def read_extracted(json_path):
+    """
+    load_extracted, for the command line: a file that cannot be used
+    stops the run with the reason.
+    """
+
+    document, problem = load_extracted(json_path)
+
+    if problem:
+        sys.exit(problem)
 
     return document
 
 
-def extracted_from(json_path):
-    """
-    The name of the file an existing extracted JSON file was made from,
-    or None if it cannot be read.
-    """
-
-    try:
-        with open(json_path, "r", encoding="utf-8") as file:
-            return json.load(file).get("file_name")
-
-    except (OSError, ValueError, AttributeError):
-        return None
-
-
 def pipeline_outputs(json_path):
     """
-    The files steps 2-4 write for an extracted JSON file, in step order:
-    PII report, tagged copy, sanitized copy, validation report.
+    The files steps 2-5 write for an extracted JSON file, in step order:
+    PII report, tagged copy, sanitized copy, validation report,
+    exposure report.
     """
 
     tagged_path, sanitized_path = output_paths(json_path)
 
-    return [findings_path(json_path), tagged_path, sanitized_path, validation_path(json_path)]
+    return [
+        findings_path(json_path), tagged_path, sanitized_path,
+        validation_path(json_path), exposure_path(json_path)
+    ]
 
 
 def delete(paths):
@@ -132,58 +319,53 @@ def delete(paths):
 
 def main():
 
-    if len(sys.argv) > 1:
-        input_path = Path(sys.argv[1])
-    else:
-        input_path = Path(input("File to scan (PDF, PPTX, DOCX or extracted JSON): ").strip().strip('"'))
+    input_path = Path(sys.argv[1]) if len(sys.argv) > 1 else ask_for_file()
 
-    if not input_path.is_file():
-        sys.exit(f"File not found: {input_path}")
+    # Before anything is uploaded, extracted or deleted
+    problem = input_problem(input_path)
 
-    file_type = input_path.suffix.lower()
+    if problem:
+        sys.exit(problem)
 
-    if file_type not in (*SUPPORTED_TYPES, ".json"):
-        sys.exit(
-            f"Unsupported file type '{input_path.suffix}'. "
-            "Use a PDF, PPTX or DOCX file, or an extracted JSON file."
-        )
-
-    already_extracted = file_type == ".json"
+    already_extracted = input_path.suffix.lower() == ".json"
 
     if already_extracted:
         json_path = input_path
         # A failed scan is reported under the original file's name
         source_path = Path(read_extracted(json_path)["file_name"])
     else:
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        json_path = OUTPUT_DIR / f"{input_path.stem}.json"
-        source_path = input_path
-
-        # Outputs are named by file name only: report.pdf and report.docx
-        # would delete and overwrite each other's
-        previous = extracted_from(json_path) if json_path.is_file() else None
-
-        if previous is not None and previous != input_path.name:
-            sys.exit(
-                f"{json_path} holds the outputs of {previous}, not {input_path.name}. "
-                f"Rename {input_path.name}, or delete {json_path} to replace them."
-            )
+        # Every later step reads the stored copy, not the file given
+        source_path, job_dir = upload(input_path)
+        json_path = job_dir / f"{source_path.stem}.json"
 
     outputs = pipeline_outputs(json_path)
     report_path = outputs[0]
 
     delete(outputs if already_extracted else [json_path, *outputs])
+    write_combined(combined_folder(json_path))
 
     try:
         if already_extracted:
-            print(f"[1/4] Extraction skipped: using {json_path}")
+            print(f"[1/5] Extraction skipped: using {json_path}")
+            print("      Format:      OK (checked on loading)")
         else:
-            print(f"[1/4] Extracting {input_path.name} ...")
-            document = extract_document(input_path)
+            print(f"[1/5] Extracting {source_path.name} ...")
+            document = extract_document(source_path)
             document.save_json(json_path)
             print(f"      Common JSON: {json_path}")
 
-        print("[2/4] Scanning for PII ...")
+            # Kept for inspection, but the scan never reads a broken document
+            problems = format_problems(document.to_dict())
+
+            if problems:
+                raise PipelineStop(
+                    f"The extracted document does not follow the common JSON format:\n"
+                    f"{format_summary(problems)}"
+                )
+
+            print(f"      Format:      OK ({len(document.pages)} pages)")
+
+        print("[2/5] Scanning for PII ...")
         nlp = LocalNLPDetector()
 
         if nlp.error:
@@ -194,6 +376,10 @@ def main():
     except Exception as error:
         save_findings(failed_report(source_path, error), report_path)
         print(f"\nFailed. Report with status 'failed': {report_path}")
+
+        if isinstance(error, PipelineStop):
+            sys.exit(str(error))
+
         raise
 
     summary = report["summary"]
@@ -205,7 +391,7 @@ def main():
         print(f"      Warning: {warning}")
 
     try:
-        print("[3/4] Tagging and redacting ...")
+        print("[3/5] Tagging and redacting ...")
         result, tagged_path, sanitized_path = redact_file(json_path, report_path)
         redaction = result["redaction"]
         print(f"      Tagged:      {tagged_path}  (still holds PII: for review only)")
@@ -215,7 +401,7 @@ def main():
             f"of {redaction['summary']['findings']} findings redacted"
         )
 
-        print("[4/4] Validating the sanitized copy ...")
+        print("[4/5] Validating the sanitized copy ...")
         validation, validation_report_path = validate_file(json_path, report_path, nlp)
         print(f"      Validation:  {validation_report_path}")
 
@@ -225,26 +411,47 @@ def main():
         print("\nFailed. No tagged or sanitized copy was kept.")
         raise
 
+    try:
+        print("[5/5] Reporting the PII exposure ...")
+        exposure, exposure_report_path = exposure_file(json_path, report_path)
+        csv_path, md_path, documents = write_combined(combined_folder(json_path))
+        print(f"      Exposure:    {exposure_report_path}  (no PII values: shareable)")
+        print_exposure(exposure)
+        print(f"      Combined:    {md_path}, {csv_path} ({documents} documents)")
+
+    except Exception:
+        # The sanitized copy and its verdict stand; only the report is missing
+        delete([exposure_path(json_path)])
+        write_combined(combined_folder(json_path))
+        print("\nFailed. No exposure report was kept.")
+        raise
+
     print_validation(validation)
 
     verdict = validation["verdict"]
 
-    if verdict == PASS:
-        print(f"\nSanitized output: {sanitized_path}\nIt passed validation and may be sent to an LLM.")
+    # The same gate any code sending text to an LLM must use
+    try:
+        approved_copy(json_path)
 
-    elif verdict == FAIL:
-        print(
-            f"\nDo not send {sanitized_path} to an LLM: PII remains, or the copy does "
-            f"not match its document. See {validation_report_path}"
-        )
+    except NotApproved as reason:
+        print(f"\nBlocked: do not send {sanitized_path} to an LLM ({reason}).")
 
-    else:
-        print(
-            f"\nDo not send {sanitized_path} to an LLM until a person has reviewed "
-            f"the issues in {validation_report_path}"
-        )
+        if verdict == FAIL:
+            print("PII remains, or the copy does not match its document.")
+        elif verdict == NEEDS_REVIEW:
+            print("A person must review the issues first.")
 
-    sys.exit(EXIT_CODES[verdict])
+        print(f"See {validation_report_path}")
+
+        sys.exit(EXIT_CODES[verdict] if verdict != PASS else 1)
+
+    print(
+        f"\nApproved: {sanitized_path} passed validation and may be sent to an LLM.\n"
+        "Load it with src.pii.validator.approved_copy(), which refuses any other copy."
+    )
+
+    sys.exit(EXIT_CODES[PASS])
 
 
 if __name__ == "__main__":

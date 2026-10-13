@@ -6,10 +6,13 @@ from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.oxml.ns import nsmap, qn
 from docx.table import Table
 from docx.text.paragraph import Paragraph
-from docx.text.run import Run
 from lxml import etree
 
 from src.extractors.common import office_properties, page_text_metadata, text_method
+from src.extractors.text_sources import (
+    ImageSource, Sources, TextSource, docx_comment_pieces, docx_paragraph_pieces,
+    docx_text_pieces, pieces_text
+)
 from src.models.document import (
     ExtractedDocument,
     DocumentPage,
@@ -30,11 +33,10 @@ NAMESPACES = {
 TEXT_BOXES = etree.XPath(
     ".//w:txbxContent[not(ancestor::mc:Fallback)]", namespaces=NAMESPACES
 )
-IMAGES = etree.XPath(
-    ".//a:blip[not(ancestor::mc:Fallback)]/@r:embed", namespaces=NAMESPACES
+BLIPS = etree.XPath(
+    ".//a:blip[not(ancestor::mc:Fallback)][@r:embed]", namespaces=NAMESPACES
 )
 TEXT_BOX_PARAGRAPHS = etree.XPath(".//w:p", namespaces=NAMESPACES)
-PARAGRAPH_TEXT = etree.XPath(".//w:t/text()", namespaces=NAMESPACES)
 
 # A cell's paragraphs, including those of tables nested in it
 CELL_PARAGRAPHS = etree.XPath(
@@ -106,14 +108,13 @@ def paragraph_text(paragraph):
     hold cover page fields such as the client name and project title.
     This reads every run in the paragraph instead, except runs inside
     text boxes: those are stored twice (drawing and VML fallback).
+    See text_sources.docx_paragraph_pieces.
     """
 
-    runs = paragraph._p.xpath(".//w:r[not(ancestor::w:txbxContent)]")
-
-    return "".join(Run(run, paragraph).text for run in runs)
+    return pieces_text(docx_paragraph_pieces(paragraph._p))
 
 
-def extract_table_cells(table, table_number, location="body"):
+def extract_table_cells(table, table_number, location="body", sources=Sources()):
     """
     Return one table_cell block per physical cell, in row order.
 
@@ -144,22 +145,16 @@ def extract_table_cells(table, table_number, location="body"):
     for cell_order, span in enumerate(spans.values(), start=1):
 
         cell = span["cell"]
-
-        text = "\n".join(
-            paragraph_text(Paragraph(element, cell))
-            for element in CELL_PARAGRAPHS(cell._tc)
-        ).strip()
+        block_id = f"table_{table_number}_row_{span['row']}_cell_{span['column']}"
+        source = TextSource(CELL_PARAGRAPHS(cell._tc), docx_paragraph_pieces)
+        sources.add(block_id, source)
 
         # Empty cells are kept so the table grid stays intact
         cells.append(
             DocumentBlock(
-                block_id=(
-                    f"table_{table_number}_"
-                    f"row_{span['row']}_"
-                    f"cell_{span['column']}"
-                ),
+                block_id=block_id,
                 block_type="table_cell",
-                text=text,
+                text=source.text(),
                 order=cell_order,
                 metadata={
                     "source": "native",
@@ -175,13 +170,13 @@ def extract_table_cells(table, table_number, location="body"):
     return cells
 
 
-def lines_text(paragraphs):
+def lines_source(paragraphs):
     """
-    Text of paragraph elements read with lxml (text boxes, notes):
-    one line per paragraph.
+    Text of paragraph elements read with lxml (text boxes, notes): one
+    line per paragraph, without tabs or breaks.
     """
 
-    return "\n".join("".join(PARAGRAPH_TEXT(paragraph)) for paragraph in paragraphs).strip()
+    return TextSource(paragraphs, docx_text_pieces)
 
 
 class StoryReader:
@@ -191,11 +186,12 @@ class StoryReader:
     by the text boxes and images inside it.
     """
 
-    def __init__(self, story, prefix, metadata, reader, section=1, track_sections=False):
+    def __init__(self, story, prefix, metadata, reader, section=1, track_sections=False, sources=Sources()):
         self.story = story                  # python-docx parent of its paragraphs
         self.prefix = prefix                # block ID prefix, "" for the body
         self.metadata = metadata            # location (and part) of every block
         self.reader = reader
+        self.sources = sources              # where each block's text is in the file
         self.section = section
         self.track_sections = track_sections
         self.counts = {}
@@ -235,7 +231,8 @@ class StoryReader:
     def paragraph(self, element, content_control):
 
         paragraph = Paragraph(element, self.story)
-        text = paragraph_text(paragraph).strip()
+        source = TextSource([element], docx_paragraph_pieces)
+        text = source.text()
 
         if not text:
             return
@@ -254,6 +251,7 @@ class StoryReader:
 
         number = self.next_number("paragraph")
         metadata = {**self.block_metadata(content_control), "style": style, "paragraph_index": number}
+        self.sources.add(f"{self.prefix}paragraph_{number}", source)
 
         if block_type == "list_item":
             # Set on the paragraph, or implied by the style ("List Bullet 2")
@@ -284,7 +282,7 @@ class StoryReader:
             block_type="table",
             children=extract_table_cells(
                 table, f"{self.prefix}{number}" if self.prefix else number,
-                self.metadata["location"]
+                self.metadata["location"], self.sources
             ),
             metadata={
                 **self.block_metadata(content_control),
@@ -296,11 +294,15 @@ class StoryReader:
     def text_boxes(self, element):
 
         for box in TEXT_BOXES(element):
-            text = lines_text(TEXT_BOX_PARAGRAPHS(box))
+            source = lines_source(TEXT_BOX_PARAGRAPHS(box))
+            text = source.text()
 
             if text:
+                block_id = f"{self.prefix}textbox_{self.next_number('textbox')}"
+                self.sources.add(block_id, source)
+
                 self.blocks.append(DocumentBlock(
-                    block_id=f"{self.prefix}textbox_{self.next_number('textbox')}",
+                    block_id=block_id,
                     block_type="paragraph",
                     text=text,
                     metadata={**self.block_metadata(), "location": "text_box", "in": self.metadata["location"]}
@@ -308,8 +310,8 @@ class StoryReader:
 
     def images(self, element):
 
-        for relationship_id in IMAGES(element):
-            part = self.story.part.related_parts.get(relationship_id)
+        for blip in BLIPS(element):
+            part = self.story.part.related_parts.get(blip.get(qn("r:embed")))
 
             if part is None:
                 continue                    # a linked image: not in the file
@@ -317,13 +319,15 @@ class StoryReader:
             metadata = {**self.block_metadata(), "image_part": str(part.partname)}
             del metadata["source"]
 
+            block_id = f"{self.prefix}image_{self.next_number('image')}"
+            self.sources.add(block_id, ImageSource(part, [blip]))
+
             self.blocks.append(self.reader.block(
-                f"{self.prefix}image_{self.next_number('image')}",
-                str(part.partname), part.blob, metadata=metadata
+                block_id, str(part.partname), part.blob, metadata=metadata
             ))
 
 
-def header_footer_blocks(doc, reader):
+def header_footer_blocks(doc, reader, sources=Sources()):
     """
     Blocks from every section's headers and footers.
 
@@ -357,7 +361,7 @@ def header_footer_blocks(doc, reader):
                     "part": name,
                     "visible": visible
                 },
-                reader, section=section_number
+                reader, section=section_number, sources=sources
             )
 
             blocks.extend(story.read(part._element))
@@ -365,7 +369,7 @@ def header_footer_blocks(doc, reader):
     return blocks
 
 
-def note_blocks(doc, relationship, kind):
+def note_blocks(doc, relationship, kind, sources=Sources()):
     """
     One block per footnote or endnote, skipping the separators Word adds.
     """
@@ -377,16 +381,20 @@ def note_blocks(doc, relationship, kind):
 
     blocks = []
 
-    for note in etree.fromstring(part.blob):
+    for note in sources.xml(part):
 
         if note.get(qn("w:type")) in NOTE_SEPARATORS:
             continue
 
-        text = lines_text(TEXT_BOX_PARAGRAPHS(note))
+        source = lines_source(TEXT_BOX_PARAGRAPHS(note))
+        text = source.text()
 
         if text:
+            block_id = f"{kind}_{note.get(qn('w:id'))}"
+            sources.add(block_id, source)
+
             blocks.append(DocumentBlock(
-                block_id=f"{kind}_{note.get(qn('w:id'))}",
+                block_id=block_id,
                 block_type="paragraph",
                 text=text,
                 metadata={"source": "native", "location": kind, "note_id": note.get(qn("w:id"))}
@@ -395,7 +403,7 @@ def note_blocks(doc, relationship, kind):
     return blocks
 
 
-def comment_blocks(doc):
+def comment_blocks(doc, sources=Sources()):
     """
     One block per comment. The author is kept in metadata.
     """
@@ -407,11 +415,17 @@ def comment_blocks(doc):
     blocks = []
 
     for comment in doc.comments:
-        text = comment.text.strip()
+        source = TextSource([paragraph._p for paragraph in comment.paragraphs], docx_comment_pieces)
+        text = source.text()
 
         if text:
+            block_id = f"comment_{comment.comment_id}"
+            sources.add(block_id, source)
+            # The comment element holds the author
+            sources.add(f"{block_id}_author", comment._comment_elm)
+
             blocks.append(DocumentBlock(
-                block_id=f"comment_{comment.comment_id}",
+                block_id=block_id,
                 block_type="paragraph",
                 text=text,
                 metadata={
@@ -426,23 +440,34 @@ def comment_blocks(doc):
     return blocks
 
 
-def extract_docx(file_path):
-
-    doc = Document(file_path)
-    reader = ImageReader()
+def docx_blocks(doc, reader, sources=Sources()):
+    """
+    Every block of an open document, in order. The original-format
+    redactor calls this in locate mode, with a SourceMap.
+    """
 
     # The body in reading order, then headers and footers, then notes and
     # comments: they sit outside the body's reading order
     blocks = (
-        StoryReader(doc, "", {"location": "body"}, reader, track_sections=True).read(doc.element.body)
-        + header_footer_blocks(doc, reader)
-        + note_blocks(doc, RT.FOOTNOTES, "footnote")
-        + note_blocks(doc, RT.ENDNOTES, "endnote")
-        + comment_blocks(doc)
+        StoryReader(
+            doc, "", {"location": "body"}, reader, track_sections=True, sources=sources
+        ).read(doc.element.body)
+        + header_footer_blocks(doc, reader, sources)
+        + note_blocks(doc, RT.FOOTNOTES, "footnote", sources)
+        + note_blocks(doc, RT.ENDNOTES, "endnote", sources)
+        + comment_blocks(doc, sources)
     )
 
     for order, block in enumerate(blocks, start=1):
         block.order = order
+
+    return blocks
+
+
+def extract_docx(file_path):
+
+    doc = Document(file_path)
+    blocks = docx_blocks(doc, ImageReader())
 
     # DOCX has no fixed page boundaries: the whole document is page 1
     page = DocumentPage(

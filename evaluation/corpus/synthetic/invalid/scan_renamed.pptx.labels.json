@@ -1,0 +1,8 @@
+{
+  "file": "scan_renamed.pptx",
+  "synthetic": true,
+  "expected_outcome": "rejected",
+  "description": "A PDF renamed to .pptx.",
+  "pii": [],
+  "not_pii": []
+}

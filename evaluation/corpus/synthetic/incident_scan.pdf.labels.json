@@ -1,0 +1,72 @@
+{
+  "file": "incident_scan.pdf",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "A scanned page with no text layer, read by OCR: paragraphs, and a table in the case-study style (dark header band, thin row rules) whose headers give the context.",
+  "pii": [
+    {
+      "text": "Kofi Mensah",
+      "type": "PERSON_NAME",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "kofi.mensah@example.com",
+      "type": "EMAIL",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "+1 (312) 555-0147",
+      "type": "PHONE",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "192.0.2.81",
+      "type": "IP_ADDRESS",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "Priyanka Rao",
+      "type": "PERSON_NAME",
+      "where": "scanned table (OCR)"
+    },
+    {
+      "text": "EMP-70412",
+      "type": "EMPLOYEE_ID",
+      "where": "scanned table (OCR)"
+    },
+    {
+      "text": "P7719024",
+      "type": "PASSPORT_NUMBER",
+      "where": "scanned table (OCR)"
+    },
+    {
+      "text": "Jonas Weber",
+      "type": "PERSON_NAME",
+      "where": "scanned table (OCR)"
+    },
+    {
+      "text": "EMP-70455",
+      "type": "EMPLOYEE_ID",
+      "where": "scanned table (OCR)"
+    },
+    {
+      "text": "C3390561",
+      "type": "PASSPORT_NUMBER",
+      "where": "scanned table (OCR)"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "IR-2026-118",
+      "why": "incident reference"
+    },
+    {
+      "text": "2026-05-14",
+      "why": "date"
+    },
+    {
+      "text": "ISS-2026-0571",
+      "why": "ticket reference"
+    }
+  ]
+}

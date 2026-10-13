@@ -19,6 +19,9 @@ Checks, in order:
     ocr             OCR words over a redacted value hold only tags;
                     OCR text too unreliable to scan and images never
                     read are listed for review
+    extraction      content the extractor could not read: declared
+                    limitations, embedded objects never opened, pages
+                    with little or no text, listed for review
     rescan          the scanner finds no PII in the sanitized copy
     known_values    no value found anywhere in the document is left
                     anywhere in the sanitized copy, nor part of a name
@@ -36,13 +39,15 @@ Each check, and the verdict, is one of:
                     to scan, an image never read
 
 The verdict is the worst of the checks. Only a PASS document may be
-sent to an LLM.
+sent to an LLM: approved_copy() is the way to load one for that, and
+refuses any other, or a copy changed since it was validated.
 
 Issues name the block, finding and rule, never the PII itself, so the
 validation report can be shared. Look a finding_id up in the PII report
 to see the value.
 """
 
+import hashlib
 import json
 import re
 import sys
@@ -59,7 +64,7 @@ from src.pii.redactor import (
 
 
 # Change whenever the checks change
-VALIDATOR_VERSION = "1.0.0"
+VALIDATOR_VERSION = "1.2.0"
 
 PASS, NEEDS_REVIEW, FAIL = "PASS", "NEEDS_REVIEW", "FAIL"
 SEVERITY = {PASS: 0, NEEDS_REVIEW: 1, FAIL: 2}
@@ -473,6 +478,47 @@ def check_ocr(document, report, sanitized):
     return issues, notes
 
 
+def check_extraction(document):
+    """
+    Content the extractor could not read, so the scan never saw it. A
+    person must check the original for each:
+
+        a limitation the extractor declared itself
+        an embedded object (a spreadsheet in a slide), never opened
+        a page with little or no text: a scan or figure nothing read
+
+    Unread images and low-confidence OCR are checked under ocr.
+    """
+
+    issues = []
+    blocks = blocks_by_id(document)
+
+    for limitation in document.get("metadata", {}).get("limitations", []):
+        issues.append(issue(NEEDS_REVIEW, f"the extractor could not read everything: {limitation}"))
+
+    for page in document["pages"]:
+        if page.get("metadata", {}).get("low_text"):
+            issues.append(issue(
+                NEEDS_REVIEW, "little or no text was extracted: PII on this page may never have been read",
+                page_number=page["page_number"]
+            ))
+
+    for block_id, (page_number, block) in blocks.items():
+        if block["block_type"] == "embedded_object":
+            issues.append(issue(
+                NEEDS_REVIEW, "the embedded object was not opened: its content was never scanned",
+                block_id=block_id, page_number=page_number
+            ))
+
+    notes = [f"{len(document['pages'])} pages checked"]
+    charts = sum(1 for _, block in blocks.values() if block["block_type"] == "chart")
+
+    if charts:
+        notes.append(f"{charts} charts: their titles and labels were scanned, not the data behind them")
+
+    return issues, notes
+
+
 def check_rescan(report, sanitized, nlp_detector):
     """
     Run the scanner over the sanitized copy. Anything it finds is PII
@@ -522,9 +568,11 @@ def check_known_values(document, report, sanitized):
 
         every value the report found: FAIL
         each word of a name the report found ("Ifeoma" of "Ifeoma C.
-        Adeyemi"): NEEDS_REVIEW, as a word alone may not identify
-        anyone. Words the document also uses in lowercase are ordinary
-        words and are not searched.
+        Adeyemi"), and a name found as one word (a surname mention):
+        NEEDS_REVIEW, as a word alone may not identify anyone. The scan
+        decides by context whether such a word names a person ("Ford"
+        is reported, "Ford Motor Company" is not). Words the document
+        also uses in lowercase are ordinary words and are not searched.
     """
 
     findings = [
@@ -536,7 +584,8 @@ def check_known_values(document, report, sanitized):
     values = {}
 
     for item in findings:
-        values.setdefault(normalise(item["text"]), item["finding_id"])
+        if item["type"] != "PERSON_NAME" or len(item["text"].split()) > 1:
+            values.setdefault(normalise(item["text"]), item["finding_id"])
 
     vocabulary = lowercase_words(
         block.get("text") or ""
@@ -765,6 +814,7 @@ def validate_document(document, report, sanitized, nlp_detector=None):
         ("report", lambda: check_report_findings(document, report)),
         ("replacements", lambda: check_replacements(report, sanitized)),
         ("ocr", lambda: check_ocr(document, report, sanitized)),
+        ("extraction", lambda: check_extraction(document)),
         ("rescan", lambda: check_rescan(report, sanitized, nlp_detector)),
         ("known_values", lambda: check_known_values(document, report, sanitized)),
         ("structure", lambda: check_structure(document, sanitized)),
@@ -822,23 +872,58 @@ def validate_file(json_path, report_path=None, nlp_detector=None):
     report_path = report_path or findings_path(json_path)
     _, sanitized_path = output_paths(json_path)
 
-    loaded = []
+    contents = [Path(path).read_bytes() for path in (json_path, report_path, sanitized_path)]
 
-    for path in (json_path, report_path, sanitized_path):
-        with open(path, "r", encoding="utf-8") as file:
-            loaded.append(json.load(file))
-
-    validation = validate_document(*loaded, nlp_detector=nlp_detector)
+    validation = validate_document(*map(json.loads, contents), nlp_detector=nlp_detector)
     validation["files"] = {
         "document": str(json_path),
         "report": str(report_path),
         "sanitized": str(sanitized_path),
+        # The exact copy validated: approved_copy refuses any other
+        "sanitized_sha256": hashlib.sha256(contents[2]).hexdigest(),
     }
 
     output_path = validation_path(json_path)
     save_json(validation, output_path)
 
     return validation, output_path
+
+
+# --------------------------------------------------
+# RELEASE
+# --------------------------------------------------
+
+class NotApproved(Exception):
+    """
+    The sanitized copy may not be sent to an LLM.
+    """
+
+
+def approved_copy(json_path):
+    """
+    The sanitized copy of an extracted JSON file, to send to an LLM. The
+    one way to load it for that: it raises NotApproved unless the copy's
+    validation report says PASS and the copy is byte for byte the one
+    that was validated. A FAIL, or a NEEDS_REVIEW nobody has resolved,
+    blocks it.
+    """
+
+    _, sanitized_path = output_paths(json_path)
+    report_path = validation_path(json_path)
+
+    try:
+        validation = json.loads(Path(report_path).read_text(encoding="utf-8"))
+        content = Path(sanitized_path).read_bytes()
+    except (OSError, ValueError) as error:
+        raise NotApproved(f"not validated: {error}") from error
+
+    if validation.get("verdict") != PASS:
+        raise NotApproved(f"the validation verdict is {validation.get('verdict')}: see {report_path}")
+
+    if hashlib.sha256(content).hexdigest() != validation.get("files", {}).get("sanitized_sha256"):
+        raise NotApproved(f"{sanitized_path} has changed since it was validated")
+
+    return json.loads(content)
 
 
 def print_validation(validation):

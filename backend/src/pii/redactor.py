@@ -366,6 +366,55 @@ def redact_inherited_headers(original, sanitized, errors):
 # REDACTION
 # --------------------------------------------------
 
+def audit_entry(item, status, **details):
+    return {
+        "finding_id": item.get("finding_id"),
+        "block_id": item.get("block_id"),
+        "type": item.get("type"),
+        "status": status,
+        **details,
+    }
+
+
+def findings_by_block(findings, slots):
+    """
+    Sort a report's findings into those to redact, by block_id, and
+    those that are not: a reviewed false positive is skipped, and one
+    whose offsets do not point at its value has failed. The redacted
+    file in its original format (src/original_format) is made from the
+    same choice.
+
+    Returns (by_block, outcomes, errors): outcomes maps id(finding) to
+    the audit record of each finding not redacted, errors lists the
+    failed ones.
+    """
+
+    by_block = {}
+    outcomes = {}
+    errors = []
+
+    for item in findings:
+
+        if item.get("review_status") == "false_positive":
+            outcomes[id(item)] = audit_entry(item, "skipped", reason="reviewed as a false positive")
+            continue
+
+        problem = check_finding(item, slots)
+
+        if problem:
+            outcomes[id(item)] = audit_entry(item, "failed", reason=problem)
+            errors.append({
+                "finding_id": item.get("finding_id"),
+                "block_id": item.get("block_id"),
+                "reason": problem
+            })
+            continue
+
+        by_block.setdefault(item["block_id"], []).append(item)
+
+    return by_block, outcomes, errors
+
+
 def redact_document(document, report):
     """
     Apply a PII report (document_scanner.scan_document) to the document
@@ -392,38 +441,11 @@ def redact_document(document, report):
     sanitized_slots = text_slots(sanitized)
 
     findings = report["findings"]
-    outcomes = {}       # id(finding) -> its audit record
-    errors = []
+    by_block, outcomes, errors = findings_by_block(findings, slots)
     warnings = []
-    by_block = {}
 
     def record(item, status, **details):
-        outcomes[id(item)] = {
-            "finding_id": item.get("finding_id"),
-            "block_id": item.get("block_id"),
-            "type": item.get("type"),
-            "status": status,
-            **details,
-        }
-
-    for item in findings:
-
-        if item.get("review_status") == "false_positive":
-            record(item, "skipped", reason="reviewed as a false positive")
-            continue
-
-        problem = check_finding(item, slots)
-
-        if problem:
-            record(item, "failed", reason=problem)
-            errors.append({
-                "finding_id": item.get("finding_id"),
-                "block_id": item.get("block_id"),
-                "reason": problem
-            })
-            continue
-
-        by_block.setdefault(item["block_id"], []).append(item)
+        outcomes[id(item)] = audit_entry(item, status, **details)
 
     spans_replaced = 0
 

@@ -55,6 +55,12 @@ CASES = [
         {"Fumiko L. Nakagawa", "M. Achebe"},
     ),
     (
+        "Surnames with an apostrophe or a Mc/Mac prefix",
+        "The review was led by Aoife O'Brien, Callum McDonald and Priya D'Souza.",
+        "",
+        {"Aoife O'Brien", "Callum McDonald", "Priya D'Souza"},
+    ),
+    (
         "Name missed by spaCy, recovered from the column header",
         "Lars-Erik Brannstrom",
         "DIVISIONAL CEO | Global Operations & Technology",
