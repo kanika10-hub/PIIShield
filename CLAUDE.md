@@ -125,8 +125,18 @@ The validator rescans with the same detector, so it cannot catch a value the det
 - **Not measured on real files:** the low-confidence OCR word check (`LOW_OCR_WORD_CONFIDENCE`) may hold back noisy scans more often (the 11-Oct report found 18% of the DOCX sample's screenshot words below 50); DOCX embedded objects now lead to NEEDS_REVIEW; the new heading and two-column rules may relabel or reorder blocks in the samples.
 - Team mailboxes (DEV-039) are redacted as EMAIL though the benchmark labels them not PII: a policy choice, left as it is.
 
+**Real samples** (`archive/samples/`, run 2026-10-13 with scanner 1.4.0 and validator 1.3.0; jobs `20261013-232035_*` and `20261013-232039_*` in `backend/output/`):
+
+- `organizational_pack.pptx`: PASS (was NEEDS_REVIEW: five first names left beside "Led by [REDACTED]"). All six "Led by" lines hold only a tag.
+- `tprm_training.docx`: NEEDS_REVIEW, as before. 4 OCR blocks below confidence 60, and 13 blocks with low-confidence value-like words (new check). Its name-part issues went from 3 to 0.
+- `risk_policy.pdf`: FAIL, as before. Now also finds 4 home addresses, 3 national IDs, 1 date of birth, 1 card number.
+  - `known_values` FAIL: an EMPLOYEE_ID found under an "EMP ID" column on p28 is still in `p25_t3_row_3_cell_2`, under a "VENDOR ID" column that names no type. The scanner reports a value only where its own context says what it is.
+  - 7 name-part NEEDS_REVIEW (was 10): a first name beside a name redacted by another rule (`p27_t3_row_2_cell_3`, `p23_t2_row_2_cell_4`); surnames inside emails that OCR broke with a space before "@" (`p12_b6`); and three single words whose use as a name is unclear.
+
 ### Proposed, not done (waiting for the user's approval)
 
+- Propagate known values in the scanner: a value found as PII in one place (at least 6 characters with a digit or "@") is reported wherever else it stands, as `surname_mentions()` does for surnames. Fixes the `risk_policy.pdf` FAIL above. Risk: an over-short or common value spreads; hence the length rule.
+- Accept OCR spaces around "@" in emails ("j.smith @cadence...") and look into the two first names left beside a name another rule redacted (`risk_policy.pdf`).
 - Trim a leading verb from spaCy PERSON spans using the part-of-speech tags already computed ("Remind Arun Pillai").
 - OCR the scanned pages of a PDF in parallel. Tesseract runs as a subprocess, so threads work; set `OMP_THREAD_LIMIT=1`. Output would be identical.
 - Load spaCy without `parser` and `lemmatizer`, which nothing uses. Keep this only if detection results are identical, because NER may respect the sentence breaks the parser sets.
