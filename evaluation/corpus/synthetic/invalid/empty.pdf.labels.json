@@ -4,5 +4,6 @@
   "expected_outcome": "rejected",
   "description": "An empty file.",
   "pii": [],
-  "not_pii": []
+  "not_pii": [],
+  "structure": []
 }

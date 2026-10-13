@@ -125,17 +125,47 @@ CASES = [
         {},
     ),
     (
+        # The initials are redacted with the surname: "OB [REDACTED]" would
+        # still point at the person
         "The person's initials before the surname, in an OCR'd signature list",
         ["The register is owned by Owen B. Hartley.",
          "8. ose-nutu OB Hartley RK Desai"],
-        {("b1", "Owen B. Hartley"), ("b2", "Hartley")},
+        {("b1", "Owen B. Hartley"), ("b2", "OB Hartley")},
         {},
     ),
     (
         "Dotted, hyphenated initials before the surname",
         ["Owner: Jan-Erik Sandvik",
          "J.-E. Sandvik"],
-        {("b1", "Jan-Erik Sandvik"), ("b2", "Sandvik")},
+        {("b1", "Jan-Erik Sandvik"), ("b2", "J.-E. Sandvik")},
+        {},
+    ),
+    (
+        "The person's first name before the surname is part of the mention",
+        ["Owner: Marguerite Okonjo",
+         "Treasury and planning\nLed by Marguerite Okonjo"],
+        {("b1", "Marguerite Okonjo"), ("b2", "Marguerite Okonjo")},
+        {},
+    ),
+    (
+        "A first name ending the line above the surname is part of the mention",
+        ["Owner: Marguerite Okonjo",
+         "Questions go to Marguerite\nOkonjo directly."],
+        {("b1", "Marguerite Okonjo"), ("b2", "Marguerite\nOkonjo")},
+        {},
+    ),
+    (
+        "An accented surname alone after the full name",
+        ["Owner: Łukasz Wiśniewski",
+         "The plan was signed off by Wiśniewski in May."],
+        {("b1", "Łukasz Wiśniewski"), ("b2", "Wiśniewski")},
+        {},
+    ),
+    (
+        "Initials before the surname are part of the mention, a title is not",
+        ["Owner: Marguerite A. Okonjo",
+         "Escalate to Dr. A. Okonjo today."],
+        {("b1", "Marguerite A. Okonjo"), ("b2", "A. Okonjo")},
         {},
     ),
     (

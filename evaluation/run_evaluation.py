@@ -20,6 +20,10 @@ The outputs are then compared with the document's labels
     0 input check   invalid files refused, valid files accepted
     1 extraction    each labelled value is in the extracted JSON: exactly,
                     approximately (OCR damage, see FUZZY_MATCH) or not at all
+    1b structure    each labelled element is found as the right kind in the
+                    right place, neighbours in the reading order stay
+                    neighbours, and the text around each redaction is kept
+                    (target: STRUCTURE_TARGET)
     2 detection     precision, recall and F1 of the PII report against the
                     labels, by type, format, place and detector
     3 redaction     no labelled value is left in the sanitized copy (part of
@@ -76,7 +80,7 @@ import main as pipeline  # noqa: E402
 from src.pii.detectors import LocalNLPDetector  # noqa: E402
 from src.pii.document_scanner import SCANNER_VERSION  # noqa: E402
 from src.pii.exposure_report import EXPOSURE_VERSION  # noqa: E402
-from src.pii.redactor import REDACTOR_VERSION  # noqa: E402
+from src.pii.redactor import REDACTION_TAG, REDACTOR_VERSION  # noqa: E402
 from src.pii.validator import (  # noqa: E402
     EXIT_CODES, PASS, VALIDATOR_VERSION, NotApproved, approved_copy
 )
@@ -92,6 +96,11 @@ SNIPPET_EVALUATOR = REPO / "archive" / "tests" / "evaluate_detector.py"
 # more or less ("Dr. Elena Varga"), still matches its label when this
 # alike (difflib ratio, 0-1)
 FUZZY_MATCH = 0.85
+
+# The extraction must keep at least this share of a document's elements
+# (found, as the right kind, in the right place) and of their neighbours
+# in the reading order
+STRUCTURE_TARGET = 0.80
 
 # The functions main.py calls for each step, timed by name
 TIMED_STEPS = {
@@ -116,6 +125,10 @@ HEADLINE = [
     ("Invalid files refused", ("input_check", "invalid_refused_rate"), True),
     ("Valid files accepted", ("input_check", "valid_accepted_rate"), True),
     ("Extraction: PII values readable", ("extraction", "recall"), True),
+    ("Structure: elements kept", ("structure", "structure_rate"), True),
+    ("Structure: neighbours kept (order)", ("structure", "order_rate"), True),
+    (f"Structure: documents below {STRUCTURE_TARGET}", ("structure", "documents_below_target"), False),
+    ("Context around redactions kept", ("structure", "context_rate"), True),
     ("Detection precision", ("detection", "overall", "precision"), True),
     ("Detection recall", ("detection", "overall", "recall"), True),
     ("Detection F1", ("detection", "overall", "f1"), True),
@@ -479,6 +492,236 @@ def score_redaction(labels, decoys, extracted_texts, sanitized_texts):
             decoy["status"] = "kept" if contains(sanitized_texts, decoy["text"]) else "removed"
 
 
+# --------------------------------------------------
+# STRUCTURE AND CONTEXT
+# --------------------------------------------------
+
+# Element kinds of the labels, by the extractor's block types
+KINDS = {"image_ocr": "image_text"}
+
+# Places outside the body's reading order: whether an element there is
+# found, and as what, is scored; its position in the reading order is not
+OUTSIDE_FLOW = ("header", "footer", "notes", "comment")
+
+# An element the extractor split over up to this many consecutive blocks
+# is still found
+MAX_SPLIT = 5
+
+# Stands for any redaction tag when texts around redactions are compared
+TAG = "[REDACTED]"
+
+
+def extracted_units(document):
+    """
+    The extracted document as units in reading order: each page's blocks,
+    and a table as its cells, row by row. Words belong to their block.
+    """
+
+    units = []
+
+    for page in document["pages"]:
+        for block in page["blocks"]:
+            parts = [block]
+
+            if block["block_type"] == "table":
+                parts = sorted(
+                    block.get("children") or [],
+                    key=lambda cell: (cell["metadata"].get("row", 0), cell["metadata"].get("column", 0))
+                )
+
+            for part in parts:
+                metadata = part.get("metadata") or {}
+                units.append({
+                    "block_id": part["block_id"],
+                    "kind": KINDS.get(part["block_type"], part["block_type"]),
+                    "where": metadata.get("location") or "body",
+                    "page": page["page_number"],
+                    "row": metadata.get("row"),
+                    "column": metadata.get("column"),
+                    "anchor": metadata.get("anchor_block_id"),
+                    "text": normalise(part.get("text") or ""),
+                })
+
+    return units
+
+
+def locate(text, units, after=0, page=None):
+    """
+    Where an element's text is among the units, as (first, last) unit
+    positions: a unit with exactly that text, a unit holding it, a run
+    of up to MAX_SPLIT consecutive units holding it together, or a unit
+    at least FUZZY_MATCH alike (OCR damage). Of several matches, the
+    first at or after position after wins. None if it is not there.
+    """
+
+    target = normalise(text)
+    candidates = [index for index, unit in enumerate(units) if page is None or unit["page"] == page]
+
+    def first(matches):
+        later = [match for match in matches if match[0] >= after]
+        return (later or matches or [None])[0]
+
+    for test in (lambda unit: unit["text"] == target, lambda unit: target in unit["text"]):
+        match = first([(index, index) for index in candidates if test(units[index])])
+
+        if match:
+            return match
+
+    runs = []
+
+    for start in candidates:
+        joined = ""
+
+        for end in range(start, min(start + MAX_SPLIT, len(units))):
+            if page is not None and units[end]["page"] != page:
+                break
+
+            joined = f"{joined} {units[end]['text']}".strip()
+
+            if target in joined:
+                runs.append((start, end))
+                break
+
+    match = first(runs)
+
+    if match:
+        return match
+
+    score, index = max(((similarity(target, units[index]["text"]), index) for index in candidates), default=(0, None))
+
+    return (index, index) if index is not None and score >= FUZZY_MATCH else None
+
+
+def with_tags(text, values):
+    """
+    text with each of values, and each redaction tag, written as TAG.
+    """
+
+    text = REDACTION_TAG.sub(TAG, normalise(text))
+
+    for value in sorted(values, key=len, reverse=True):
+        text = re.sub(rf"(?<!\w){re.escape(normalise(value))}(?!\w)", TAG, text)
+
+    # Adjacent redactions are one
+    return re.sub(rf"{re.escape(TAG)}(?:\s*{re.escape(TAG)})+", TAG, text)
+
+
+def score_structure(expected, document, sanitized, pii):
+    """
+    How much of the document's structure the extraction kept, from the
+    elements the labels list in reading order:
+
+        elements    each found, as the right kind (heading, list item...),
+                    in the right place (body, header, notes...), a table
+                    cell in its row and column, a comment attached to its
+                    text: "kept"; otherwise what went wrong
+        neighbours  each pair of elements next to each other in the body's
+                    reading order is next to each other in the extraction
+                    too: the text before and after every element is kept
+        context     around each element holding PII, the sanitized copy
+                    differs from the extracted text only by the tags in
+                    place of the labelled values: no word of context was
+                    redacted or lost
+    """
+
+    units = extracted_units(document)
+    position = {unit["block_id"]: index for index, unit in enumerate(units)}
+    elements = []
+    cursor = 0
+
+    for item in expected:
+        span = locate(item["text"], units, cursor, item.get("page"))
+        element = {"text": item["text"], "kind": item["kind"], "where": item["where"], "span": span}
+        elements.append(element)
+
+        if span is None:
+            element["status"] = "not found"
+            continue
+
+        unit = units[span[0]]
+        problems = []
+
+        if unit["kind"] != item["kind"]:
+            problems.append(f"read as {unit['kind']}")
+
+        if unit["where"] != item["where"]:
+            problems.append(f"placed in {unit['where']}")
+
+        if item["kind"] == "table_cell" and (unit["row"], unit["column"]) != (item.get("row"), item.get("column")):
+            problems.append(f"in row {unit['row']}, column {unit['column']}")
+
+        if "anchor" in item:
+            anchor = position.get(unit["anchor"])
+
+            if anchor is None or normalise(item["anchor"]) not in units[anchor]["text"]:
+                problems.append("not attached to the text it is about")
+
+        element["status"] = "; ".join(problems) or "kept"
+
+        if item["where"] not in OUTSIDE_FLOW:
+            cursor = span[0]
+
+    # The body's reading order: units the extraction did not put aside
+    flow = {index: number for number, index in enumerate(
+        index for index, unit in enumerate(units) if unit["where"] not in OUTSIDE_FLOW
+    )}
+    body = [
+        element for element in elements
+        if element["where"] not in OUTSIDE_FLOW and element["span"]
+        and element["span"][0] in flow and element["span"][1] in flow
+    ]
+    broken = []
+
+    for before, after in zip(body, body[1:]):
+        if not (
+            after["span"][0] == before["span"][1]
+            or flow[after["span"][0]] == flow[before["span"][1]] + 1
+        ):
+            broken.append((before["text"], after["text"]))
+
+    sanitized_text = {}
+
+    if sanitized:
+        for page in sanitized["pages"]:
+            stack = list(page["blocks"])
+
+            while stack:
+                block = stack.pop()
+                sanitized_text[block["block_id"]] = block.get("text") or ""
+                stack.extend(child for child in block.get("children") or [] if child["block_type"] != "word")
+
+    values = [label["text"] for label in pii]
+    context = []
+
+    for element in elements:
+        if not element["span"] or not any(normalise(value) in normalise(element["text"]) for value in values):
+            continue
+
+        ids = [units[index]["block_id"] for index in range(element["span"][0], element["span"][1] + 1)]
+        wanted = with_tags(" ".join(units[position[block_id]]["text"] for block_id in ids), values)
+        actual = with_tags(" ".join(sanitized_text.get(block_id, "") for block_id in ids), [])
+        context.append({"text": element["text"], "kept": wanted == actual, "expected": wanted, "actual": actual})
+
+    kept = sum(1 for element in elements if element["status"] == "kept")
+    relations = max(len(body) - 1, 0)
+
+    return {
+        "elements": len(elements),
+        "found": sum(1 for element in elements if element["span"]),
+        "kept": kept,
+        "structure_rate": ratio(kept, len(elements)),
+        "relations": relations,
+        "neighbours_kept": relations - len(broken),
+        "order_rate": ratio(relations - len(broken), relations),
+        "pii_elements": len(context),
+        "context_kept": sum(1 for item in context if item["kept"]),
+        "context_rate": ratio(sum(1 for item in context if item["kept"]), len(context)),
+        "problems": [element for element in elements if element["status"] != "kept"],
+        "broken": broken,
+        "context_lost": [item for item in context if not item["kept"]],
+    }
+
+
 def shareable_leaks(job_dir, labels):
     """
     Labelled values found in the files meant to be shared.
@@ -604,6 +847,9 @@ def score_document(source, corpus, labels, run):
 
     holds_pii = any(label["redaction"] in ("LEAKED", "PARTLY LEAKED") for label in pii)
 
+    if labels.get("structure") and document:
+        result["structure"] = score_structure(labels["structure"], document, sanitized, pii)
+
     result.update({
         "pii": pii,
         "not_pii": decoys,
@@ -693,6 +939,11 @@ def corpus_metrics(results, snippets):
     removable = sum(redaction[status] for status in ("removed", "LEAKED", "PARTLY LEAKED"))
     outcomes = Counter(result.get("outcome") for result in labelled)
     gated = [result for result in labelled if result.get("outcome") in (UNSAFE_RELEASE, CORRECT_RELEASE, CORRECT_BLOCK, OVER_BLOCK)]
+    structured = [result["structure"] for result in labelled if result.get("structure")]
+    structure = {
+        key: sum(item[key] for item in structured)
+        for key in ("elements", "found", "kept", "relations", "neighbours_kept", "pii_elements", "context_kept")
+    }
     timing = defaultdict(float)
 
     for result in results:
@@ -718,6 +969,18 @@ def corpus_metrics(results, snippets):
             **{status: extraction[status] for status in ("exact", "approximate", "missing")},
             "recall": ratio(extraction["exact"] + extraction["approximate"], len(labels)),
             "exact_rate": ratio(extraction["exact"], len(labels)),
+        },
+        "structure": {
+            "documents": len(structured),
+            **structure,
+            "structure_rate": ratio(structure["kept"], structure["elements"]),
+            "order_rate": ratio(structure["neighbours_kept"], structure["relations"]),
+            "context_rate": ratio(structure["context_kept"], structure["pii_elements"]),
+            "documents_below_target": sum(
+                1 for item in structured
+                if min(item["structure_rate"] or 0, item["order_rate"] if item["order_rate"] is not None else 1)
+                < STRUCTURE_TARGET
+            ),
         },
         "detection": detection_metrics(labelled),
         "redaction": {
@@ -935,6 +1198,11 @@ DOCUMENT_HEADERS = [
 ]
 
 
+def short(text, length=60):
+    text = normalise(text)
+    return text if len(text) <= length else text[:length - 3] + "..."
+
+
 def problem_lines(result):
     """
     Everything that went wrong for one document, one line each.
@@ -983,6 +1251,19 @@ def problem_lines(result):
     for leak in result.get("report_leaks", []):
         lines.append(f"- **PII in shareable report {leak['file']}:** `{leak['text']}` ({leak['type']})")
 
+    structure = result.get("structure") or {}
+
+    for element in structure.get("problems", []):
+        lines.append(f"- **Structure:** `{short(element['text'])}` ({element['kind']}, {element['where']}): "
+                     f"{element['status']}")
+
+    for before, after in structure.get("broken", []):
+        lines.append(f"- **Reading order:** `{short(after)}` does not follow `{short(before)}`")
+
+    for item in structure.get("context_lost", []):
+        lines.append(f"- **Context around a redaction:** expected `{short(item['expected'], 90)}`, "
+                     f"sanitized `{short(item['actual'], 90)}`")
+
     if result.get("gate_consistent") is False:
         lines.append(f"- **Gate disagrees with verdict {result['verdict']}:** {result['gate_reason']}")
 
@@ -1028,6 +1309,33 @@ def write_summary(path, metrics, results, previous, previous_name, corpus):
         table(
             ["Values labelled", "Exact", "Approximate (OCR damage)", "Missing", "Readable"],
             [[metrics["extraction"][key] for key in ("values", "exact", "approximate", "missing", "recall")]]
+        ),
+        "",
+        "## Step 1b: structure and context",
+        "",
+        "Each element the labels list (heading, paragraph, list item, table cell, image text, header, "
+        "footer, notes, comment) is *kept* if it is found as the right kind, in the right place (and a "
+        "cell in its row and column). *Neighbours kept* counts the pairs of elements next to each other "
+        "in the body's reading order that are next to each other in the extraction too. *Context kept* "
+        "counts the elements holding PII whose sanitized text is the extracted text with only the PII "
+        f"replaced by tags. Target: at least {STRUCTURE_TARGET} of the elements and of the neighbours "
+        "kept in every document.",
+        "",
+        table(
+            ["Document", "Elements", "Found", "Kept", "Elements kept", "Neighbours kept", "Context kept", "Target met"],
+            [
+                [
+                    result["file"], item["elements"], item["found"], item["kept"], item["structure_rate"],
+                    item["order_rate"], item["context_rate"],
+                    "yes" if min(item["structure_rate"] or 0, item["order_rate"] if item["order_rate"] is not None else 1)
+                    >= STRUCTURE_TARGET else "NO",
+                ]
+                for result in results if (item := result.get("structure"))
+            ] + [[
+                "all", metrics["structure"]["elements"], metrics["structure"]["found"],
+                metrics["structure"]["kept"], metrics["structure"]["structure_rate"],
+                metrics["structure"]["order_rate"], metrics["structure"]["context_rate"], "",
+            ]]
         ),
         "",
         "## Step 2: detection",

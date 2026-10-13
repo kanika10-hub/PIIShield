@@ -1,0 +1,121 @@
+{
+  "file": "multipage_report.pdf",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "A three-page report with a text layer: a running header and a page number on every page, and paragraphs that continue from one page to the next.",
+  "pii": [
+    {
+      "text": "Ingrid Haugen",
+      "type": "PERSON_NAME",
+      "where": "page 1"
+    },
+    {
+      "text": "+47 2255 0187",
+      "type": "PHONE",
+      "where": "page 1"
+    },
+    {
+      "text": "Tomasz Zieliński",
+      "type": "PERSON_NAME",
+      "where": "page 2"
+    },
+    {
+      "text": "t.zielinski@example.com",
+      "type": "EMAIL",
+      "where": "page 2"
+    }
+  ],
+  "not_pii": [],
+  "structure": [
+    {
+      "text": "Cadence Group | Internal - Confidential",
+      "kind": "paragraph",
+      "where": "header",
+      "page": 1
+    },
+    {
+      "text": "Annual Supplier Risk Report",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "The annual review covered 214 suppliers across\nfour regions and three business lines.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Suppliers in the critical tier received an\non-site assessment and a control test.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "The review was coordinated by Ingrid Haugen, who can be\nreached on +47 2255 0187 about the findings.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Page 1 of 3",
+      "kind": "paragraph",
+      "where": "footer",
+      "page": 1
+    },
+    {
+      "text": "Cadence Group | Internal - Confidential",
+      "kind": "paragraph",
+      "where": "header",
+      "page": 2
+    },
+    {
+      "text": "Seven suppliers had open findings at year end,\ntwo of them rated high.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Remediation is tracked by Tomasz Zieliński\n(t.zielinski@example.com) every month.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Contract clauses were updated for data\nresidency and breach notification.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Page 2 of 3",
+      "kind": "paragraph",
+      "where": "footer",
+      "page": 2
+    },
+    {
+      "text": "Cadence Group | Internal - Confidential",
+      "kind": "paragraph",
+      "where": "header",
+      "page": 3
+    },
+    {
+      "text": "The next cycle starts in January and adds\na review of fourth parties.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 3
+    },
+    {
+      "text": "Questions about the method go to the\nsupplier risk mailbox.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 3
+    },
+    {
+      "text": "Page 3 of 3",
+      "kind": "paragraph",
+      "where": "footer",
+      "page": 3
+    }
+  ]
+}

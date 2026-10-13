@@ -149,5 +149,159 @@
       "text": "HR-POL-014",
       "why": "policy reference"
     }
+  ],
+  "structure": [
+    {
+      "text": "Confidential - prepared by Laura Okonjo",
+      "kind": "paragraph",
+      "where": "header"
+    },
+    {
+      "text": "Questions: samuel.brandt@example.org",
+      "kind": "paragraph",
+      "where": "footer"
+    },
+    {
+      "text": "New Starter Record",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "This record confirms that Grace Holloway joined the Risk Analytics team in London on 2026-03-02. Her line manager is Omar Siddiqui (EMP-48213).",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Start date confirmed with payroll.",
+      "kind": "paragraph",
+      "where": "comment",
+      "anchor": "This record confirms that Grace Holloway joined the Risk Analytics team in London on 2026-03-02. Her line manager is Omar Siddiqui (EMP-48213)."
+    },
+    {
+      "text": "She can be reached at grace.holloway@example.com or on +44 7700 900481.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "For payroll, Social Security Number: 078-05-1120 and passport number K8203917 were checked under ticket ISS-2026-0417, cost centre 4500018832.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Holloway completes the security induction in week one, as required by policy HR-POL-014.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Team Contacts",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Name",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Email",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Phone",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Employee ID",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 4
+    },
+    {
+      "text": "Nadia Rahman",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "nadia.rahman@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "020 7946 0123",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "EMP-55102",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 4
+    },
+    {
+      "text": "Felix Moreau",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "f.moreau@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "+33 1 99 00 12 34",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "CFG-7731",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 4
+    },
+    {
+      "text": "Sign-off sheet:",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Approved by: Daniel Osei\nMobile +44 7700 900733",
+      "kind": "image_text",
+      "where": "body"
+    }
   ]
 }

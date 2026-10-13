@@ -93,5 +93,114 @@
       "text": "10.0.19041",
       "why": "version number"
     }
+  ],
+  "structure": [
+    {
+      "text": "Access Control Policy",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Policy GRP-POL-007 supersedes ISS-2026-0233 (see page 14 of 35).",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "The policy owner is Elena Varga, elena.varga@example.com,\ntelephone +1 (646) 555-0119.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Server 198.51.100.23 hosts the identity provider; build 10.0.19041 is approved.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Out of hours, call Yusuf Demir on +44 7700\n900218 or the duty manager.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Name",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Employee ID",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Mobile",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Tomasz Nowak",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "EMP-61234",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "+1 (415) 555-0172",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "Ines Duarte",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "EMP-61290",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "+1 (415) 555-0193",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "Badge record:",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Badge issued to Rafael Costa\nStaff ID: EMP-61377",
+      "kind": "image_text",
+      "where": "body"
+    }
   ]
 }

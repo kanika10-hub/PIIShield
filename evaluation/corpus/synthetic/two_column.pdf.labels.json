@@ -1,0 +1,61 @@
+{
+  "file": "two_column.pdf",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "A newsletter page in two columns, with a text layer. The left column is read before the right one, so each paragraph keeps the paragraphs before and after it.",
+  "pii": [
+    {
+      "text": "Ewa Nowak",
+      "type": "PERSON_NAME",
+      "where": "left column"
+    },
+    {
+      "text": "+48 22 555 0193",
+      "type": "PHONE",
+      "where": "left column"
+    },
+    {
+      "text": "evidence@example.com",
+      "type": "EMAIL",
+      "where": "right column"
+    }
+  ],
+  "not_pii": [],
+  "structure": [
+    {
+      "text": "Quarterly Risk Bulletin",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Third-party reviews closed this quarter\nrose to 41, ahead of the target.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Questions go to Ewa Nowak on\n+48 22 555 0193 until Friday.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Two vendors moved to the high-risk tier\nafter their annual assessment.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "The access review starts in March and\ncovers every privileged account.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Evidence goes to evidence@example.com\nbefore the end of the month.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Training completion stands at 96 percent\nacross all business units.",
+      "kind": "paragraph",
+      "where": "body"
+    }
+  ]
+}

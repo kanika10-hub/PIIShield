@@ -1,0 +1,285 @@
+{
+  "file": "org_chart.pptx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "Organisation chart: names after 'Presented by' and 'Led by', a first name that ends the line above its surname, and the leaders named in full in a contacts table.",
+  "pii": [
+    {
+      "text": "Joanna Whitcombe",
+      "type": "PERSON_NAME",
+      "where": "title slide"
+    },
+    {
+      "text": "Marguerite Okonjo",
+      "type": "PERSON_NAME",
+      "where": "org chart"
+    },
+    {
+      "text": "Priyanka Raghavan",
+      "type": "PERSON_NAME",
+      "where": "org chart"
+    },
+    {
+      "text": "Rosalind Achterberg",
+      "type": "PERSON_NAME",
+      "where": "org chart"
+    },
+    {
+      "text": "Daniel\nFairweather",
+      "type": "PERSON_NAME",
+      "where": "org chart (line break)"
+    },
+    {
+      "text": "Marguerite Okonjo",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "m.okonjo@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "Priyanka Raghavan",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "p.raghavan@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "Daniel Fairweather",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "d.fairweather@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "Organisation Overview",
+      "why": "document title"
+    },
+    {
+      "text": "Communications Office",
+      "why": "team name"
+    },
+    {
+      "text": "Finance",
+      "why": "business unit"
+    },
+    {
+      "text": "Operations",
+      "why": "business unit"
+    },
+    {
+      "text": "People & Culture",
+      "why": "business unit"
+    }
+  ],
+  "structure": [
+    {
+      "text": "Organisation Overview",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Presented by Joanna Whitcombe",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Leadership Team",
+      "kind": "heading",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Finance",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Treasury, financial control and planning",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Led by Marguerite Okonjo",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Operations",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Client servicing, payments and shared services",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Led by Priyanka Raghavan",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "People & Culture",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Talent, workforce policy and employee relations",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Led by Rosalind Achterberg",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Risk & Compliance",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Led by Daniel\nFairweather",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Leadership Contacts",
+      "kind": "heading",
+      "where": "body",
+      "page": 3
+    },
+    {
+      "text": "Function",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Head",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Email",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Finance",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "Marguerite Okonjo",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "m.okonjo@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "Operations",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "Priyanka Raghavan",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "p.raghavan@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "Risk & Compliance",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 4,
+      "column": 1
+    },
+    {
+      "text": "Daniel Fairweather",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 4,
+      "column": 2
+    },
+    {
+      "text": "d.fairweather@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 4,
+      "column": 3
+    }
+  ]
+}

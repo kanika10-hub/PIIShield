@@ -107,5 +107,160 @@
       "text": "2026-08-19",
       "why": "date"
     }
+  ],
+  "structure": [
+    {
+      "text": "Vendor Risk Review Q3 2026",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Presented by Lucas Ferreira",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Escalation Contacts",
+      "kind": "heading",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Account manager: Hannah Becker (hannah.becker@example.net)",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Escalation line: +1 (212) 555-0186",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "VPN gateway 192.0.2.44 was exposed for 3 days",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Contract VND-2026-0042, availability 99.9%",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Prepared for Northwind Traders, Rotterdam",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 2
+    },
+    {
+      "text": "Remind Arun Pillai to send the PAN ABCPK1234F for the vendor file.",
+      "kind": "paragraph",
+      "where": "notes",
+      "page": 2
+    },
+    {
+      "text": "Site Contacts",
+      "kind": "heading",
+      "where": "body",
+      "page": 3
+    },
+    {
+      "text": "Contact",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Role",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Passport No.",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Victor Nakamura",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "Site lead",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "TN4471902",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "Sofia Ricci",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "Auditor",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "YB2208815",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "Site visit signed off by\nChloe Dubois on 2026-08-19",
+      "kind": "image_text",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "Photo: site visit record",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 4
+    }
   ]
 }

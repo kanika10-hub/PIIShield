@@ -119,6 +119,107 @@ CASES = [
         "",
         {("IP_ADDRESS", "192.168.1.10")},
     ),
+    (
+        "Card numbers with a known prefix and a valid Luhn digit",
+        "Corporate card 4111 1111 1111 1111; refund to 5555-5555-5555-4444; Amex 3782 822463 10005",
+        "",
+        {
+            ("PAYMENT_CARD", "4111 1111 1111 1111"),
+            ("PAYMENT_CARD", "5555-5555-5555-4444"),
+            ("PAYMENT_CARD", "3782 822463 10005"),
+        },
+    ),
+    (
+        "Masked card numbers after a card label",
+        "Card number: **** **** **** 4417. Visa ending in 9921 was blocked.",
+        "",
+        {("PAYMENT_CARD", "**** **** **** 4417"), ("PAYMENT_CARD", "9921")},
+    ),
+    (
+        "Table cell: masked card under a Card header",
+        "**** 4417",
+        "Corporate Card",
+        {("PAYMENT_CARD", "**** 4417")},
+    ),
+    (
+        "IBANs with a valid checksum",
+        "IBAN: GB82 WEST 1234 5698 7654 32, or PL61 1090 1014 0000 0712 1981 2874",
+        "",
+        {
+            ("BANK_ACCOUNT", "GB82 WEST 1234 5698 7654 32"),
+            ("BANK_ACCOUNT", "PL61 1090 1014 0000 0712 1981 2874"),
+        },
+    ),
+    (
+        "Account numbers after their label, plain and masked",
+        "Account number: 12345678; A/C no. ****5678",
+        "",
+        {("BANK_ACCOUNT", "12345678"), ("BANK_ACCOUNT", "****5678")},
+    ),
+    (
+        "PESEL with a valid check digit, labelled or not",
+        "PESEL 44051401359; legacy record 02270803624",
+        "",
+        {("NATIONAL_ID", "44051401359"), ("NATIONAL_ID", "02270803624")},
+    ),
+    (
+        "Aadhaar: labelled, or unlabelled in its 4-4-4 grouping",
+        "Aadhaar: 234567890124; copy on file 2345 6789 0124",
+        "",
+        {("NATIONAL_ID", "234567890124"), ("NATIONAL_ID", "2345 6789 0124")},
+    ),
+    (
+        "National ID after its label",
+        "National Insurance number: QQ 12 34 56 C",
+        "",
+        {("NATIONAL_ID", "QQ 12 34 56 C")},
+    ),
+    (
+        "Dates of birth after their label, in several formats",
+        "Date of birth: 14/05/1984; DOB 1984-05-14; born on 14 May 1984; Born: March 3rd, 1990",
+        "",
+        {
+            ("DATE_OF_BIRTH", "14/05/1984"),
+            ("DATE_OF_BIRTH", "1984-05-14"),
+            ("DATE_OF_BIRTH", "14 May 1984"),
+            ("DATE_OF_BIRTH", "March 3rd, 1990"),
+        },
+    ),
+    (
+        "Table cell: date under a Date of Birth header",
+        "14/05/1984",
+        "Employee | Date of Birth",
+        {("DATE_OF_BIRTH", "14/05/1984")},
+    ),
+    (
+        "Labelled home address ends where a lowercase clause starts",
+        "Home address: 12 Ashwood Lane, Leeds LS6 2AB, which she shares",
+        "",
+        {("POSTAL_ADDRESS", "12 Ashwood Lane, Leeds LS6 2AB")},
+    ),
+    (
+        "Street addresses without a label: UK, US and Polish",
+        "Moved to 221B Baker Street, London NW1 6XE in May. Office: 1600 Pennsylvania "
+        "Avenue, Washington, DC 20500. Zamieszkały: ul. Kwiatowa 12/4, 00-950 Warszawa",
+        "",
+        {
+            ("POSTAL_ADDRESS", "221B Baker Street, London NW1 6XE"),
+            ("POSTAL_ADDRESS", "1600 Pennsylvania Avenue, Washington, DC 20500"),
+            ("POSTAL_ADDRESS", "ul. Kwiatowa 12/4, 00-950 Warszawa"),
+        },
+    ),
+    (
+        "An address over several lines, town and postcode included",
+        "Delivery to:\n12 Oak Lane\nLeeds\nLS6 2AB",
+        "",
+        {("POSTAL_ADDRESS", "12 Oak Lane\nLeeds\nLS6 2AB")},
+    ),
+    (
+        "Table cell: the whole cell under a Home Address header",
+        "12 Oak Lane\nLeeds\nLS6 2AB",
+        "Home Address",
+        {("POSTAL_ADDRESS", "12 Oak Lane\nLeeds\nLS6 2AB")},
+    ),
 
     # ---------------- Must NOT be found ----------------
     ("Issue reference", "Issue\nISS-2026-0112 remains open", "", set()),
@@ -180,6 +281,66 @@ CASES = [
         "Mobile: none. Account 9876543210",
         "",
         set(),
+    ),
+    (
+        "Card-length numbers failing the Luhn check or without a card prefix",
+        "Order 4111 1111 1111 1112 shipped; reference 1234567890123 closed",
+        "",
+        set(),
+    ),
+    (
+        "Three groups of a card number or an IBAN are not an Aadhaar number",
+        "Card 5105 1051 0510 5100; IBAN DE89 3704 0044 0532 0130 00",
+        "",
+        {("PAYMENT_CARD", "5105 1051 0510 5100"), ("BANK_ACCOUNT", "DE89 3704 0044 0532 0130 00")},
+    ),
+    (
+        "IBAN with a wrong check digit",
+        "Ref GB82 WEST 1234 5698 7654 33",
+        "",
+        set(),
+    ),
+    (
+        "Eleven digits failing the PESEL check, twelve ungrouped digits without a label",
+        "Order 44051401358 shipped; batch 234567890124 logged",
+        "",
+        set(),
+    ),
+    (
+        "Dates that are not dates of birth",
+        "Effective date: 14/05/2024; review on 14 May 2026",
+        "",
+        set(),
+    ),
+    (
+        "Table cell: date under a Start Date header",
+        "14/05/2024",
+        "Start Date",
+        set(),
+    ),
+    (
+        "Address as a verb, and an address label before a reference",
+        "Address the open findings by 12 March. Address: Section 4.2 of the policy",
+        "",
+        set(),
+    ),
+    (
+        "IP and email addresses are not postal addresses",
+        "Email address: jane@example.com; server address 10.0.0.12",
+        "",
+        {("EMAIL", "jane@example.com"), ("IP_ADDRESS", "10.0.0.12")},
+    ),
+    (
+        "Table cell: no address in an Address column",
+        "Head office",
+        "Address",
+        set(),
+    ),
+    (
+        "An ordinary line after a street address is not its town",
+        "12 Oak Lane\nManager approval is required",
+        "",
+        {("POSTAL_ADDRESS", "12 Oak Lane")},
     ),
 ]
 

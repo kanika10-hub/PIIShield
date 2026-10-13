@@ -1,0 +1,198 @@
+{
+  "file": "customer_record.docx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "Customer record: a date of birth, home addresses (in a sentence, and over three lines in a table cell), a card number in full and masked, an IBAN and an account number, a PESEL and a National Insurance number, beside dates and numbers that are not PII.",
+  "pii": [
+    {
+      "text": "Beatrix Lindqvist",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "14/05/1984",
+      "type": "DATE_OF_BIRTH",
+      "where": "body"
+    },
+    {
+      "text": "12 Ashwood Lane, Leeds LS6 2AB",
+      "type": "POSTAL_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "GB82 WEST 1234 5698 7654 32",
+      "type": "BANK_ACCOUNT",
+      "where": "body"
+    },
+    {
+      "text": "4111 1111 1111 1111",
+      "type": "PAYMENT_CARD",
+      "where": "body"
+    },
+    {
+      "text": "44051401359",
+      "type": "NATIONAL_ID",
+      "where": "body"
+    },
+    {
+      "text": "QQ 12 34 56 C",
+      "type": "NATIONAL_ID",
+      "where": "body"
+    },
+    {
+      "text": "Tobias Engel",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "02/11/1979",
+      "type": "DATE_OF_BIRTH",
+      "where": "table"
+    },
+    {
+      "text": "15 Elm Grove\nManchester\nM14 6HJ",
+      "type": "POSTAL_ADDRESS",
+      "where": "table"
+    },
+    {
+      "text": "**** 4417",
+      "type": "PAYMENT_CARD",
+      "where": "table"
+    },
+    {
+      "text": "40261937",
+      "type": "BANK_ACCOUNT",
+      "where": "table"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "Customer Record",
+      "why": "document title"
+    },
+    {
+      "text": "4111 1111 1111 1112",
+      "why": "order number that fails the card check"
+    },
+    {
+      "text": "14/05/2024",
+      "why": "date"
+    },
+    {
+      "text": "Address the open actions",
+      "why": "address as a verb"
+    }
+  ],
+  "structure": [
+    {
+      "text": "Customer Record",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Customer Beatrix Lindqvist, date of birth 14/05/1984, home address: 12 Ashwood Lane, Leeds LS6 2AB.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Refunds go to IBAN GB82 WEST 1234 5698 7654 32 or to the card 4111 1111 1111 1111; order 4111 1111 1111 1112 is not affected.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Identity checked against PESEL 44051401359 and National Insurance number QQ 12 34 56 C.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "The contract took effect on 14/05/2024. Address the open actions before the review.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Payment Details",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Name",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Date of Birth",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Home Address",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Card",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 4
+    },
+    {
+      "text": "Account Number",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 5
+    },
+    {
+      "text": "Tobias Engel",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "02/11/1979",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "15 Elm Grove\nManchester\nM14 6HJ",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "**** 4417",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 4
+    },
+    {
+      "text": "40261937",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 5
+    }
+  ]
+}

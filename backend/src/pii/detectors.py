@@ -13,6 +13,12 @@ except ImportError:
 # 0. CONTEXT HELPERS
 # --------------------------------------------------
 
+# Capital and small letters of the Latin scripts, for regex character
+# classes: names are "Łukasz Wiśniewski" and "José Álvarez" too, not only
+# A-Z. Python's re has no \p{Lu}, so the classes are listed.
+UPPER = "A-Z" + "".join(letter for letter in map(chr, range(0xC0, 0x250)) if letter.isupper())
+LOWER = "a-z" + "".join(letter for letter in map(chr, range(0xC0, 0x250)) if letter.islower())
+
 # Labels that announce the value after them, e.g. "SSN 900-55-2043".
 LABEL_PATTERNS = {
     pii_type: re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE)
@@ -24,6 +30,20 @@ LABEL_PATTERNS = {
         # "Employee ID", not just "Employee": a header like
         # "Employee count" must not turn "1500" into an ID
         "EMPLOYEE_ID": r"(?:employee|staff|emp)\.?\s*(?:id|no|number|code)",
+        "DATE_OF_BIRTH": r"date of birth|birth ?date|dob|d\.o\.b|born(?: on)?",
+        "NATIONAL_ID": (
+            r"pesel|aadhaar|national (?:id|identity|identification|insurance)(?: number| no| card)?"
+            r"|ni number|nino|personal id(?:entification)? number"
+        ),
+        "PAYMENT_CARD": r"card|visa|mastercard|amex",
+        # Not "account" alone: "Account 9876543210" can be any reference
+        "BANK_ACCOUNT": r"iban|(?:bank )?account (?:number|no)|acct|a/c|bank account",
+        # Not "IP address", "email address": those values have their own types
+        "POSTAL_ADDRESS": (
+            r"(?<!ip )(?<!mac )(?<!web )(?<!email )(?<!e-mail )(?<!server )"
+            r"(?:(?:home|residential|postal|mailing|permanent|correspondence|private) )?address"
+            r"|resides at|residing at|lives at|living at"
+        ),
         # Column headers and labels that hold people's names. "Name" only
         # on its own or after a person word: "RULE NAME" holds rule titles
         "PERSON_NAME": (
@@ -31,9 +51,11 @@ LABEL_PATTERNS = {
             r"|members?|users?|employee|individual|attendee|incumbent"
             r"|chair|secretary|owner|author|reviewer|approver|requestor|sponsor"
             r"|lead|analyst|manager|officer|deputy|primary|alternate|contact"
-            r"|ceo|cro|cfo|ciso|dpo"
+            r"|ceo|cro|cfo|ciso|dpo|presenter|speaker"
             r"|(?:accepted|approved|prepared|recommended|booked|determined"
-            r"|owned|reviewed|chaired|coordinated|attested|modified) by"
+            r"|owned|reviewed|chaired|coordinated|attested|modified"
+            r"|led|headed|presented|submitted|authored|signed(?: off)?) by"
+            r"|(?:issued|assigned) to"
         ),
     }.items()
 }
@@ -50,6 +72,13 @@ CLAUSE_BREAK = re.compile(
     re.IGNORECASE
 )
 
+# A person label counts for a name spaCy missed only if it stands close
+# before it: "Owner: Jane Okafor", "led by Jane Okafor". Not "Contact
+# the Service Desk" (an article between) nor "Manager approval is
+# needed for Remote Access" (too many words between).
+MAX_LABEL_GAP_WORDS = 2
+ARTICLE = re.compile(r"\b(?:the|a|an|our|your|their|its|this|that|these|those)\b", re.IGNORECASE)
+
 
 def find_label(text, start, pii_type, context="", window=40):
     """
@@ -61,6 +90,29 @@ def find_label(text, start, pii_type, context="", window=40):
     before = CLAUSE_BREAK.split(text[max(0, start - window):start])[-1]
     pattern = LABEL_PATTERNS[pii_type]
     match = pattern.search(before) or (pattern.search(context) if context else None)
+
+    return match.group() if match else None
+
+
+def person_label(text, start, context=""):
+    """
+    The person label for a name spaCy missed at text[start:]: the label
+    nearest before it in the same clause, if few words and no article
+    stand between them (see MAX_LABEL_GAP_WORDS), or else a label in the
+    context (a column header). None if there is no such label.
+    """
+
+    pattern = LABEL_PATTERNS["PERSON_NAME"]
+    before = CLAUSE_BREAK.split(text[max(0, start - 40):start])[-1]
+    labels = list(pattern.finditer(before))
+
+    if labels:
+        gap = before[labels[-1].end():]
+
+        if not ARTICLE.search(gap) and len(re.findall(r"\w+", gap)) <= MAX_LABEL_GAP_WORDS:
+            return labels[-1].group()
+
+    match = pattern.search(context) if context else None
 
     return match.group() if match else None
 
@@ -125,6 +177,88 @@ SSN = re.compile(r"(?<![\w-])\d{3}-\d{2}-\d{4}(?![\w-])")
 INDIAN_PAN = re.compile(r"(?<![\w-])[A-Z]{3}[ABCFGHJLPT][A-Z]\d{4}[A-Z](?![\w-])")
 
 IP_ADDRESS = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+
+# Payment card numbers: 13-19 digits, grouped by spaces or hyphens. Only
+# those passing the Luhn check count, and without a card label only with
+# a known card prefix (Visa 4, Mastercard 51-55 and 22-27, Amex 34/37,
+# Diners 30/36/38, JCB 35, Discover 6011/64/65, UnionPay 62).
+CARD = re.compile(r"(?<![\w.+-])\d(?:[ -]?\d){12,18}(?![\w-])")
+CARD_PREFIX = re.compile(r"4|5[1-5]|2[2-7]|3[0478]|35|6(?:011|4[4-9]|5)|62")
+
+# IBAN: country, check digits, then the account in groups of four
+IBAN = re.compile(r"(?<![\w-])[A-Z]{2}\d{2}(?: ?[A-Z0-9]{4}){2,7}(?: ?[A-Z0-9]{1,3})?(?![\w-])")
+
+# Polish PESEL: 11 digits that encode the birth date, with a check digit
+PESEL = re.compile(r"(?<![\w-])\d{11}(?![\w-])")
+PESEL_WEIGHTS = (1, 3, 7, 9, 1, 3, 7, 9, 1, 3)
+
+# Indian Aadhaar: 12 digits, not starting 0 or 1, with a Verhoeff check
+# digit. Without a label, only in its usual 4-4-4 grouping. Never three
+# groups of a longer number: a card number or an IBAN goes on after them.
+AADHAAR = re.compile(r"(?<![\w-])(?<!\d )[2-9]\d{3}([ -]?)\d{4}\1\d{4}(?![\w-]|[ -]\d)")
+
+VERHOEFF_MULTIPLY = (
+    (0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (1, 2, 3, 4, 0, 6, 7, 8, 9, 5),
+    (2, 3, 4, 0, 1, 7, 8, 9, 5, 6), (3, 4, 0, 1, 2, 8, 9, 5, 6, 7),
+    (4, 0, 1, 2, 3, 9, 5, 6, 7, 8), (5, 9, 8, 7, 6, 0, 4, 3, 2, 1),
+    (6, 5, 9, 8, 7, 1, 0, 4, 3, 2), (7, 6, 5, 9, 8, 2, 1, 0, 4, 3),
+    (8, 7, 6, 5, 9, 3, 2, 1, 0, 4), (9, 8, 7, 6, 5, 4, 3, 2, 1, 0),
+)
+VERHOEFF_PERMUTE = (
+    (0, 1, 2, 3, 4, 5, 6, 7, 8, 9), (1, 5, 7, 6, 2, 8, 3, 0, 9, 4),
+    (5, 8, 0, 3, 7, 9, 6, 1, 4, 2), (8, 9, 1, 6, 0, 4, 3, 5, 2, 7),
+    (9, 4, 5, 3, 1, 2, 6, 8, 7, 0), (4, 2, 8, 6, 5, 7, 3, 9, 0, 1),
+    (2, 7, 9, 3, 8, 0, 6, 4, 1, 5), (7, 0, 4, 6, 9, 1, 3, 2, 5, 8),
+)
+
+
+def luhn_valid(digits):
+    total = 0
+
+    for index, digit in enumerate(reversed(digits)):
+        number = int(digit) * (2 if index % 2 else 1)
+        total += number - 9 if number > 9 else number
+
+    return total % 10 == 0
+
+
+def iban_valid(value):
+    """
+    ISO 13616: moving the first four characters to the end and reading
+    letters as numbers (A = 10) gives a number whose remainder by 97 is 1.
+    """
+
+    compact = value.replace(" ", "")
+
+    if not 15 <= len(compact) <= 34:
+        return False
+
+    return int("".join(str(int(character, 36)) for character in compact[4:] + compact[:4])) % 97 == 1
+
+
+def pesel_valid(digits):
+    """
+    The check digit matches, and the month and day can be a birth date.
+    The month carries the century (+20 for 2000-2099...), so modulo 20
+    it is the calendar month.
+    """
+
+    check = (10 - sum(int(digit) * weight for digit, weight in zip(digits, PESEL_WEIGHTS)) % 10) % 10
+
+    return (
+        check == int(digits[10])
+        and 1 <= int(digits[2:4]) % 20 <= 12
+        and 1 <= int(digits[4:6]) <= 31
+    )
+
+
+def verhoeff_valid(digits):
+    check = 0
+
+    for index, digit in enumerate(reversed(digits)):
+        check = VERHOEFF_MULTIPLY[check][VERHOEFF_PERMUTE[index % 8][int(digit)]]
+
+    return check == 0
 
 
 def valid_ip(value):
@@ -288,6 +422,51 @@ def regex_detector(text, context=""):
                 "IP_ADDRESS_REGEX", "regex", "IP_ADDRESS"
             ))
 
+    ibans = []
+
+    for match in IBAN.finditer(text):
+        if iban_valid(match.group()):
+            ibans.append((match.start(), match.end()))
+            findings.append(finding(
+                "BANK_ACCOUNT", text, match.start(), match.end(), 0.99, "regex",
+                "IBAN_REGEX", "regex", "IBAN", find_label(text, match.start(), "BANK_ACCOUNT", context)
+            ))
+
+    for match in CARD.finditer(text):
+        digits = re.sub(r"\D", "", match.group())
+        label = find_label(text, match.start(), "PAYMENT_CARD", context)
+
+        # The digits of an IBAN can pass the Luhn check too
+        if (
+            not luhn_valid(digits)
+            or not (label or CARD_PREFIX.match(digits))
+            or any(start < match.end() and match.start() < end for start, end in ibans)
+        ):
+            continue
+
+        findings.append(finding(
+            "PAYMENT_CARD", text, match.start(), match.end(), 0.99 if label else 0.90, "regex",
+            "CARD_REGEX", "regex", "CARD+LUHN", label
+        ))
+
+    for match in PESEL.finditer(text):
+        if pesel_valid(match.group()):
+            label = find_label(text, match.start(), "NATIONAL_ID", context)
+            findings.append(finding(
+                "NATIONAL_ID", text, match.start(), match.end(), 0.99 if label else 0.80, "regex",
+                "PESEL_REGEX", "regex", "PESEL", label
+            ))
+
+    for match in AADHAAR.finditer(text):
+        label = find_label(text, match.start(), "NATIONAL_ID", context)
+
+        # Twelve digits in a row are often just a number: only with a label
+        if verhoeff_valid(re.sub(r"\D", "", match.group())) and (label or match.group(1)):
+            findings.append(finding(
+                "NATIONAL_ID", text, match.start(), match.end(), 0.99 if label else 0.85, "regex",
+                "AADHAAR_REGEX", "regex", "AADHAAR", label
+            ))
+
     return findings
 
 
@@ -336,13 +515,169 @@ EMPLOYEE_LABELLED = re.compile(
     + rf"(?P<value>{EMPLOYEE_VALUE})"
 )
 
+# A date of birth is a date after its label. Other dates are not PII.
+MONTH = (
+    r"(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?"
+    r"|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+)
+DATE_VALUE = (
+    r"(?:\d{1,2}[./-]\d{1,2}[./-](?:\d{4}|\d{2})"            # 14/05/1984, 14.05.84
+    r"|\d{4}[./-]\d{1,2}[./-]\d{1,2}"                        # 1984-05-14
+    rf"|\d{{1,2}}(?:st|nd|rd|th)?[ -](?i:{MONTH})\.?[ ,-]+\d{{4}}"   # 14 May 1984
+    rf"|(?i:{MONTH})\.? \d{{1,2}}(?:st|nd|rd|th)?,? \d{{4}})"        # May 14, 1984
+    r"(?![\w-])"
+)
+
+DOB_LABELLED = re.compile(
+    r"(?P<label>(?i:\b(?:date of birth|birth ?date|dob|d\.o\.b|born(?: on)?)\b\.?))"
+    + LABEL_SEPARATOR + FILLER_WORDS
+    + rf"(?P<value>{DATE_VALUE})"
+)
+
+# Card numbers printed masked, all but the last four digits hidden:
+# "**** **** **** 4417", or "card ending in 4417"
+MASKED_CARD = r"(?:[*xX•]{4}[ -]?){1,3}\d{4}(?![\w-])"
+
+CARD_MASKED_LABELLED = re.compile(
+    r"(?P<label>(?i:\b(?:(?:credit|debit|payment|corporate|company) )?"
+    r"(?:card|visa|mastercard|amex)(?: (?:no\.?|number))?\b))"
+    + LABEL_SEPARATOR + FILLER_WORDS
+    + rf"(?P<value>{MASKED_CARD})"
+)
+
+CARD_ENDING = re.compile(
+    r"(?P<label>(?i:\b(?:card|visa|mastercard|amex)\b(?:[ \t]+\w+){0,3}?[ \t]+ending(?: in)?))"
+    r"\s*[:#-]?\s*(?P<value>\d{4})(?![\w-])"
+)
+
+# A bank account number after its label, possibly masked ("****5678")
+ACCOUNT_VALUE = r"(?:[*xX•]{2,}[ -]?\d{4,}|\d(?:[ -]?\d){5,17})(?![\w-])"
+
+ACCOUNT_LABELLED = re.compile(
+    r"(?P<label>(?i:\b(?:(?:bank )?account (?:no\.?|number)|acct\.?(?: (?:no\.?|number))?"
+    r"|a/c(?: no\.?)?|bank account)))"
+    + LABEL_SEPARATOR + FILLER_WORDS
+    + rf"(?P<value>{ACCOUNT_VALUE})"
+)
+
+# A national ID after its label: "National Insurance number: QQ 12 34 56 C"
+NATIONAL_ID_VALUE = r"(?=[A-Z0-9 -]*\d)[A-Z0-9](?:[ -]?[A-Z0-9]){5,15}(?![\w-])"
+
+NATIONAL_ID_LABELLED = re.compile(
+    r"(?P<label>(?i:\b(?:pesel|aadhaar(?: (?:no\.?|number))?"
+    r"|national (?:id|identity|identification|insurance)(?: (?:no\.?|number|card))?"
+    r"|ni number|nino|personal id(?:entification)? number)))"
+    + LABEL_SEPARATOR + FILLER_WORDS
+    + rf"(?P<value>{NATIONAL_ID_VALUE})"
+)
+
+# Home addresses. A street address: house number, street name and a
+# street word ("221B Baker Street"), or a Polish "ul. Kwiatowa 12/4",
+# then optionally a flat, town and postcode (UK, US ZIP, Polish).
+STREET_SUFFIX = (
+    r"Street|St|Road|Rd|Avenue|Ave|Lane|Ln|Drive|Dr|Way|Close|Place|Pl|Boulevard"
+    r"|Blvd|Crescent|Terrace|Gardens|Square|Sq|Mews|Parade|Highway|Hwy"
+)
+# A capitalised word in lowercase after its capital ("Ashwood",
+# "McKinley", "Saint-Denis"), so a postcode's "NW" is not taken for a town
+CAP_WORD = rf"[{UPPER}][{LOWER}]+(?:[-'’]?[{UPPER}]?[{LOWER}]+)*"
+POSTCODE = r"[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}|\d{2}-\d{3}|\d{5}(?:-\d{4})?"
+
+# An address may go on over the next lines: "12 Oak Lane\nLeeds\nLS6 2AB".
+# A town on a line of its own counts only with a postcode after it.
+ADDRESS_SEPARATOR = r"(?:,? ?\n ?|,? )"
+TOWN = rf"{CAP_WORD}(?: {CAP_WORD})?"
+
+STREET_ADDRESS = re.compile(
+    rf"(?<![\w-])(?:\d{{1,5}}[A-Za-z]?,? (?:{CAP_WORD} ){{1,3}}(?:{STREET_SUFFIX})\b\.?"
+    rf"|(?:ul|al|os)\. ?{CAP_WORD}(?: {CAP_WORD})? \d{{1,4}}[A-Za-z]?(?:/\d{{1,4}})?)"
+    rf"(?:,? (?:Apt|Flat|Unit|Suite)\.? ?\w+)?"
+    rf"(?:,? (?:{POSTCODE}))?"                      # Polish order: postcode, then town
+    rf"(?:,? {TOWN})?"
+    rf"(?:{ADDRESS_SEPARATOR}(?:{TOWN}{ADDRESS_SEPARATOR})?(?:[A-Z]{{2}} )?(?:{POSTCODE})(?: {TOWN})?)?"
+)
+
+# What makes text after an address label an address, not "Address the
+# findings by Friday": a house number, a postcode or a street word
+ADDRESS_EVIDENCE = re.compile(
+    rf"\d{{1,5}}[A-Za-z]?,? {CAP_WORD}|\b(?:{POSTCODE})\b|\b(?:{STREET_SUFFIX})\b"
+)
+
+# One comma-separated part of a labelled address, starting with a capital
+# or a digit; a part in lowercase ("..., which she shares") ends it
+ADDRESS_PART = re.compile(rf"[{UPPER}0-9](?:[^,\n;|.]|\.(?! ))*")
+MAX_ADDRESS_CHARS = 150
+
+ADDRESS_CELL = re.compile(rf"(?s)(?=.*?(?:{ADDRESS_EVIDENCE.pattern})).{{5,{MAX_ADDRESS_CHARS}}}")
+
 # For a table cell the label is usually the column header, not the cell.
 # If the header names the type, the whole cell must be a value of it.
 CELL_VALUES = {
     "PASSPORT_NUMBER": ("PASSPORT_VALUE", re.compile(PASSPORT_VALUE), 0.90),
     "US_SSN": ("SSN_VALUE", re.compile(SSN_VALUE), 0.95),
     "EMPLOYEE_ID": ("EMPLOYEE_VALUE", re.compile(EMPLOYEE_VALUE), 0.90),
+    "DATE_OF_BIRTH": ("DATE_VALUE", re.compile(DATE_VALUE), 0.95),
+    "NATIONAL_ID": ("NATIONAL_ID_VALUE", re.compile(NATIONAL_ID_VALUE), 0.90),
+    "PAYMENT_CARD": ("MASKED_CARD", re.compile(MASKED_CARD), 0.90),
+    "BANK_ACCOUNT": ("ACCOUNT_VALUE", re.compile(ACCOUNT_VALUE), 0.90),
+    "POSTAL_ADDRESS": ("ADDRESS_CELL", ADDRESS_CELL, 0.85),
 }
+
+
+def address_findings(text):
+    """
+    Home addresses: the comma-separated parts after an address label
+    ("Home address: 12 Ashwood Lane, Leeds LS6 2AB"), and street
+    addresses with or without a label. Overlapping matches are one
+    address, reported once over all of them.
+    """
+
+    spans = []      # (start, end, label)
+
+    for label in LABEL_PATTERNS["POSTAL_ADDRESS"].finditer(text):
+        start = position = label.end() + len(re.match(r"\s*[:#-]?\s*", text[label.end():]).group())
+        end = None
+
+        while part := ADDRESS_PART.match(text, position):
+            end = part.end()
+            comma = re.match(r", *", text[end:])
+
+            if not comma:
+                break
+
+            position = end + comma.end()
+
+        if end is None:
+            continue
+
+        end = start + len(text[start:end].rstrip(" ."))
+
+        if end - start <= MAX_ADDRESS_CHARS and ADDRESS_EVIDENCE.search(text[start:end]):
+            spans.append((start, end, label.group()))
+
+    spans.extend((match.start(), match.end(), None) for match in STREET_ADDRESS.finditer(text))
+
+    merged = []
+
+    for start, end, label in sorted(spans, key=lambda span: span[:2]):
+        if merged and start < merged[-1][1]:
+            previous = merged[-1]
+            merged[-1] = (previous[0], max(previous[1], end), previous[2] or label)
+        else:
+            merged.append((start, end, label))
+
+    return [
+        finding(
+            "POSTAL_ADDRESS", text, start, end, 0.90, "custom_rule",
+            "ADDRESS_LABELLED", "context_rule", "ADDRESS_LABELLED", label
+        )
+        if label else
+        finding(
+            "POSTAL_ADDRESS", text, start, end, 0.80, "custom_rule",
+            "STREET_ADDRESS", "regex", "STREET_ADDRESS"
+        )
+        for start, end, label in merged
+    ]
 
 
 def custom_rule_detector(text, context=""):
@@ -358,6 +693,11 @@ def custom_rule_detector(text, context=""):
         ("PASSPORT_NUMBER", "PASSPORT_LABELLED", PASSPORT_LABELLED, 0.95),
         ("US_SSN", "SSN_LABELLED", SSN_LABELLED, 0.99),
         ("EMPLOYEE_ID", "EMPLOYEE_LABELLED", EMPLOYEE_LABELLED, 0.90),
+        ("DATE_OF_BIRTH", "DOB_LABELLED", DOB_LABELLED, 0.95),
+        ("PAYMENT_CARD", "CARD_MASKED_LABELLED", CARD_MASKED_LABELLED, 0.90),
+        ("PAYMENT_CARD", "CARD_ENDING", CARD_ENDING, 0.85),
+        ("BANK_ACCOUNT", "ACCOUNT_LABELLED", ACCOUNT_LABELLED, 0.90),
+        ("NATIONAL_ID", "NATIONAL_ID_LABELLED", NATIONAL_ID_LABELLED, 0.95),
     ):
         for match in pattern.finditer(text):
             # Words between label and value weaken the link
@@ -369,6 +709,8 @@ def custom_rule_detector(text, context=""):
                 rule_id, "context_rule", rule_id, match.group("label")
             ))
 
+    findings.extend(address_findings(text))
+
     value = text.strip()
 
     if context and value:
@@ -378,6 +720,11 @@ def custom_rule_detector(text, context=""):
             label = LABEL_PATTERNS[pii_type].search(context)
 
             if label and pattern.fullmatch(value):
+                # Under an address header the whole cell is the address,
+                # not only the street line found in it
+                if pii_type == "POSTAL_ADDRESS":
+                    findings = [item for item in findings if item["type"] != "POSTAL_ADDRESS"]
+
                 findings.append(finding(
                     pii_type, text, start, start + len(value),
                     confidence, "custom_rule",
@@ -396,10 +743,11 @@ def custom_rule_detector(text, context=""):
 # ("Daniela Figueroa\nBridgett Gatewood"). Its spans are therefore cut
 # into name-shaped parts and checked before they are reported.
 
-# Name parts: initials ("M.", "DK"), capitalised words ("Achebe",
-# "Okonkwo-Bell", "O'Brien", "McDonald") and lowercase particles ("van", "de")
-NAME_INITIAL = re.compile(r"(?:[A-Z]\.){1,2}|[A-Z]{1,2}")
-NAME_WORD = re.compile(r"(?:[A-Z]['’]|Ma?c)?[A-Z][a-z]+(?:[-'’][A-Z]?[a-z]+)*")
+# Name parts: initials ("M.", "DK", "Ł."), capitalised words ("Achebe",
+# "Okonkwo-Bell", "O'Brien", "McDonald", "Wiśniewski") and lowercase
+# particles ("van", "de")
+NAME_INITIAL = re.compile(rf"(?:[{UPPER}]\.){{1,2}}|[{UPPER}]{{1,2}}")
+NAME_WORD = re.compile(rf"(?:[{UPPER}]['’]|Ma?c)?[{UPPER}][{LOWER}]+(?:[-'’][{UPPER}]?[{LOWER}]+)*")
 NAME_PARTICLES = {
     "van", "von", "de", "da", "del", "della", "di", "du",
     "bin", "ibn", "al", "el", "le", "la"
@@ -415,10 +763,16 @@ TITLE_WORDS = {
     "Partner", "Associate", "Assistant", "Specialist", "Consultant",
     "Administrator", "Coordinator", "Supervisor", "Controller", "Treasurer", "Auditor"
 }
+# Teams and offices sit where people's names do ("Contact the Service
+# Desk", author "Risk Office") but name no one
+TEAM_WORDS = {
+    "Desk", "Office", "Team", "Department", "Committee", "Support", "Service",
+    "Services", "Board", "Group", "Unit", "Division", "Centre", "Center", "Council"
+}
 MAX_NAME_TOKENS = 5
 
 # A whole word in lowercase, with at most surrounding punctuation
-LOWERCASE_WORD = re.compile(r"\(?[a-z][a-z'-]+[),.;:]?")
+LOWERCASE_WORD = re.compile(rf"\(?[{LOWER}][{LOWER}'-]+[),.;:]?")
 
 
 def lowercase_words(texts):
@@ -534,7 +888,7 @@ def plausible_name(tokens, common_words):
         and not any(word.lower() in common_words for word in words)
         # "Ashwood Lane" is an address, not a person
         and words[-1] not in STREET_WORDS
-        and not any(word in TITLE_WORDS for word in words)
+        and not any(word in TITLE_WORDS or word in TEAM_WORDS for word in words)
     ):
         return tokens[0][1], tokens[-1][2]
 
@@ -627,10 +981,10 @@ class LocalNLPDetector:
                         "PERSON_NER", "ner", "spacy:PERSON", label
                     ))
 
-        # Names spaCy missed: name-shaped text next to a person label
+        # Names spaCy missed: name-shaped text close after a person label
         for tokens in name_runs(text, 0, len(text)):
             name = plausible_name(tokens, common_words)
-            label = find_label(text, name[0], "PERSON_NAME", context) if name else None
+            label = person_label(text, name[0], context) if name else None
 
             if (
                 label

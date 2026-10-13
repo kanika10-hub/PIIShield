@@ -65,5 +65,96 @@
       "text": "10.0.19041",
       "why": "version number"
     }
+  ],
+  "structure": [
+    {
+      "text": "Quarterly Update",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "The steering committee approved budget line 4500018832 on 2026-07-01 for the years 2026-2028.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Release 2.4.1 of the Risk Portal ships to the Rotterdam and Singapore offices.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Policy GRP-POL-007 remains in force until 2027-01-31 (see page 14 of 35).",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Contact the Service Desk through the intranet portal for access requests.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Metric",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Value",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Employee count",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "1500",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "Open findings",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "37",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "Build",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 1
+    },
+    {
+      "text": "10.0.19041",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 2
+    }
   ]
 }

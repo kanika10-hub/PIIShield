@@ -25,17 +25,23 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.pii.detectors import NAME_WORD, detect_pii, finding
+from src.pii.detectors import NAME_WORD, UPPER, detect_pii, finding
 
 
 # Version of the report format, and of the detection code. Change
 # SCANNER_VERSION whenever detection rules change, so reports made by
 # different code can be told apart.
 SCHEMA_VERSION = "1.2"
-SCANNER_VERSION = "1.1.1"
+SCANNER_VERSION = "1.4.0"
 
 # OCR'd blocks below this Tesseract confidence (0-100) are reported
 LOW_OCR_CONFIDENCE = 60
+
+# A single OCR word below this confidence that looks like part of a value
+# (three digits or more, or an @) may be misread PII that no rule
+# recognises ("TK48Z0913"), however well the rest of its block was read
+LOW_OCR_WORD_CONFIDENCE = 60
+VALUE_LIKE_WORD = re.compile(r"@|(?:\D*\d){3}")
 
 # File properties that hold text (dates are left out)
 TEXT_PROPERTIES = (
@@ -56,8 +62,11 @@ HONORIFICS = {"Mr", "Mrs", "Ms", "Mx", "Miss", "Dr", "Prof", "Sir", "Dame"}
 WORD_BEFORE = re.compile(r"(\S+)[ \t]+$")
 WORD_AFTER = re.compile(r"^[ \t]+(\S+)")
 
-# Initials written as one word: "C.", "CA", "F.L.", "L.-E."
-INITIALS = re.compile(r"(?:[A-Z]\.?-?){1,3}")
+# The last word of the line above a value that starts its line
+WORD_ABOVE = re.compile(r"(\S+)[ \t]*\n[ \t]*$")
+
+# Initials written as one word: "C.", "CA", "F.L.", "L.-E.", "Ł."
+INITIALS = re.compile(rf"(?:[{UPPER}]\.?-?){{1,3}}")
 
 
 def clean(text):
@@ -451,6 +460,12 @@ def used_as_name(text, start, end, names, tags):
     if before and introduces(before.group(1), names):
         return True
 
+    # The person's first name ending the line above: "Marguerite\nOkonjo"
+    above = WORD_ABOVE.search(text[:start])
+
+    if above and own_name_part(above.group(1), names):
+        return True
+
     name_parts = {part for name in names for part in name.split()}
 
     if after:
@@ -474,12 +489,56 @@ def used_as_name(text, start, end, names, tags):
     return tags.get(start, "PROPN") == "PROPN"
 
 
+def own_name_part(word, names):
+    """
+    True if word is one of these people's own first or middle names, or
+    their initials: "Marguerite", "A.", "CA" for "Caleb A. Whitfield".
+    """
+
+    letters = re.sub(r"[.-]", "", word)
+
+    return any(
+        word in name.split()[:-1]
+        or (letters.isalpha() and letters.isupper() and initials_of(name).startswith(letters))
+        for name in names
+    )
+
+
+def name_start(text, start, names, covered):
+    """
+    Where the name ending in the surname at text[start:] begins. The
+    first names and initials before a surname name the person too:
+    "Led by Marguerite Okonjo" must not become "Led by Marguerite
+    [REDACTED]". The first name may end the line above ("Led by
+    Marguerite\\nOkonjo"). A title stays outside the name ("Dr."), as do
+    words already inside another finding (covered: (start, end) pairs).
+    """
+
+    while True:
+        before = WORD_BEFORE.search(text[:start])
+        above = WORD_ABOVE.search(text[:start])
+
+        if before and before.group(1).rstrip(".") not in HONORIFICS and introduces(before.group(1), names):
+            word_start = before.start(1)
+        elif above and own_name_part(above.group(1), names):
+            word_start = above.start(1)
+        else:
+            return start
+
+        if any(begin < start and word_start < end for begin, end in covered):
+            return start
+
+        start = word_start
+
+
 def surname_mentions(units, found, parts_of_speech=None):
     """
     A person named in full somewhere in the document ("Caleb A. Whitfield")
     is often named by surname alone elsewhere ("owned by Whitfield").
     Those mentions identify the person too, so they are reported, at a
-    lower confidence. The people it can stand for are the reason
+    lower confidence, together with the person's first names or initials
+    when they stand before the surname (see name_start). The people it can
+    stand for are the reason
     (context_trigger): "Anna Park; James Park" if two people share it.
     Each person is named in their fullest form: "T. Lindqvist" and
     "Tobias Lindqvist" are one person (see same_person).
@@ -549,8 +608,8 @@ def surname_mentions(units, found, parts_of_speech=None):
                 continue
 
             mentions.append((unit, finding(
-                "PERSON_NAME", text, match.start(), match.end(),
-                0.75, "surname",
+                "PERSON_NAME", text, name_start(text, match.start(), names, block_covered),
+                match.end(), 0.75, "surname",
                 "PERSON_SURNAME", "context_rule", "surname_mentions",
                 "; ".join(names)
             )))
@@ -596,6 +655,62 @@ def image_details(block, start, end):
             for word in covered
         ],
     }
+
+
+def word_lists(block):
+    """
+    The word lists that repeat a block's text: the word children of a
+    PDF paragraph or table cell, and the OCR words of an image.
+    """
+
+    lists = []
+    children = [child for child in block.get("children", []) if child["block_type"] == "word"]
+
+    if children:
+        lists.append(children)
+
+    words = block.get("metadata", {}).get("words")
+
+    if words:
+        lists.append(words)
+
+    return lists
+
+
+def word_confidence(word):
+    """
+    The OCR confidence (0-100) of a word in a word list, or None for a
+    word read from a text layer.
+    """
+
+    value = word.get("confidence", (word.get("metadata") or {}).get("ocr_confidence"))
+
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return None
+
+    return value if value >= 0 else None
+
+
+def uncertain_value_words(words):
+    """
+    Positions in a word list of the OCR words read with low confidence
+    that look like part of a value (see LOW_OCR_WORD_CONFIDENCE).
+    """
+
+    return [
+        index for index, word in enumerate(words)
+        if (confidence := word_confidence(word)) is not None
+        and confidence < LOW_OCR_WORD_CONFIDENCE
+        and VALUE_LIKE_WORD.search(word.get("text") or "")
+    ]
+
+
+def all_blocks(blocks):
+    for block in blocks:
+        yield block
+        yield from all_blocks(block.get("children") or [])
 
 
 def page_list(numbers):
@@ -653,6 +768,21 @@ def extraction_warnings(document):
         warnings.append(
             f"{len(low_confidence)} OCR'd blocks have confidence below {LOW_OCR_CONFIDENCE} "
             f"(pages {page_list(low_confidence)})"
+        )
+
+    uncertain = Counter()
+
+    for page in pages:
+        for block in all_blocks(page["blocks"]):
+            for words in word_lists(block):
+                uncertain[page["page_number"]] += len(uncertain_value_words(words))
+
+    if sum(uncertain.values()):
+        warnings.append(
+            f"{sum(uncertain.values())} OCR words that look like part of a value (digits or @) "
+            f"were read with confidence below {LOW_OCR_WORD_CONFIDENCE} (pages "
+            f"{page_list(page for page, count in uncertain.items() if count)}): a misread "
+            "value escapes detection"
         )
 
     if count("image_ocr"):

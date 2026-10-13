@@ -14,6 +14,7 @@ from src.models.document import (
     BoundingBox
 )
 from src.ocr.image_ocr import ImageReader
+from src.structure.page_layout import mark_running_text, reading_order
 
 # PyMuPDF prints a hint about an optional layout package on first use
 pymupdf.no_recommend_layout()
@@ -386,10 +387,9 @@ def native_page_blocks(pdf, page, page_number, reader):
                 metadata={"location": "body", "image_xref": xref}
             ))
 
-    # Reading order: top to bottom, then left to right
-    blocks.sort(key=lambda block: (round(block.bounding_box.y), block.bounding_box.x))
-
-    return blocks
+    # Top to bottom, then left to right; the left column first on a page
+    # set in two columns
+    return reading_order(blocks, page.rect.width)
 
 
 # --------------------------------------------------
@@ -420,6 +420,7 @@ def extract_pdf(file_path, ocr_pages=()):
     """
     Extract a PDF into the common format. Each page is read from its
     text layer when it has one, and OCR'd when it is a scanned page.
+    Running headers and footers are labelled (src/structure/page_layout).
     Tables on scanned pages are rebuilt afterwards by
     src/structure/pdf_tables.reconstruct_tables.
 
@@ -459,6 +460,10 @@ def extract_pdf(file_path, ocr_pages=()):
                 **page_text_metadata(blocks)
             }
         ))
+
+    # Running headers, footers and page numbers: labelled, and put at the
+    # start and end of their page
+    mark_running_text(pages)
 
     return ExtractedDocument(
         document_id=Path(file_path).stem,

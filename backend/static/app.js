@@ -36,6 +36,11 @@
     US_SSN: ["US Social Security numbers", "US Social Security number"],
     INDIAN_PAN: ["Indian PAN numbers", "Indian PAN number"],
     PASSPORT_NUMBER: ["Passport numbers", "Passport number"],
+    NATIONAL_ID: ["National ID numbers", "National ID number"],
+    DATE_OF_BIRTH: ["Dates of birth", "Date of birth"],
+    POSTAL_ADDRESS: ["Home addresses", "Home address"],
+    PAYMENT_CARD: ["Payment card numbers", "Payment card number"],
+    BANK_ACCOUNT: ["Bank account numbers", "Bank account number"],
     IP_ADDRESS: ["IP addresses", "IP address"],
   };
 

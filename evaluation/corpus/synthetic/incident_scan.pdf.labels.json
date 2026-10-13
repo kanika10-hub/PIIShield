@@ -68,5 +68,104 @@
       "text": "ISS-2026-0571",
       "why": "ticket reference"
     }
+  ],
+  "structure": [
+    {
+      "text": "Incident Report IR-2026-118",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Reported by Kofi Mensah on 2026-05-14.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Contact: kofi.mensah@example.com, +1 (312) 555-0147.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Affected host 192.0.2.81; ticket ISS-2026-0571.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Name",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Employee ID",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Passport Number",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Priyanka Rao",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "EMP-70412",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "P7719024",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "Jonas Weber",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "EMP-70455",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "C3390561",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "Page 1 of 1",
+      "kind": "paragraph",
+      "where": "footer"
+    }
   ]
 }

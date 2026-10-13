@@ -530,6 +530,100 @@
     "text": "Q3 Board Pack\nPrepared for the Audit Committee",
     "expected": []
   },
+  {
+    "id": "DEV-051",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Finance\nTreasury, financial control and planning\nLed by Marguerite Okonjo",
+    "expected": [
+      {"text": "Marguerite Okonjo", "type": "PERSON_NAME"}
+    ],
+    "note": "Org-chart box: 'led by' labels the name."
+  },
+  {
+    "id": "DEV-052",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Contact the Service Desk through the intranet portal for access requests.",
+    "expected": [],
+    "note": "A team after a person label is not a person."
+  },
+  {
+    "id": "DEV-053",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Badge issued to Rafaela Montes\nStaff ID: EMP-61901",
+    "expected": [
+      {"text": "Rafaela Montes", "type": "PERSON_NAME"},
+      {"text": "EMP-61901", "type": "EMPLOYEE_ID"}
+    ],
+    "note": "Text in an ID-badge image: 'issued to' labels the name."
+  },
+  {
+    "id": "DEV-054",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Emergency details\nDate of birth: 02/11/1979\nHome address: 15 Elm Grove, Manchester M14 6HJ",
+    "expected": [
+      {"text": "02/11/1979", "type": "DATE_OF_BIRTH"},
+      {"text": "15 Elm Grove, Manchester M14 6HJ", "type": "POSTAL_ADDRESS"}
+    ]
+  },
+  {
+    "id": "DEV-055",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Refund the deposit to IBAN DE89 3704 0044 0532 0130 00 (card on file **** **** **** 0005).",
+    "expected": [
+      {"text": "DE89 3704 0044 0532 0130 00", "type": "BANK_ACCOUNT"},
+      {"text": "**** **** **** 0005", "type": "PAYMENT_CARD"}
+    ]
+  },
+  {
+    "id": "DEV-056",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "PESEL 79110201234",
+    "expected": [
+      {"text": "79110201234", "type": "NATIONAL_ID"}
+    ]
+  },
+  {
+    "id": "DEV-057",
+    "split": "dev",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Effective date 14/05/2024; next review 14/05/2025",
+    "expected": [],
+    "note": "Dates without a birth label are not PII."
+  },
+  {
+    "id": "DEV-059",
+    "split": "dev",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "Control owner: Łukasz Wiśniewski, Group Treasury",
+    "expected": [
+      {"text": "Łukasz Wiśniewski", "type": "PERSON_NAME"}
+    ],
+    "note": "A name with letters outside A-Z."
+  },
+  {
+    "id": "DEV-058",
+    "split": "dev",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Aadhaar 2345 6789 0124 verified by HR",
+    "expected": [
+      {"text": "2345 6789 0124", "type": "NATIONAL_ID"}
+    ]
+  },
 
   {
     "id": "EVAL-001",
@@ -829,6 +923,112 @@
     "text": "Passport No. YB7731042 (expires 2029)",
     "expected": [
       {"text": "YB7731042", "type": "PASSPORT_NUMBER"}
+    ]
+  },
+  {
+    "id": "EVAL-031",
+    "split": "eval",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Board Strategy Day 2026\nPresented by Joaquim Pereira-Lund",
+    "expected": [
+      {"text": "Joaquim Pereira-Lund", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-032",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Procurement Office",
+    "context": "author",
+    "expected": []
+  },
+  {
+    "id": "EVAL-033",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "native",
+    "text": "Exception signed off by Henrietta Vasquez on 12 May.",
+    "expected": [
+      {"text": "Henrietta Vasquez", "type": "PERSON_NAME"}
+    ]
+  },
+  {
+    "id": "EVAL-034",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Salary is paid to account no. 40261937 at the Leeds branch.",
+    "expected": [
+      {"text": "40261937", "type": "BANK_ACCOUNT"}
+    ]
+  },
+  {
+    "id": "EVAL-035",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "DOB: 7 Jan 1991",
+    "expected": [
+      {"text": "7 Jan 1991", "type": "DATE_OF_BIRTH"}
+    ]
+  },
+  {
+    "id": "EVAL-036",
+    "split": "eval",
+    "source_type": "PPTX",
+    "extraction": "native",
+    "text": "Ship the replacement badge to 48 Kingsley Road, Bristol BS7 9AB",
+    "expected": [
+      {"text": "48 Kingsley Road, Bristol BS7 9AB", "type": "POSTAL_ADDRESS"}
+    ]
+  },
+  {
+    "id": "EVAL-037",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Expense card 5105 1051 0510 5100 was cancelled",
+    "expected": [
+      {"text": "5105 1051 0510 5100", "type": "PAYMENT_CARD"}
+    ]
+  },
+  {
+    "id": "EVAL-038",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "native",
+    "text": "Renewal due 2026-01-31 for contract 7731-2209-8812",
+    "expected": []
+  },
+  {
+    "id": "EVAL-039",
+    "split": "eval",
+    "source_type": "PDF",
+    "extraction": "ocr",
+    "text": "PESEL: 91010704569",
+    "expected": [
+      {"text": "91010704569", "type": "NATIONAL_ID"}
+    ]
+  },
+  {
+    "id": "EVAL-040",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "Review the address book before 3 June.",
+    "expected": []
+  },
+  {
+    "id": "EVAL-041",
+    "split": "eval",
+    "source_type": "DOCX",
+    "extraction": "native",
+    "text": "The audit was chaired by Agnieszka Dąbrowska and attended by Søren Østergaard.",
+    "expected": [
+      {"text": "Agnieszka Dąbrowska", "type": "PERSON_NAME"},
+      {"text": "Søren Østergaard", "type": "PERSON_NAME"}
     ]
   }
 ]

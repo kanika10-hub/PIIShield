@@ -61,7 +61,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.pii.document_scanner import findings_path
+from src.pii.document_scanner import findings_path, word_lists
 
 
 # Change whenever the redaction rules change
@@ -226,26 +226,6 @@ def replace_spans(text, spans, replacement):
     parts.append(text[position:])
 
     return "".join(parts)
-
-
-def word_lists(block):
-    """
-    The word lists that repeat a block's text: the word children of a
-    PDF paragraph or table cell, and the OCR words of an image.
-    """
-
-    lists = []
-    children = [child for child in block.get("children", []) if child["block_type"] == "word"]
-
-    if children:
-        lists.append(children)
-
-    words = block.get("metadata", {}).get("words")
-
-    if words:
-        lists.append(words)
-
-    return lists
 
 
 def redact_words(words, text, spans):

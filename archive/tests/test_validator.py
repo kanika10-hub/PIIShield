@@ -258,6 +258,45 @@ def case_low_confidence_ocr_needs_review():
     ], validation
 
 
+def ocr_paragraph(block_id, text, confidences):
+    """
+    An OCR'd paragraph whose word children carry these confidences.
+    """
+
+    words = words_of(block_id, text)
+
+    for word, confidence in zip(words, confidences):
+        word["metadata"] = {"ocr_confidence": confidence, "line": 1}
+
+    return block(block_id, text, children=words, metadata={"ocr_confidence": 85.0})
+
+
+def case_uncertain_value_word_needs_review():
+    # The block reads well on average; one value-like word does not, and
+    # without its (misread) label no rule recognises it
+    text = "Passpon TK48Z0913 on file"
+    original = document(ocr_paragraph("b1", text, [96, 41, 95, 94]))
+    pii_report = report()
+    validation = validate_document(original, pii_report, redact(original, pii_report), nlp)
+    ocr = next(check for check in validation["checks"] if check["name"] == "ocr")
+
+    return [
+        statuses(validation) == {"ocr": NEEDS_REVIEW},
+        [item["block_id"] for item in ocr["issues"]] == ["b1"],
+        "TK48" not in json.dumps(validation),
+    ], validation
+
+
+def case_uncertain_words_redacted_or_ordinary_pass():
+    # The uncertain value was redacted; the uncertain word "Passpon" holds no digits
+    text = "Passpon TK48Z0913 on file"
+    original = document(ocr_paragraph("b1", text, [30, 41, 95, 94]))
+    pii_report = report(finding(1, "b1", "PASSPORT_NUMBER", text, "TK48Z0913"))
+    validation = validate_document(original, pii_report, redact(original, pii_report), nlp)
+
+    return [validation["verdict"] == PASS, statuses(validation) == {}], validation
+
+
 def case_ocr_word_left_visible_fails():
     text = "Policy owner: Miriam T. Achebe, Group CRO"
     original = document(block("b1", text, children=words_of("b1", text)))
@@ -464,6 +503,8 @@ CASES = [
     ("Ordinary words in a wrong name are not searched", case_ordinary_words_not_searched),
     ("A reviewed false positive kept in the text passes", case_false_positive_kept_passes),
     ("Low-confidence OCR text and unread images need review", case_low_confidence_ocr_needs_review),
+    ("One low-confidence value-like OCR word needs review", case_uncertain_value_word_needs_review),
+    ("Uncertain OCR words already redacted, or holding no value, pass", case_uncertain_words_redacted_or_ordinary_pass),
     ("An OCR word left over a redacted value fails", case_ocr_word_left_visible_fails),
     ("Image OCR words hidden by the redactor pass", case_image_ocr_words_pass),
     ("Continued table headers rebuilt by the redactor pass", case_continued_table_headers_pass),

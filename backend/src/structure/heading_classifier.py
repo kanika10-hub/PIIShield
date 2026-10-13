@@ -23,6 +23,11 @@ MAX_HEADING_WORDS = 15
 # is a short standalone line, not a sentence that wraps onto the next line
 SHORT_LINE_RATIO = 0.85
 
+# An unnumbered title ("Incident Report"): a paragraph of one line, set
+# this much taller than the document's typical OCR line, not ending a
+# sentence. Text-layer pages use the same ratio (pdf_extractor).
+LARGE_LINE_RATIO = 1.25
+
 
 def split_lines(block):
     """
@@ -205,10 +210,56 @@ def classify_block(block, large_text, right_margin):
     return blocks
 
 
+def classify_large_lines(document):
+    """
+    Mark unnumbered titles on OCR'd pages as headings: one-line OCR
+    paragraphs set clearly larger than the document's typical OCR line
+    (see LARGE_LINE_RATIO). Running headers and footers stay as they are.
+    """
+
+    paragraphs = [
+        block
+        for page in document.pages
+        for block in page.blocks
+        if block.block_type == "paragraph" and block.children
+        and block.metadata.get("source") == "ocr"
+    ]
+
+    heights = sorted(line_height(line) for block in paragraphs for line in split_lines(block))
+
+    if not heights:
+        return
+
+    typical = heights[len(heights) // 2]
+
+    for block in paragraphs:
+        lines = split_lines(block)
+        text = block.text.strip()
+
+        if (
+            len(lines) == 1
+            and len(block.children) <= MAX_HEADING_WORDS
+            and not text.endswith((".", ":", ";", ","))
+            and block.metadata.get("location", "body") == "body"
+            and line_height(lines[0]) >= LARGE_LINE_RATIO * typical
+        ):
+            block.block_type = "heading"
+            block.metadata["classification"] = {
+                "label": "heading",
+                "level": 1,
+                "confidence": "medium",
+                "signals": ["larger_text", "single_line"],
+                "method": "rule_based"
+            }
+
+
 def classify_headings(document):
     """
-    Mark numbered section titles in an OCR-extracted document as headings.
+    Mark section titles in an OCR-extracted document as headings:
+    unnumbered titles set in larger text, and numbered section titles.
     """
+
+    classify_large_lines(document)
 
     body_paragraphs = [
         block

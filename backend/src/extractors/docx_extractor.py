@@ -10,7 +10,7 @@ from lxml import etree
 
 from src.extractors.common import office_properties, page_text_metadata, text_method
 from src.extractors.text_sources import (
-    ImageSource, Sources, TextSource, docx_comment_pieces, docx_paragraph_pieces,
+    ImageSource, PartsSource, Sources, TextSource, docx_comment_pieces, docx_paragraph_pieces,
     docx_text_pieces, pieces_text
 )
 from src.models.document import (
@@ -25,8 +25,33 @@ NAMESPACES = {
     "w": nsmap["w"],
     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
-    "mc": "http://schemas.openxmlformats.org/markup-compatibility/2006"
+    "mc": "http://schemas.openxmlformats.org/markup-compatibility/2006",
+    "c": "http://schemas.openxmlformats.org/drawingml/2006/chart",
+    "dgm": "http://schemas.openxmlformats.org/drawingml/2006/diagram",
 }
+
+# Charts and SmartArt diagrams: a drawing whose graphic data names a part
+# that holds the text. Word keeps a picture of each in mc:Fallback.
+CHART_URI = NAMESPACES["c"]
+DIAGRAM_URI = NAMESPACES["dgm"]
+GRAPHIC_DATA = etree.XPath(".//a:graphicData[not(ancestor::mc:Fallback)]", namespaces=NAMESPACES)
+GRAPHIC_PARTS = {
+    CHART_URI: ("chart", etree.XPath("./c:chart/@r:id", namespaces=NAMESPACES)),
+    DIAGRAM_URI: ("diagram", etree.XPath("./dgm:relIds/@r:dm", namespaces=NAMESPACES)),
+}
+
+# A chart's visible text: titles, series names and category labels. Its
+# values come from an embedded workbook that is not read.
+CHART_TEXT = etree.XPath(
+    ".//a:t/text() | .//c:tx//c:v/text() | .//c:cat//c:v/text()", namespaces=NAMESPACES
+)
+# A SmartArt diagram's text: each node's paragraphs in the data part
+DIAGRAM_PARAGRAPHS = etree.XPath(".//a:p", namespaces=NAMESPACES)
+PARAGRAPH_TEXT = etree.XPath(".//a:t/text()", namespaces=NAMESPACES)
+
+# An embedded object (a spreadsheet, another document): never opened
+OLE_OBJECTS = etree.XPath(".//w:object[not(ancestor::mc:Fallback)]", namespaces=NAMESPACES)
+OLE_PROG_ID = etree.XPath(".//*[local-name()='OLEObject']/@ProgID")
 
 # Word stores each text box and drawing twice: as a drawing, and as a
 # VML copy inside mc:Fallback for old readers. Only the first is read.
@@ -49,6 +74,28 @@ ENDS_SECTION = etree.XPath("boolean(./w:pPr/w:sectPr)", namespaces=NAMESPACES)
 
 # Footnotes and endnotes that are separators, not notes
 NOTE_SEPARATORS = ("separator", "continuationSeparator", "continuationNotice")
+
+# Where comments and notes are attached: the ids they are marked with
+# in the text they belong to
+ANCHOR_IDS = {
+    "comment": etree.XPath(
+        ".//w:commentRangeStart/@w:id | .//w:commentReference/@w:id", namespaces=NAMESPACES
+    ),
+    "footnote": etree.XPath(".//w:footnoteReference/@w:id", namespaces=NAMESPACES),
+    "endnote": etree.XPath(".//w:endnoteReference/@w:id", namespaces=NAMESPACES),
+}
+
+
+def record_anchors(anchors, element, block_id):
+    """
+    Note in anchors ((kind, id) -> block_id) the comments, footnotes and
+    endnotes attached to the text of element, a block's XML. The first
+    block a comment covers is the one it is about.
+    """
+
+    for kind, query in ANCHOR_IDS.items():
+        for note_id in query(element):
+            anchors.setdefault((kind, str(note_id)), block_id)
 
 # Every header and footer a section can define
 HEADER_FOOTER_PARTS = (
@@ -114,14 +161,14 @@ def paragraph_text(paragraph):
     return pieces_text(docx_paragraph_pieces(paragraph._p))
 
 
-def extract_table_cells(table, table_number, location="body", sources=Sources()):
+def extract_table_cells(table, table_number, location="body", sources=Sources(), anchors=None):
     """
     Return one table_cell block per physical cell, in row order.
 
     python-docx repeats a merged cell for every grid position it
     covers. Each cell is emitted once, at its top-left position,
     with the number of rows and columns it spans. A table nested in a
-    cell is part of that cell's text.
+    cell is part of that cell's text. anchors: see record_anchors.
     """
 
     spans = {}
@@ -148,6 +195,9 @@ def extract_table_cells(table, table_number, location="body", sources=Sources())
         block_id = f"table_{table_number}_row_{span['row']}_cell_{span['column']}"
         source = TextSource(CELL_PARAGRAPHS(cell._tc), docx_paragraph_pieces)
         sources.add(block_id, source)
+
+        if anchors is not None:
+            record_anchors(anchors, cell._tc, block_id)
 
         # Empty cells are kept so the table grid stays intact
         cells.append(
@@ -183,15 +233,18 @@ class StoryReader:
     """
     Reads one story of the document (the body, or a header or footer)
     into blocks, in reading order. Each paragraph or table is followed
-    by the text boxes and images inside it.
+    by the text boxes, images, charts, diagrams and embedded objects
+    inside it.
     """
 
-    def __init__(self, story, prefix, metadata, reader, section=1, track_sections=False, sources=Sources()):
+    def __init__(self, story, prefix, metadata, reader, section=1, track_sections=False, sources=Sources(),
+                 anchors=None):
         self.story = story                  # python-docx parent of its paragraphs
         self.prefix = prefix                # block ID prefix, "" for the body
         self.metadata = metadata            # location (and part) of every block
         self.reader = reader
         self.sources = sources              # where each block's text is in the file
+        self.anchors = {} if anchors is None else anchors   # see record_anchors
         self.section = section
         self.track_sections = track_sections
         self.counts = {}
@@ -221,6 +274,7 @@ class StoryReader:
 
             self.text_boxes(child)
             self.images(child)
+            self.graphics(child)
 
             # A paragraph holding section properties ends its section
             if self.track_sections and child.tag == qn("w:p") and ENDS_SECTION(child):
@@ -252,6 +306,7 @@ class StoryReader:
         number = self.next_number("paragraph")
         metadata = {**self.block_metadata(content_control), "style": style, "paragraph_index": number}
         self.sources.add(f"{self.prefix}paragraph_{number}", source)
+        record_anchors(self.anchors, element, f"{self.prefix}paragraph_{number}")
 
         if block_type == "list_item":
             # Set on the paragraph, or implied by the style ("List Bullet 2")
@@ -282,7 +337,7 @@ class StoryReader:
             block_type="table",
             children=extract_table_cells(
                 table, f"{self.prefix}{number}" if self.prefix else number,
-                self.metadata["location"], self.sources
+                self.metadata["location"], self.sources, self.anchors
             ),
             metadata={
                 **self.block_metadata(content_control),
@@ -300,6 +355,7 @@ class StoryReader:
             if text:
                 block_id = f"{self.prefix}textbox_{self.next_number('textbox')}"
                 self.sources.add(block_id, source)
+                record_anchors(self.anchors, box, block_id)
 
                 self.blocks.append(DocumentBlock(
                     block_id=block_id,
@@ -326,8 +382,47 @@ class StoryReader:
                 block_id, str(part.partname), part.blob, metadata=metadata
             ))
 
+    def graphics(self, element):
+        """
+        Charts and SmartArt diagrams, with the text they show, and embedded
+        objects, which are reported but not opened.
+        """
 
-def header_footer_blocks(doc, reader, sources=Sources()):
+        for data in GRAPHIC_DATA(element):
+            kind, relationship_ids = GRAPHIC_PARTS.get(data.get("uri"), (None, None))
+            ids = relationship_ids(data) if kind else []
+            part = self.story.part.related_parts.get(ids[0]) if ids else None
+
+            if part is None:
+                continue
+
+            xml = etree.fromstring(part.blob)
+            lines = (
+                CHART_TEXT(xml) if kind == "chart"
+                else ["".join(PARAGRAPH_TEXT(paragraph)) for paragraph in DIAGRAM_PARAGRAPHS(xml)]
+            )
+
+            block_id = f"{self.prefix}{kind}_{self.next_number(kind)}"
+            self.sources.add(block_id, PartsSource([part]))
+
+            self.blocks.append(DocumentBlock(
+                block_id=block_id,
+                block_type=kind,
+                text="\n".join(dict.fromkeys(line.strip() for line in lines if line.strip())),
+                metadata={**self.block_metadata(), "graphic_part": str(part.partname)}
+            ))
+
+        for ole in OLE_OBJECTS(element):
+            prog_id = OLE_PROG_ID(ole)
+
+            self.blocks.append(DocumentBlock(
+                block_id=f"{self.prefix}object_{self.next_number('object')}",
+                block_type="embedded_object",
+                metadata={**self.block_metadata(), "prog_id": prog_id[0] if prog_id else None}
+            ))
+
+
+def header_footer_blocks(doc, reader, sources=Sources(), anchors=None):
     """
     Blocks from every section's headers and footers.
 
@@ -335,6 +430,7 @@ def header_footer_blocks(doc, reader, sources=Sources()):
     section's content and is skipped. Ones Word does not display (a
     first-page header while "different first page" is off) are still
     read, since their text is in the file; metadata.visible says which.
+    anchors: see record_anchors.
     """
 
     blocks = []
@@ -361,7 +457,7 @@ def header_footer_blocks(doc, reader, sources=Sources()):
                     "part": name,
                     "visible": visible
                 },
-                reader, section=section_number, sources=sources
+                reader, section=section_number, sources=sources, anchors=anchors
             )
 
             blocks.extend(story.read(part._element))
@@ -369,9 +465,10 @@ def header_footer_blocks(doc, reader, sources=Sources()):
     return blocks
 
 
-def note_blocks(doc, relationship, kind, sources=Sources()):
+def note_blocks(doc, relationship, kind, sources=Sources(), anchors=None):
     """
     One block per footnote or endnote, skipping the separators Word adds.
+    metadata.anchor_block_id is the block whose text refers to the note.
     """
 
     try:
@@ -392,20 +489,26 @@ def note_blocks(doc, relationship, kind, sources=Sources()):
         if text:
             block_id = f"{kind}_{note.get(qn('w:id'))}"
             sources.add(block_id, source)
+            metadata = {"source": "native", "location": kind, "note_id": note.get(qn("w:id"))}
+            anchor = (anchors or {}).get((kind, str(note.get(qn("w:id")))))
+
+            if anchor:
+                metadata["anchor_block_id"] = anchor
 
             blocks.append(DocumentBlock(
                 block_id=block_id,
                 block_type="paragraph",
                 text=text,
-                metadata={"source": "native", "location": kind, "note_id": note.get(qn("w:id"))}
+                metadata=metadata
             ))
 
     return blocks
 
 
-def comment_blocks(doc, sources=Sources()):
+def comment_blocks(doc, sources=Sources(), anchors=None):
     """
-    One block per comment. The author is kept in metadata.
+    One block per comment. The author is kept in metadata, and
+    metadata.anchor_block_id is the block the comment is about.
     """
 
     # Reading doc.comments would add an empty comments part
@@ -424,17 +527,23 @@ def comment_blocks(doc, sources=Sources()):
             # The comment element holds the author
             sources.add(f"{block_id}_author", comment._comment_elm)
 
+            metadata = {
+                "source": "native",
+                "location": "comment",
+                "comment_id": comment.comment_id,
+                "author": comment.author,
+                "initials": comment.initials
+            }
+            anchor = (anchors or {}).get(("comment", str(comment.comment_id)))
+
+            if anchor:
+                metadata["anchor_block_id"] = anchor
+
             blocks.append(DocumentBlock(
                 block_id=block_id,
                 block_type="paragraph",
                 text=text,
-                metadata={
-                    "source": "native",
-                    "location": "comment",
-                    "comment_id": comment.comment_id,
-                    "author": comment.author,
-                    "initials": comment.initials
-                }
+                metadata=metadata
             ))
 
     return blocks
@@ -447,15 +556,19 @@ def docx_blocks(doc, reader, sources=Sources()):
     """
 
     # The body in reading order, then headers and footers, then notes and
-    # comments: they sit outside the body's reading order
+    # comments: they sit outside the body's reading order, so each note and
+    # comment names the block it belongs to (metadata.anchor_block_id)
+    anchors = {}
     blocks = (
         StoryReader(
-            doc, "", {"location": "body"}, reader, track_sections=True, sources=sources
+            doc, "", {"location": "body"}, reader, track_sections=True, sources=sources, anchors=anchors
         ).read(doc.element.body)
-        + header_footer_blocks(doc, reader, sources)
-        + note_blocks(doc, RT.FOOTNOTES, "footnote", sources)
-        + note_blocks(doc, RT.ENDNOTES, "endnote", sources)
-        + comment_blocks(doc, sources)
+        + header_footer_blocks(doc, reader, sources, anchors)
+    )
+    blocks += (
+        note_blocks(doc, RT.FOOTNOTES, "footnote", sources, anchors)
+        + note_blocks(doc, RT.ENDNOTES, "endnote", sources, anchors)
+        + comment_blocks(doc, sources, anchors)
     )
 
     for order, block in enumerate(blocks, start=1):

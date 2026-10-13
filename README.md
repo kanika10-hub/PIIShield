@@ -444,7 +444,12 @@ detectors, and their results are merged:
 | `IP_ADDRESS` | `192.168.1.10` | Regex, checked with Python's `ipaddress` module |
 | `EMPLOYEE_ID` | `EMP-12345` | Prefix regex, or any ID after "Employee ID:" or under an "Employee ID" column |
 | `PASSPORT_NUMBER` | `X1234567` | Only next to a passport label or under a passport column |
-| `PERSON_NAME` | `Jane Doe` | spaCy's name recognition (NER), filtered by name-shape rules. Plus names next to a person label ("Owner: ...", a "Name" column) |
+| `PERSON_NAME` | `Jane Doe` | spaCy's name recognition (NER), filtered by name-shape rules (no job titles, no team or office words). Plus names close after a person label ("Owner: ...", "Led by ...", "Presented by ...", a "Name" column), and a surname alone where the document names that person in full elsewhere, with the first name or initials before it |
+| `DATE_OF_BIRTH` | `14/05/1984` | A date after "Date of birth", "DOB" or "born", or under such a column. Other dates are not PII |
+| `NATIONAL_ID` | `44051401359` | PESEL (check digit and birth date), Aadhaar (Verhoeff check digit; without a label only as `dddd dddd dddd`), or an ID after a national ID label ("National Insurance number") or under such a column |
+| `PAYMENT_CARD` | `4111 1111 1111 1111` | 13-19 digits passing the Luhn check, with a card prefix or a card label; masked numbers (`**** 4417`, "card ending in 4417") after a card label |
+| `BANK_ACCOUNT` | `GB82 WEST 1234 5698 7654 32` | IBAN with a valid checksum, or an account number after "Account no.", "A/C" or under such a column |
+| `POSTAL_ADDRESS` | `12 Ashwood Lane, Leeds LS6 2AB` | A house number, street name and street word (or a Polish "ul. ..."), with town and postcode, even over several lines; or the text after an address label ("Home address:") holding a house number, postcode or street word |
 
 Things to know about detection:
 

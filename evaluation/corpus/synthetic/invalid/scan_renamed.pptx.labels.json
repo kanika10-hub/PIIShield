@@ -4,5 +4,6 @@
   "expected_outcome": "rejected",
   "description": "A PDF renamed to .pptx.",
   "pii": [],
-  "not_pii": []
+  "not_pii": [],
+  "structure": []
 }

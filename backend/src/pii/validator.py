@@ -56,15 +56,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from src.pii.detectors import NAME_WORD, LocalNLPDetector, lowercase_words
-from src.pii.document_scanner import LOW_OCR_CONFIDENCE, findings_path, scan_document
+from src.pii.document_scanner import (
+    LOW_OCR_CONFIDENCE, LOW_OCR_WORD_CONFIDENCE, findings_path, scan_document,
+    uncertain_value_words, word_lists
+)
 from src.pii.redactor import (
     REDACTION_TAG, check_finding, merge_spans, output_paths, save_json,
-    text_slots, walk, word_lists
+    text_slots, walk
 )
 
 
 # Change whenever the checks change
-VALIDATOR_VERSION = "1.2.0"
+VALIDATOR_VERSION = "1.3.0"
 
 PASS, NEEDS_REVIEW, FAIL = "PASS", "NEEDS_REVIEW", "FAIL"
 SEVERITY = {PASS: 0, NEEDS_REVIEW: 1, FAIL: 2}
@@ -390,6 +393,8 @@ def check_ocr(document, report, sanitized):
         that still holds text: FAIL
         a block read by OCR with low confidence: misread PII ("Passpon
         TK4820013") escapes detection, so a person must read it
+        in a block read well on the whole, a low-confidence word that
+        looks like part of a value and was not redacted: the same risk
         an image that could not be OCR'd: its text was never scanned
     """
 
@@ -445,6 +450,8 @@ def check_ocr(document, report, sanitized):
                     finding_id=covering[0]["finding_id"] if covering else None
                 ))
 
+    uncertain_words = 0
+
     for block_id, (page_number, block) in original_blocks.items():
         confidence = block.get("metadata", {}).get("ocr_confidence")
 
@@ -461,6 +468,26 @@ def check_ocr(document, report, sanitized):
                 block_id=block_id, page_number=page_number
             ))
 
+        # A well-read block can still hold one badly read value. Words
+        # the redaction already hid are no risk.
+        elif block_id in sanitized_blocks:
+            sanitized_lists = word_lists(sanitized_blocks[block_id][1])
+            uncertain = [
+                index
+                for words, sanitized_words in zip(word_lists(block), sanitized_lists)
+                for index in uncertain_value_words(words)
+                if index >= len(sanitized_words) or not only_tags(sanitized_words[index].get("text"))
+            ]
+
+            if uncertain:
+                uncertain_words += len(uncertain)
+                issues.append(issue(
+                    NEEDS_REVIEW,
+                    f"{len(uncertain)} OCR words that look like part of a value were read with "
+                    f"confidence below {LOW_OCR_WORD_CONFIDENCE}: a misread value cannot be detected",
+                    block_id=block_id, page_number=page_number
+                ))
+
         if block["block_type"] == "image":
             issues.append(issue(
                 NEEDS_REVIEW, "the image could not be OCR'd: text in it was never scanned",
@@ -468,6 +495,9 @@ def check_ocr(document, report, sanitized):
             ))
 
     notes.append(f"{words_hidden} OCR words over redacted values hold only tags")
+
+    if uncertain_words:
+        notes.append(f"{uncertain_words} low-confidence OCR words that look like values need a look")
 
     if images_with_values:
         notes.append(

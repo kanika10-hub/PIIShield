@@ -98,6 +98,54 @@ CASES = [
         "Role",
         set(),
     ),
+    (
+        "Name after 'led by' on a line of its own",
+        "Treasury, financial control and planning\nLed by Marguerite Okonjo",
+        "",
+        {"Marguerite Okonjo"},
+    ),
+    (
+        "Name after 'presented by'",
+        "Presented by Tobias Lindqvist",
+        "",
+        {"Tobias Lindqvist"},
+    ),
+    (
+        "Name after 'issued to'",
+        "Badge issued to Wilhelmina Castellanos",
+        "",
+        {"Wilhelmina Castellanos"},
+    ),
+    (
+        "Names with letters outside A-Z",
+        "The review was led by Łukasz Wiśniewski; approved by Małgorzata Żak.",
+        "",
+        {"Łukasz Wiśniewski", "Małgorzata Żak"},
+    ),
+    (
+        "An accented initial before an accented surname",
+        "Approved by Ł. Wiśniewski",
+        "",
+        {"Ł. Wiśniewski"},
+    ),
+    (
+        "A team after a person label is not a name",
+        "Contact the Service Desk through the portal for access requests.",
+        "",
+        set(),
+    ),
+    (
+        "An office as the document author is not a name",
+        "Risk Office",
+        "author",
+        set(),
+    ),
+    (
+        "A label several words before capitalised words is not their label",
+        "Manager approval is needed for Remote Access requests.",
+        "",
+        set(),
+    ),
 ]
 
 failures = 0

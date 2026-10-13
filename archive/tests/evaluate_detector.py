@@ -73,7 +73,8 @@ EXTRACTIONS = ("native", "ocr")
 # Every type the detectors report
 PII_TYPES = (
     "EMAIL", "PHONE", "US_SSN", "INDIAN_PAN", "IP_ADDRESS",
-    "EMPLOYEE_ID", "PASSPORT_NUMBER", "PERSON_NAME"
+    "EMPLOYEE_ID", "PASSPORT_NUMBER", "PERSON_NAME",
+    "DATE_OF_BIRTH", "NATIONAL_ID", "PAYMENT_CARD", "BANK_ACCOUNT", "POSTAL_ADDRESS"
 )
 
 # Breakdowns, in print order
