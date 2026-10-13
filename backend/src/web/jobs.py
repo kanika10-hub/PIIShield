@@ -24,6 +24,23 @@ written with status "failed" and nothing is tagged or redacted. If
 redaction or validation fails, the files they wrote are deleted. A step
 that fails stops the job, and the steps after it are "skipped".
 
+A finished job can then be reviewed, one validation issue at a time
+(src/pii/review.py):
+
+    hide        add the issue's text (leftover name parts, unreadable OCR
+                text) to the PII report as manual findings, delete
+                <name>_review.json (its sign-offs were for the old copy),
+                redact and validate again, give the new validation the
+                sign-offs of the issues it still holds unchanged
+                (review.kept_review), then audit
+    hide all    the same at once for every OCR issue that can be hidden
+                and was not signed off
+    sign off all
+                sign off, or withdraw, every unreadable OCR issue at once
+    sign off    save or withdraw a sign-off in <name>_review.json, then
+                audit again: the exposure report and the release gate
+                read it
+
 Jobs are kept in memory: after a restart the page no longer lists them,
 but their folders stay until deleted (Jobs.delete, or by hand).
 """
@@ -43,10 +60,17 @@ from main import (
 )
 from src.models.schema import format_problems
 from src.pii.detectors import LocalNLPDetector
-from src.pii.document_scanner import failed_report, save_findings, scan_file
+from src.pii.document_scanner import failed_report, findings_path, save_findings, scan_file
 from src.pii.exposure_report import combined_folder, exposure_file, exposure_path, write_combined
 from src.pii.redactor import redact_file
-from src.pii.validator import NotApproved, approved_copy, validate_file
+from src.pii.review import (
+    hidden_all_report, hidden_report, kept_review, save_review, signed_off_all_review,
+    signed_off_review, standing_sign_offs, withdrawn_all_review, withdrawn_review
+)
+from src.pii.validator import (
+    PASS, NotApproved, approved_copy, load_review, review_approval, review_path,
+    validate_file, validation_path
+)
 from src.uploads import store_file
 
 
@@ -79,6 +103,17 @@ class StepFailed(Exception):
     """
     A step found a problem that stops the job (not a crash).
     """
+
+
+class JobBusy(Exception):
+    """
+    The job is still running: a review can be applied once it finishes.
+    """
+
+
+# The steps a reviewer's answer runs again
+AFTER_HIDING = ["redact", "validate", "audit"]
+AFTER_SIGN_OFF = ["audit"]
 
 
 class Job:
@@ -142,6 +177,25 @@ class Job:
             for key, value in fields.items():
                 setattr(self, key, value)
 
+    def start_review(self, steps):
+        """
+        Queue a finished job again for a reviewer's answer, with the steps
+        it runs again back to pending. False if the job is still running.
+        """
+
+        with self.lock:
+            if self.state not in ("completed", "failed"):
+                return False
+
+            self.state = "queued"
+            self.error = None
+
+            for name in steps:
+                self.steps[name]["status"] = "pending"
+                self.steps[name]["detail"] = None
+
+            return True
+
     def fail(self, error):
         with self.lock:
             self.state = "failed"
@@ -183,6 +237,41 @@ def error_text(error):
     return f"{type(error).__name__}: {error}"
 
 
+def approval(json_path):
+    """
+    What the release gate says of the job's sanitized copy (approved_copy,
+    the same gate any code sending text to an LLM must use), and how far
+    the review of its issues has got.
+    """
+
+    json_path = Path(json_path)
+
+    try:
+        approved_copy(json_path)
+        result = {"approved": True, "reason": None}
+    except NotApproved as reason:
+        result = {"approved": False, "reason": str(reason).replace(str(json_path.parent), "output")}
+
+    try:
+        validation = json.loads(validation_path(json_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return result
+
+    review = review_approval(validation, load_review(json_path))
+
+    return {
+        **result,
+        # PASS once the gate lets the copy go, through sign-offs too; the
+        # validation report keeps its own verdict
+        "final_verdict": PASS if result["approved"] else validation.get("verdict"),
+        "review": {
+            "after_review": result["approved"] and review["after_review"],
+            "signed_off": review["total"] - review["open"],
+            "needing_review": review["total"],
+        },
+    }
+
+
 def safe_name(file_name):
     """
     The name the upload is stored under: no folders, only safe
@@ -210,6 +299,8 @@ class Jobs:
         self.jobs = {}
         self.lock = threading.Lock()
         self.run_lock = threading.Lock()
+        # One review answer is checked and queued at a time
+        self.review_lock = threading.Lock()
         self.nlp = None
 
     def submit(self, upload):
@@ -366,6 +457,20 @@ class Jobs:
             save_findings(failed_report(Path(job.source_name), error), report_path)
             raise
 
+        self.finish(job, nlp)
+
+    def finish(self, job, nlp, sign_offs=None):
+        """
+        Redact, validate and audit: the steps after the scan, and again
+        after a reviewer hides text. sign_offs: after hiding, those given
+        to the old copy, kept for the issues the new validation still
+        holds unchanged (review.kept_review).
+        """
+
+        json_path = job.json_path
+        outputs = pipeline_outputs(json_path)
+        report_path = outputs[0]
+
         try:
             with job.step("redact") as detail:
                 result, _, _ = redact_file(json_path, report_path)
@@ -384,12 +489,26 @@ class Jobs:
             delete(outputs[1:])
             raise
 
-        result = {**job.result, "verdict": validation["verdict"], "checks": validation["summary"]}
-        job.update(result=result)
+        job.update(result={**job.result, "verdict": validation["verdict"], "checks": validation["summary"]})
+
+        kept = kept_review(sign_offs, validation)
+
+        if kept:
+            save_review(json_path, kept)
+
+        self.audit(job)
+
+    def audit(self, job):
+        """
+        The exposure report, then the release gate: after the validation,
+        and again after a reviewer signs an issue off.
+        """
+
+        json_path = job.json_path
 
         try:
             with job.step("audit") as detail:
-                exposure, _ = exposure_file(json_path, report_path)
+                exposure, _ = exposure_file(json_path, findings_path(json_path))
                 write_combined(combined_folder(json_path))
                 detail["text"] = f"{exposure['summary']['flagged_by_validation']} findings flagged by validation"
 
@@ -399,11 +518,126 @@ class Jobs:
             write_combined(combined_folder(json_path))
             raise
 
-        # The same gate any code sending text to an LLM must use
-        try:
-            approved_copy(json_path)
-            approval = {"approved": True, "reason": None}
-        except NotApproved as reason:
-            approval = {"approved": False, "reason": str(reason).replace(str(json_path.parent), "output")}
+        job.update(result={**job.result, **approval(json_path)})
 
-        job.update(result={**result, **approval})
+    # --------------------------------------------------
+    # REVIEW
+    # --------------------------------------------------
+
+    def hide(self, job, key, reviewer):
+        """
+        "Hide it": add the text of the issue with this key (leftover
+        name parts, unreadable OCR text) as manual findings, then redact,
+        validate and audit again. Raises ReviewError (the answer cannot
+        be applied) or JobBusy.
+        """
+
+        with self.review_lock:
+            self.check_free(job)
+            report, _ = hidden_report(job.json_path, key, reviewer)
+            sign_offs = standing_sign_offs(job.json_path)
+            self.start_review(job, AFTER_HIDING, lambda: self.apply_hidden(job, report, sign_offs))
+
+    def hide_all(self, job, reviewer):
+        """
+        "Hide all OCR issues": add the text of every OCR issue "Hide it"
+        can fix, and no reviewer signed off, as manual findings, then
+        redact, validate and audit once. Raises ReviewError or JobBusy.
+        """
+
+        with self.review_lock:
+            self.check_free(job)
+            report, _, _ = hidden_all_report(job.json_path, reviewer)
+            sign_offs = standing_sign_offs(job.json_path)
+            self.start_review(job, AFTER_HIDING, lambda: self.apply_hidden(job, report, sign_offs))
+
+    def apply_hidden(self, job, report, sign_offs):
+        """
+        Save a PII report with hidden text added, then run the steps after
+        the scan again, keeping the sign-offs of unchanged issues.
+        """
+
+        save_findings(report, findings_path(job.json_path))
+        # Its sign-offs were for the copy about to be replaced: finish
+        # gives back those of the issues that come back unchanged
+        delete([review_path(job.json_path)])
+
+        summary = report["summary"]
+        job.update(result={
+            **job.result, "findings_total": summary["total_findings"], "by_type": summary["by_type"]
+        })
+
+        self.finish(job, self.detector(), sign_offs)
+
+    def sign_off(self, job, key, reviewer):
+        """
+        "Checked, it's fine": sign the issue with this key off, then audit
+        again. Raises ReviewError or JobBusy.
+        """
+
+        with self.review_lock:
+            self.check_free(job)
+            review = signed_off_review(job.json_path, key, reviewer)
+            self.start_review(job, AFTER_SIGN_OFF, lambda: self.save_and_audit(job, review))
+
+    def withdraw(self, job, key):
+        """
+        Undo the sign-off of the issue with this key, then audit again.
+        """
+
+        with self.review_lock:
+            self.check_free(job)
+            review = withdrawn_review(job.json_path, key)
+            self.start_review(job, AFTER_SIGN_OFF, lambda: self.save_and_audit(job, review))
+
+    def sign_off_all(self, job, reviewer):
+        """
+        "Checked, all fine": sign off every unreadable OCR issue at once,
+        then audit again. Raises ReviewError or JobBusy.
+        """
+
+        with self.review_lock:
+            self.check_free(job)
+            review = signed_off_all_review(job.json_path, reviewer)
+            self.start_review(job, AFTER_SIGN_OFF, lambda: self.save_and_audit(job, review))
+
+    def withdraw_all(self, job):
+        """
+        Undo the sign-offs of every unreadable OCR issue, then audit again.
+        """
+
+        with self.review_lock:
+            self.check_free(job)
+            review = withdrawn_all_review(job.json_path)
+            self.start_review(job, AFTER_SIGN_OFF, lambda: self.save_and_audit(job, review))
+
+    def save_and_audit(self, job, review):
+        save_review(job.json_path, review)
+        self.audit(job)
+
+    @staticmethod
+    def check_free(job):
+        if not job.finished():
+            raise JobBusy("The scan is still running: try again when it finishes.")
+
+    def start_review(self, job, steps, apply):
+        """
+        Run a reviewer's answer (apply) on a finished job, in the
+        background and after any job already running.
+        """
+
+        if not job.start_review(steps):
+            raise JobBusy("The scan is still running: try again when it finishes.")
+
+        threading.Thread(target=self.run_review, args=(job, apply), daemon=True).start()
+
+    def run_review(self, job, apply):
+        with self.run_lock:
+            job.update(state="running")
+
+            try:
+                apply()
+                job.update(state="completed")
+
+            except Exception as error:
+                job.fail(error)

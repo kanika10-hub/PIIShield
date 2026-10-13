@@ -1,0 +1,1076 @@
+{
+  "title": "PII pipeline test report",
+  "date": "2026-10-13",
+  "pipeline_run": "evaluation/results/20261013-233019",
+  "test_documents": "evaluation/panel_test/",
+  "note": "All names, numbers and emails in the test documents are made up.",
+  "summary": {
+    "documents_tested": 6,
+    "pii_values": 91,
+    "found": 91,
+    "missed": 0,
+    "false_detections": 4,
+    "removed": 91,
+    "leaked": 0,
+    "detection_rate": 1.0,
+    "precision": 0.958,
+    "removal_rate": 1.0,
+    "released": 4,
+    "held_for_review": 2
+  },
+  "documents": [
+    {
+      "document": "contractor_onboarding.docx",
+      "file_type": "Word",
+      "pii_values": 15,
+      "found": 15,
+      "missed": 0,
+      "false_detections": 0,
+      "removed": 15,
+      "leaked": 0,
+      "structure_kept": 1.0,
+      "result": "Released (PASS)",
+      "notes": "All PII found and removed."
+    },
+    {
+      "document": "assignment_record.docx",
+      "file_type": "Word",
+      "pii_values": 22,
+      "found": 22,
+      "missed": 0,
+      "false_detections": 0,
+      "removed": 22,
+      "leaked": 0,
+      "structure_kept": 1.0,
+      "result": "Released (PASS)",
+      "notes": "All PII found and removed."
+    },
+    {
+      "document": "tprm_training.pptx",
+      "file_type": "PowerPoint",
+      "pii_values": 11,
+      "found": 11,
+      "missed": 0,
+      "false_detections": 0,
+      "removed": 11,
+      "leaked": 0,
+      "structure_kept": 1.0,
+      "result": "Released (PASS)",
+      "notes": "All PII found and removed."
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "file_type": "PowerPoint",
+      "pii_values": 14,
+      "found": 14,
+      "missed": 0,
+      "false_detections": 1,
+      "removed": 14,
+      "leaked": 0,
+      "structure_kept": 1.0,
+      "result": "Held for review (NEEDS_REVIEW)",
+      "notes": "All PII found and removed. Team name 'Security Operations' wrongly flagged as a name, so the copy was held for review."
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "file_type": "PDF (text)",
+      "pii_values": 20,
+      "found": 20,
+      "missed": 0,
+      "false_detections": 1,
+      "removed": 20,
+      "leaked": 0,
+      "structure_kept": 0.824,
+      "result": "Released (PASS)",
+      "notes": "All PII found and removed. Heading 'Key Personnel' wrongly flagged as a name."
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "file_type": "PDF (scanned)",
+      "pii_values": 9,
+      "found": 9,
+      "missed": 0,
+      "false_detections": 2,
+      "removed": 9,
+      "leaked": 0,
+      "structure_kept": 0.44,
+      "result": "Held for review (NEEDS_REVIEW)",
+      "notes": "All PII found and removed. Headings 'A. Requester' and 'B. Access Requested' wrongly flagged as names, so the copy was held for review."
+    }
+  ],
+  "problems": [
+    {
+      "document": "incident_briefing.pptx",
+      "problem": "False detection",
+      "text": "Security Operations",
+      "flagged_as": "PERSON_NAME"
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "problem": "Held for review",
+      "text": null,
+      "flagged_as": null
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "problem": "False detection",
+      "text": "Key Personnel",
+      "flagged_as": "PERSON_NAME"
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "problem": "False detection",
+      "text": "A. Requester",
+      "flagged_as": "PERSON_NAME"
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "problem": "False detection",
+      "text": "B. Access Requested",
+      "flagged_as": "PERSON_NAME"
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "problem": "Held for review",
+      "text": null,
+      "flagged_as": null
+    }
+  ],
+  "pii_values": [
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "Claire Whitaker",
+      "type": "PERSON_NAME",
+      "where": [
+        "properties",
+        "footer"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "Henrik Lund",
+      "type": "PERSON_NAME",
+      "where": [
+        "properties",
+        "comment"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "Siobhan Gallagher",
+      "type": "PERSON_NAME",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "14/09/1986",
+      "type": "DATE_OF_BIRTH",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "27 Kingsley Road\nBristol\nBS7 8LQ",
+      "type": "POSTAL_ADDRESS",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "siobhan.gallagher@example.com",
+      "type": "EMAIL",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "07700 900417",
+      "type": "PHONE",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "QQ 88 77 66 D",
+      "type": "NATIONAL_ID",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "548120773",
+      "type": "PASSPORT_NUMBER",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "GB29 NWBK 6016 1331 9268 19",
+      "type": "BANK_ACCOUNT",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "Marcus Oyelaran",
+      "type": "PERSON_NAME",
+      "where": [
+        "body",
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "EMP-30418",
+      "type": "EMPLOYEE_ID",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "Tomás Herrera",
+      "type": "PERSON_NAME",
+      "where": [
+        "list item"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "0161 496 0732",
+      "type": "PHONE",
+      "where": [
+        "list item"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "contractor_onboarding.docx",
+      "value": "Gallagher",
+      "type": "PERSON_NAME",
+      "where": [
+        "surname mention"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "Fiona MacLeod",
+      "type": "PERSON_NAME",
+      "where": [
+        "properties",
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "Daniel Okafor",
+      "type": "PERSON_NAME",
+      "where": [
+        "table",
+        "body",
+        "list item",
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "EMP-41207",
+      "type": "EMPLOYEE_ID",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "04/03/1979",
+      "type": "DATE_OF_BIRTH",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "Agnieszka Wójcik",
+      "type": "PERSON_NAME",
+      "where": [
+        "table",
+        "body",
+        "list item"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "EMP-41388",
+      "type": "EMPLOYEE_ID",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "22/11/1990",
+      "type": "DATE_OF_BIRTH",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "Priya Raman",
+      "type": "PERSON_NAME",
+      "where": [
+        "table",
+        "body",
+        "list item"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "EMP-41412",
+      "type": "EMPLOYEE_ID",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "09/06/1985",
+      "type": "DATE_OF_BIRTH",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "QQ 12 34 56 C",
+      "type": "NATIONAL_ID",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "90112207561",
+      "type": "NATIONAL_ID",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "ul. Lipowa 14/3, 00-950 Warszawa",
+      "type": "POSTAL_ADDRESS",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "4831 7290 5127",
+      "type": "NATIONAL_ID",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "AFKPR7741M",
+      "type": "INDIAN_PAN",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "219-09-9999",
+      "type": "US_SSN",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "2250 North Clark Street, Apt 5B, Chicago, IL 60614",
+      "type": "POSTAL_ADDRESS",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "4111 1111 1111 1111",
+      "type": "PAYMENT_CARD",
+      "where": [
+        "list item"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "3782 822463 10005",
+      "type": "PAYMENT_CARD",
+      "where": [
+        "list item"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "120394857",
+      "type": "PASSPORT_NUMBER",
+      "where": [
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "fiona.macleod@example.org",
+      "type": "EMAIL",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "assignment_record.docx",
+      "value": "+1 (312) 555-0164",
+      "type": "PHONE",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "Nkechi Adeyemi",
+      "type": "PERSON_NAME",
+      "where": [
+        "properties",
+        "title slide",
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "nkechi.adeyemi@example.com",
+      "type": "EMAIL",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "Oliver Brandt",
+      "type": "PERSON_NAME",
+      "where": [
+        "bullet",
+        "speaker notes"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "+1 (646) 555-0127",
+      "type": "PHONE",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "Mei Lin Zhou",
+      "type": "PERSON_NAME",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "mei.zhou@example.com",
+      "type": "EMAIL",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "Ama Owusu",
+      "type": "PERSON_NAME",
+      "where": [
+        "speaker notes"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "+44 7700 900311",
+      "type": "PHONE",
+      "where": [
+        "speaker notes"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "Gareth Pryce",
+      "type": "PERSON_NAME",
+      "where": [
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "gareth.pryce@example.com",
+      "type": "EMAIL",
+      "where": [
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "tprm_training.pptx",
+      "value": "203.0.113.57",
+      "type": "IP_ADDRESS",
+      "where": [
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "Rohan Kapoor",
+      "type": "PERSON_NAME",
+      "where": [
+        "properties",
+        "speaker notes"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "Lena Fischer",
+      "type": "PERSON_NAME",
+      "where": [
+        "bullet",
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "Tomasz Kowal",
+      "type": "PERSON_NAME",
+      "where": [
+        "bullet",
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "198.51.100.77",
+      "type": "IP_ADDRESS",
+      "where": [
+        "bullet",
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "203.0.113.140",
+      "type": "IP_ADDRESS",
+      "where": [
+        "bullet",
+        "table",
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "+44 20 7946 0321",
+      "type": "PHONE",
+      "where": [
+        "speaker notes"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "EMP-55871",
+      "type": "EMPLOYEE_ID",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "lena.fischer@example.com",
+      "type": "EMAIL",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "EMP-56002",
+      "type": "EMPLOYEE_ID",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "tomasz.kowal@example.com",
+      "type": "EMAIL",
+      "where": [
+        "table",
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "4000 0566 5566 5556",
+      "type": "PAYMENT_CARD",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "Hélène Lefèvre",
+      "type": "PERSON_NAME",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "41926837",
+      "type": "BANK_ACCOUNT",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "incident_briefing.pptx",
+      "value": "Femi Adebayo",
+      "type": "PERSON_NAME",
+      "where": [
+        "bullet"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "Beatriz Moreno",
+      "type": "PERSON_NAME",
+      "where": [
+        "body",
+        "image (OCR)",
+        "properties"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "beatriz.moreno@example.com",
+      "type": "EMAIL",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "+1 (415) 555-0138",
+      "type": "PHONE",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "Arjun Malhotra",
+      "type": "PERSON_NAME",
+      "where": [
+        "table",
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "arjun.malhotra@example.net",
+      "type": "EMAIL",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "+44 20 7946 0774",
+      "type": "PHONE",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "Hannah Sørensen",
+      "type": "PERSON_NAME",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "h.sorensen@example.net",
+      "type": "EMAIL",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "+44 20 7946 0819",
+      "type": "PHONE",
+      "where": [
+        "table"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "192.0.2.10",
+      "type": "IP_ADDRESS",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "192.0.2.40",
+      "type": "IP_ADDRESS",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "192.0.2.15",
+      "type": "IP_ADDRESS",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "1974-08-19",
+      "type": "DATE_OF_BIRTH",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "X4829173",
+      "type": "PASSPORT_NUMBER",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "9 Ferncliff Gardens, Leeds LS6 4QT",
+      "type": "POSTAL_ADDRESS",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "Elif Arslan",
+      "type": "PERSON_NAME",
+      "where": [
+        "body",
+        "image (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "3 May 1983",
+      "type": "DATE_OF_BIRTH",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "QQ 45 67 89 B",
+      "type": "NATIONAL_ID",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "Malhotra",
+      "type": "PERSON_NAME",
+      "where": [
+        "surname mention"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "due_diligence_report.pdf",
+      "value": "DE89 3704 0044 0532 0130 00",
+      "type": "BANK_ACCOUNT",
+      "where": [
+        "body"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "Chloe Abernathy",
+      "type": "PERSON_NAME",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "E204877",
+      "type": "EMPLOYEE_ID",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "chloe.abernathy@example.com",
+      "type": "EMAIL",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "(512) 555-0182",
+      "type": "PHONE",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "17 June 1992",
+      "type": "DATE_OF_BIRTH",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "1187 Larkspur Drive, Austin, TX 78745",
+      "type": "POSTAL_ADDRESS",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "10.20.31.45",
+      "type": "IP_ADDRESS",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "Desmond Achebe",
+      "type": "PERSON_NAME",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    },
+    {
+      "document": "access_request_scan.pdf",
+      "value": "Natalia Petrova",
+      "type": "PERSON_NAME",
+      "where": [
+        "scanned page (OCR)"
+      ],
+      "found": true,
+      "removed": true
+    }
+  ]
+}

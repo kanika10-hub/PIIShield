@@ -1,0 +1,233 @@
+{
+  "file": "access_request_scan.pdf",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "A scanned IT access request form with no text layer: grey paper with specks, tilted 0.5 degrees and saved as JPEG. Requester details as label: value lines, a table in the case-study style (dark header band) with no PII, approvers and a footer.",
+  "pii": [
+    {
+      "text": "Chloe Abernathy",
+      "type": "PERSON_NAME",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "E204877",
+      "type": "EMPLOYEE_ID",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "chloe.abernathy@example.com",
+      "type": "EMAIL",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "(512) 555-0182",
+      "type": "PHONE",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "17 June 1992",
+      "type": "DATE_OF_BIRTH",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "1187 Larkspur Drive, Austin, TX 78745",
+      "type": "POSTAL_ADDRESS",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "10.20.31.45",
+      "type": "IP_ADDRESS",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "Desmond Achebe",
+      "type": "PERSON_NAME",
+      "where": "scanned page (OCR)"
+    },
+    {
+      "text": "Natalia Petrova",
+      "type": "PERSON_NAME",
+      "where": "scanned page (OCR)"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "ITS-F-07",
+      "why": "form reference"
+    },
+    {
+      "text": "Treasury Operations",
+      "why": "department"
+    },
+    {
+      "text": "LT-0042187",
+      "why": "asset tag"
+    },
+    {
+      "text": "$250,000",
+      "why": "amount"
+    },
+    {
+      "text": "08/10/2026",
+      "why": "approval date"
+    },
+    {
+      "text": "REQ-118204",
+      "why": "ticket reference"
+    }
+  ],
+  "structure": [
+    {
+      "text": "IT Access Request Form",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Form ITS-F-07 rev 2",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "A. Requester",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Full name: Chloe Abernathy",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Employee ID: E204877",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Department: Treasury Operations",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Work email: chloe.abernathy@example.com",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Mobile: (512) 555-0182",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Date of birth: 17 June 1992",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Home address: 1187 Larkspur Drive, Austin, TX 78745",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Laptop: LT-0042187, static IP 10.20.31.45",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "B. Access Requested",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "System",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Access level",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Justification",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "SAP Treasury",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "Read and write",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "Daily cash positioning",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "Kyriba",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "Approver",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "Release payments up to $250,000",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "C. Approvals",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Line manager: Desmond Achebe, approved 08/10/2026",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Security reviewer: Natalia Petrova, ticket REQ-118204",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "ITS-F-07 rev 2 | Page 1 of 1",
+      "kind": "paragraph",
+      "where": "footer"
+    }
+  ]
+}

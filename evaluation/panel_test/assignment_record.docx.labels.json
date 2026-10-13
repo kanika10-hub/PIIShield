@@ -1,0 +1,476 @@
+{
+  "file": "assignment_record.docx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "International assignment record: an assignee table with dates of birth beside start dates, national IDs of three countries (UK NI, PESEL, Aadhaar) with an Indian PAN and a US SSN, a Polish and a US home address, card numbers in a bulleted list, a work permit screenshot, contact details, the header, footer and file properties.",
+  "pii": [
+    {
+      "text": "Fiona MacLeod",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Daniel Okafor",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "EMP-41207",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "04/03/1979",
+      "type": "DATE_OF_BIRTH",
+      "where": "table"
+    },
+    {
+      "text": "Agnieszka Wójcik",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "EMP-41388",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "22/11/1990",
+      "type": "DATE_OF_BIRTH",
+      "where": "table"
+    },
+    {
+      "text": "Priya Raman",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "EMP-41412",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "09/06/1985",
+      "type": "DATE_OF_BIRTH",
+      "where": "table"
+    },
+    {
+      "text": "Daniel Okafor",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "QQ 12 34 56 C",
+      "type": "NATIONAL_ID",
+      "where": "body"
+    },
+    {
+      "text": "Agnieszka Wójcik",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "90112207561",
+      "type": "NATIONAL_ID",
+      "where": "body"
+    },
+    {
+      "text": "ul. Lipowa 14/3, 00-950 Warszawa",
+      "type": "POSTAL_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "Priya Raman",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "4831 7290 5127",
+      "type": "NATIONAL_ID",
+      "where": "body"
+    },
+    {
+      "text": "AFKPR7741M",
+      "type": "INDIAN_PAN",
+      "where": "body"
+    },
+    {
+      "text": "219-09-9999",
+      "type": "US_SSN",
+      "where": "body"
+    },
+    {
+      "text": "2250 North Clark Street, Apt 5B, Chicago, IL 60614",
+      "type": "POSTAL_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "4111 1111 1111 1111",
+      "type": "PAYMENT_CARD",
+      "where": "list item"
+    },
+    {
+      "text": "3782 822463 10005",
+      "type": "PAYMENT_CARD",
+      "where": "list item"
+    },
+    {
+      "text": "Daniel Okafor",
+      "type": "PERSON_NAME",
+      "where": "list item"
+    },
+    {
+      "text": "Priya Raman",
+      "type": "PERSON_NAME",
+      "where": "list item"
+    },
+    {
+      "text": "Agnieszka Wójcik",
+      "type": "PERSON_NAME",
+      "where": "list item"
+    },
+    {
+      "text": "Daniel Okafor",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "120394857",
+      "type": "PASSPORT_NUMBER",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "Fiona MacLeod",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "fiona.macleod@example.org",
+      "type": "EMAIL",
+      "where": "body"
+    },
+    {
+      "text": "+1 (312) 555-0164",
+      "type": "PHONE",
+      "where": "body"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "International Assignment Record",
+      "why": "document title"
+    },
+    {
+      "text": "Global Mobility",
+      "why": "team name"
+    },
+    {
+      "text": "HR-MOB-004",
+      "why": "policy reference"
+    },
+    {
+      "text": "July 2026",
+      "why": "month"
+    },
+    {
+      "text": "GM-2026-0193",
+      "why": "case reference"
+    },
+    {
+      "text": "Warsaw",
+      "why": "city"
+    },
+    {
+      "text": "01/07/2026",
+      "why": "start date"
+    },
+    {
+      "text": "Pune",
+      "why": "city"
+    },
+    {
+      "text": "15/07/2026",
+      "why": "start date"
+    },
+    {
+      "text": "Chicago",
+      "why": "city"
+    },
+    {
+      "text": "03/08/2026",
+      "why": "start date"
+    },
+    {
+      "text": "£5,000",
+      "why": "amount"
+    },
+    {
+      "text": "$8,000",
+      "why": "amount"
+    },
+    {
+      "text": "August 2026",
+      "why": "month"
+    },
+    {
+      "text": "WP/2026/55812",
+      "why": "permit reference"
+    },
+    {
+      "text": "30/06/2028",
+      "why": "expiry date"
+    }
+  ],
+  "structure": [
+    {
+      "text": "HR Confidential - Global Mobility",
+      "kind": "paragraph",
+      "where": "header"
+    },
+    {
+      "text": "Policy HR-MOB-004 v2.0",
+      "kind": "paragraph",
+      "where": "footer"
+    },
+    {
+      "text": "International Assignment Record",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Three employees start long-term assignments in July 2026. Tax equalisation is handled under case GM-2026-0193 and allowances follow policy HR-MOB-004.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Assignees",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Name",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Employee ID",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Host location",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Start date",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 4
+    },
+    {
+      "text": "Date of birth",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 5
+    },
+    {
+      "text": "Daniel Okafor",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "EMP-41207",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "Warsaw",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "01/07/2026",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 4
+    },
+    {
+      "text": "04/03/1979",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 5
+    },
+    {
+      "text": "Agnieszka Wójcik",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "EMP-41388",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "Pune",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "15/07/2026",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 4
+    },
+    {
+      "text": "22/11/1990",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 5
+    },
+    {
+      "text": "Priya Raman",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 1
+    },
+    {
+      "text": "EMP-41412",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 2
+    },
+    {
+      "text": "Chicago",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 3
+    },
+    {
+      "text": "03/08/2026",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 4
+    },
+    {
+      "text": "09/06/1985",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 5
+    },
+    {
+      "text": "Identity and tax details",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Daniel Okafor stays on UK payroll under National Insurance number QQ 12 34 56 C.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Agnieszka Wójcik (PESEL 90112207561) keeps her home address at ul. Lipowa 14/3, 00-950 Warszawa for tax purposes.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Priya Raman holds Aadhaar 4831 7290 5127 and PAN AFKPR7741M. For US payroll she was issued Social Security number 219-09-9999; her address in the US is 2250 North Clark Street, Apt 5B, Chicago, IL 60614.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Corporate cards",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Daniel Okafor: Visa 4111 1111 1111 1111, monthly limit £5,000",
+      "kind": "list_item",
+      "where": "body"
+    },
+    {
+      "text": "Priya Raman: American Express 3782 822463 10005, monthly limit $8,000",
+      "kind": "list_item",
+      "where": "body"
+    },
+    {
+      "text": "Agnieszka Wójcik: card to be issued in August 2026",
+      "kind": "list_item",
+      "where": "body"
+    },
+    {
+      "text": "Work permit",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Work permit confirmation (screenshot):",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "WORK PERMIT CONFIRMATION\nHolder: Daniel Okafor\nPassport: 120394857\nPermit reference: WP/2026/55812\nValid until: 30/06/2028",
+      "kind": "image_text",
+      "where": "body"
+    },
+    {
+      "text": "Contacts",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Questions go to the mobility adviser, Fiona MacLeod, at fiona.macleod@example.org or +1 (312) 555-0164.",
+      "kind": "paragraph",
+      "where": "body"
+    }
+  ]
+}

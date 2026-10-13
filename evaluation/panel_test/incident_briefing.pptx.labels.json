@@ -1,0 +1,424 @@
+{
+  "file": "incident_briefing.pptx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "Security incident briefing: IP addresses in bullets, a table and a SIEM screenshot, affected staff with employee IDs, a card number and a bank account number, timeline text boxes, speaker notes and file properties.",
+  "pii": [
+    {
+      "text": "Rohan Kapoor",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Lena Fischer",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "Tomasz Kowal",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "198.51.100.77",
+      "type": "IP_ADDRESS",
+      "where": "bullet"
+    },
+    {
+      "text": "203.0.113.140",
+      "type": "IP_ADDRESS",
+      "where": "bullet"
+    },
+    {
+      "text": "Rohan Kapoor",
+      "type": "PERSON_NAME",
+      "where": "speaker notes"
+    },
+    {
+      "text": "+44 20 7946 0321",
+      "type": "PHONE",
+      "where": "speaker notes"
+    },
+    {
+      "text": "Lena Fischer",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "EMP-55871",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "lena.fischer@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "198.51.100.77",
+      "type": "IP_ADDRESS",
+      "where": "table"
+    },
+    {
+      "text": "Tomasz Kowal",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "EMP-56002",
+      "type": "EMPLOYEE_ID",
+      "where": "table"
+    },
+    {
+      "text": "tomasz.kowal@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "203.0.113.140",
+      "type": "IP_ADDRESS",
+      "where": "table"
+    },
+    {
+      "text": "4000 0566 5566 5556",
+      "type": "PAYMENT_CARD",
+      "where": "bullet"
+    },
+    {
+      "text": "Hélène Lefèvre",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "41926837",
+      "type": "BANK_ACCOUNT",
+      "where": "bullet"
+    },
+    {
+      "text": "Femi Adebayo",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "tomasz.kowal@example.com",
+      "type": "EMAIL",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "203.0.113.140",
+      "type": "IP_ADDRESS",
+      "where": "image (OCR)"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "Incident Briefing INC-2026-0712",
+      "why": "document title"
+    },
+    {
+      "text": "Security Operations",
+      "why": "team name"
+    },
+    {
+      "text": "INC-2026-0712",
+      "why": "incident reference"
+    },
+    {
+      "text": "9 October 2026",
+      "why": "date"
+    },
+    {
+      "text": "6 October 2026",
+      "why": "date"
+    },
+    {
+      "text": "7 October 2026",
+      "why": "date"
+    },
+    {
+      "text": "PR-2026-41",
+      "why": "payment run reference"
+    },
+    {
+      "text": "06 Oct 09:14",
+      "why": "date and time"
+    },
+    {
+      "text": "88213",
+      "why": "alert number"
+    },
+    {
+      "text": "AAD-IT-004",
+      "why": "detection rule"
+    }
+  ],
+  "structure": [
+    {
+      "text": "Incident Briefing: Credential Phishing",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "INC-2026-0712 | Risk Committee | 9 October 2026",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "What Happened",
+      "kind": "heading",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "On 6 October 2026 a phishing email reached 214 mailboxes.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Two staff entered their passwords: Lena Fischer and Tomasz Kowal.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "The attacker signed in from 198.51.100.77 and 203.0.113.140.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "No customer data was exported; three forwarding rules were removed.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Rohan Kapoor (SOC analyst, +44 20 7946 0321) can answer technical questions.",
+      "kind": "paragraph",
+      "where": "notes",
+      "page": 2
+    },
+    {
+      "text": "Affected Accounts",
+      "kind": "heading",
+      "where": "body",
+      "page": 3
+    },
+    {
+      "text": "Name",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Employee ID",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Email",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Last sign-in IP",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 4
+    },
+    {
+      "text": "Action",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 5
+    },
+    {
+      "text": "Lena Fischer",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "EMP-55871",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "lena.fischer@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "198.51.100.77",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 4
+    },
+    {
+      "text": "Password reset",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 5
+    },
+    {
+      "text": "Tomasz Kowal",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "EMP-56002",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "tomasz.kowal@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "203.0.113.140",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 4
+    },
+    {
+      "text": "Password reset, MFA re-enrolled",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 5
+    },
+    {
+      "text": "Do not share this slide outside the committee: it lists staff by name.",
+      "kind": "paragraph",
+      "where": "notes",
+      "page": 3
+    },
+    {
+      "text": "Financial Exposure",
+      "kind": "heading",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "A finance mailbox held one unencrypted card number, 4000 0566 5566 5556; the card was cancelled.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "The cardholder, Hélène Lefèvre, was told on 7 October 2026.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "A remittance advice in the same mailbox showed the bank account number 41926837 of a contractor, Femi Adebayo.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "Payment run PR-2026-41 was checked: no bank details were changed.",
+      "kind": "list_item",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "Timeline",
+      "kind": "heading",
+      "where": "body",
+      "page": 5
+    },
+    {
+      "text": "06 Oct 09:14 - first phishing email delivered",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 5
+    },
+    {
+      "text": "06 Oct 09:52 - first password entered",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 5
+    },
+    {
+      "text": "06 Oct 11:30 - SOC blocked the sender domain",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 5
+    },
+    {
+      "text": "07 Oct 08:00 - all affected passwords reset",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 5
+    },
+    {
+      "text": "Evidence: SIEM Alert",
+      "kind": "heading",
+      "where": "body",
+      "page": 6
+    },
+    {
+      "text": "ALERT 88213 - IMPOSSIBLE TRAVEL\nUser: tomasz.kowal@example.com\nSource IP: 203.0.113.140\nLocation: unknown (anonymising proxy)\nRule: AAD-IT-004",
+      "kind": "image_text",
+      "where": "body",
+      "page": 6
+    }
+  ]
+}

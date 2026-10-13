@@ -42,6 +42,7 @@
     PAYMENT_CARD: ["Payment card numbers", "Payment card number"],
     BANK_ACCOUNT: ["Bank account numbers", "Bank account number"],
     IP_ADDRESS: ["IP addresses", "IP address"],
+    UNREADABLE_TEXT: ["Unreadable OCR text", "Unreadable OCR text"],
   };
 
   const VERDICTS = {
@@ -52,6 +53,17 @@
     },
     FAIL: { label: "FAIL", cls: "fail", text: "PII remains in the sanitized copy, or the copy does not match its document." },
   };
+
+  // The verdict once the review is counted: PASS when a reviewer answered
+  // every issue and the release gate let the copy go (jobs.approval)
+  function finalVerdict(job) {
+    const result = job.result || {};
+    return job.state === "completed" && result.final_verdict ? result.final_verdict : result.verdict;
+  }
+
+  function passedAfterReview(job) {
+    return job.result.verdict === "NEEDS_REVIEW" && finalVerdict(job) === "PASS";
+  }
 
   // What each validator check (src/pii/validator.py) confirms
   const CHECKS = {
@@ -81,7 +93,7 @@
   const LOW_OCR_CONFIDENCE = 60;
 
   // The API this page was written for (API_VERSION in app.py)
-  const API_VERSION = 2;
+  const API_VERSION = 3;
 
   const RESTART_SERVER = "The scanner server is running older code than this page. "
     + "Stop it (Ctrl+C in its terminal) and start it again with: python app.py";
@@ -142,9 +154,13 @@
     data: {},
     rendered: {},
     blockNodes: {},
+    pageNodes: {},
     blockTexts: new Map(),
     findingRows: new Map(),
     activeTab: "extracted",
+    // The tab to show again after a review answer, and the reviewer's name
+    returnTab: null,
+    reviewer: "",
   };
 
   // ------------------------------------------------------------
@@ -502,8 +518,10 @@
     state.data = {};
     state.rendered = {};
     state.blockNodes = {};
+    state.pageNodes = {};
     state.blockTexts = new Map();
     state.findingRows = new Map();
+    state.returnTab = null;
     ui.results.hidden = true;
     ui.after.hidden = true;
     for (const name of TABS) $(`view-${name}`).replaceChildren();
@@ -630,10 +648,11 @@
     const rows = [];
 
     if (result.verdict) {
-      const info = VERDICTS[result.verdict];
+      const verdict = finalVerdict(job);
+      const info = VERDICTS[verdict];
       rows.push(el("div", { class: "decision-row" }, [
-        el("span", { text: "Validation" }),
-        badge(info ? info.label : result.verdict, info ? info.cls : ""),
+        el("span", { text: passedAfterReview(job) ? "Validation (after review)" : "Validation" }),
+        badge(info ? info.label : verdict, info ? info.cls : ""),
       ]));
     }
 
@@ -672,7 +691,9 @@
     state.blockTexts = indexTexts(original);
     state.rendered = {};
     ui.results.hidden = false;
-    selectTab("extracted");
+    // After a review answer, back to the tab it was given on
+    selectTab(state.returnTab || "extracted");
+    state.returnTab = null;
   }
 
   function bindTabs() {
@@ -737,7 +758,12 @@
     const job = state.job;
 
     if (job.state === "completed" && job.result.approved === true) {
-      return el("p", { class: "note", text: "Approved for AI processing: this copy passed validation." });
+      return el("p", {
+        class: "note",
+        text: job.result.verdict === "NEEDS_REVIEW"
+          ? "Approved for AI processing: this copy passed validation after a reviewer checked every issue it raised."
+          : "Approved for AI processing: this copy passed validation.",
+      });
     }
 
     const verdict = job.result.verdict ? statusLabel(job.result.verdict) : "not validated";
@@ -797,9 +823,11 @@
 
     const marks = tab === "extracted" ? findingsByBlock() : null;
     const nodes = new Map();
+    const pages = new Map();
     const fragment = document.createDocumentFragment();
 
     state.blockNodes[tab] = nodes;
+    state.pageNodes[tab] = pages;
 
     for (const page of view.pages) {
       const blocks = el("div", { class: "doc-blocks" });
@@ -808,14 +836,17 @@
 
       if (!page.blocks.length) blocks.append(el("p", { class: "muted", text: "No text was extracted from this page." }));
 
-      fragment.append(el("section", { class: "doc-page" }, [
+      const section = el("section", { class: "doc-page" }, [
         el("h3", { class: "doc-page-label" }, [
           page.label,
           page.hidden ? badge("Hidden slide") : null,
           page.low_text ? badge("Little or no text extracted", "review") : null,
         ]),
         blocks,
-      ]));
+      ]);
+
+      pages.set(page.page_number, section);
+      fragment.append(section);
     }
 
     if (view.properties.length) {
@@ -1158,20 +1189,36 @@
   }
 
   function showInDocument(item) {
+    showBlock(item.block_id, item.page_number, item.finding_id);
+  }
+
+  // Whether the extracted text shows this block, or at least its page
+  function inDocument(blockId, pageNumber) {
+    const original = state.data.original;
+
+    return state.blockTexts.has(blockId)
+      || Boolean(original && original.pages && original.pages.some((page) => page.page_number === pageNumber));
+  }
+
+  // Open the extracted text at a block, or at its page when the block is not shown
+  function showBlock(blockId, pageNumber, findingId) {
     selectTab("extracted");
 
-    const node = state.blockNodes.extracted && state.blockNodes.extracted.get(item.block_id);
+    const block = state.blockNodes.extracted && state.blockNodes.extracted.get(blockId);
+    const node = block || (state.pageNodes.extracted && state.pageNodes.extracted.get(pageNumber));
     if (!node) return;
 
-    node.scrollIntoView({ block: "center" });
+    node.scrollIntoView({ block: block ? "center" : "start" });
     node.classList.remove("flash");
     void node.offsetWidth;
     node.classList.add("flash");
 
     for (const mark of document.querySelectorAll("#view-extracted mark.pii.selected")) mark.classList.remove("selected");
 
-    for (const mark of node.querySelectorAll("mark.pii")) {
-      if (mark.dataset.finding === item.finding_id) mark.classList.add("selected");
+    if (!block || !findingId) return;
+
+    for (const mark of block.querySelectorAll("mark.pii")) {
+      if (mark.dataset.finding === findingId) mark.classList.add("selected");
     }
   }
 
@@ -1196,6 +1243,7 @@
     const job = state.job;
     const info = VERDICTS[verdict];
     const approved = job.state === "completed" && job.result.approved === true;
+    const reviewed = approved && passedAfterReview(job);
 
     if (!info) {
       return el("div", { class: "verdict-box fail" }, [
@@ -1211,13 +1259,14 @@
       badge(info.label, info.cls),
       el("div", { class: "verdict-text" }, [
         el("strong", { text: approved ? "Approved for AI processing" : "Blocked for AI processing" }),
-        info.text,
+        reviewed ? "Validation raised issues that needed review, and a reviewer checked every one (below)." : info.text,
         !approved && job.result.reason && verdict === "PASS" ? ` (${job.result.reason})` : null,
       ]),
     ]);
   }
 
-  function issueItem(issue) {
+  // readOnly: no answers of its own (an OCR issue, answered with the others)
+  function issueItem(issue, readOnly) {
     const where = [];
 
     if (issue.finding_id) {
@@ -1227,11 +1276,40 @@
       }));
     }
 
-    if (issue.block_id) where.push(` block ${issue.block_id}`);
-    if (issue.page_number) where.push(` · page ${issue.page_number}`);
+    const place = [
+      issue.block_id ? `block ${issue.block_id}` : null,
+      issue.page_number ? `page ${issue.page_number}` : null,
+    ].filter(Boolean).join(" · ");
 
-    return el("li", null, [
-      badge(statusLabel(issue.severity), statusClass(issue.severity)),
+    // The block (or page) opens in the extracted text, where the reviewer can read it
+    if (place) {
+      where.push(" ", inDocument(issue.block_id, issue.page_number)
+        ? el("button", {
+          type: "button", class: "link-button", text: place, title: "Show in extracted text",
+          onclick: () => showBlock(issue.block_id, issue.page_number),
+        })
+        : place);
+    }
+
+    const item = el("li");
+    const signed = issue.signed_off;
+
+    // An issue that needs review: its badge opens the reviewer's choices
+    const status = readOnly
+      ? badge(signed ? "CHECKED" : statusLabel(issue.severity), signed ? "pass" : statusClass(issue.severity))
+      : issue.severity === "NEEDS_REVIEW" && issue.key
+      ? el("button", {
+        type: "button",
+        class: `badge badge-button ${signed ? "pass" : "review"}`,
+        text: signed ? "CHECKED" : statusLabel(issue.severity),
+        title: signed ? "Checked by a reviewer: select to see who, or to undo" : "Select to review this issue",
+        "aria-expanded": "false",
+        onclick: () => toggleReview(item, issue, status),
+      })
+      : badge(statusLabel(issue.severity), statusClass(issue.severity));
+
+    return append(item, [
+      status,
       " ",
       issue.reason,
       issue.occurrences ? ` (${issue.occurrences}×)` : null,
@@ -1239,20 +1317,248 @@
     ]);
   }
 
+  function toggleReview(item, issue, button) {
+    const open = item.querySelector(".review-box");
+
+    if (open) {
+      open.remove();
+      button.setAttribute("aria-expanded", "false");
+      return;
+    }
+
+    button.setAttribute("aria-expanded", "true");
+    item.append(reviewBox(issue));
+  }
+
+  // The reviewer's choices for one issue (src/pii/review.py)
+  function reviewBox(issue) {
+    const message = el("p", { class: "review-message", role: "alert", hidden: true });
+    const fail = (text) => {
+      message.textContent = text;
+      message.hidden = false;
+    };
+
+    if (issue.signed_off) {
+      return el("div", { class: "review-box" }, [
+        el("span", { class: "muted", text: `Checked by ${issue.signed_off.reviewer} · ${formatTime(issue.signed_off.signed_at)}` }),
+        el("button", {
+          type: "button", class: "button subtle", text: "Undo",
+          onclick: () => sendReview(`sign-offs/${encodeURIComponent(issue.key)}`, "DELETE", null, fail),
+        }),
+        message,
+      ]);
+    }
+
+    const name = el("input", {
+      class: "input", type: "text", placeholder: "Your name",
+      maxlength: "80", value: state.reviewer || "",
+    });
+
+    const send = (path) => {
+      state.reviewer = name.value.trim();
+
+      if (!state.reviewer) {
+        fail("Enter your name: it is recorded with your review.");
+        name.focus();
+        return;
+      }
+
+      sendReview(path, "POST", { key: issue.key, reviewer: state.reviewer }, fail);
+    };
+
+    return el("div", { class: "review-box" }, [
+      // Who checked the issue: recorded with the answer, not a value to hide
+      el("label", { class: "review-name" }, ["Reviewer", name]),
+      issue.can_hide ? el("button", { type: "button", class: "button", text: "Hide it", onclick: () => send("hide") }) : null,
+      el("button", { type: "button", class: "button", text: "Checked, it's fine", onclick: () => send("sign-offs") }),
+      issue.can_hide
+        ? el("p", { class: "muted review-hint", text: "Hide it redacts this text and runs the checks again. \"Checked\" answers on issues it does not change are kept." })
+        : null,
+      message,
+    ]);
+  }
+
+  // Send a review answer; the job runs again and the page follows it
+  async function sendReview(path, method, body, fail) {
+    if (!state.job) return;
+
+    if (state.busy) {
+      fail("The checks are still running from your last answer: try again when they finish.");
+      return;
+    }
+
+    try {
+      const job = await api(`/api/jobs/${encodeURIComponent(state.job.job_id)}/review/${path}`, {
+        method,
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+
+      state.job = job;
+      state.returnTab = state.activeTab;
+      clearError();
+      setBusy(true);
+      renderJob(job);
+      pollJob();
+    } catch (error) {
+      fail(error.message);
+    }
+  }
+
+  function formatTime(value) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value || "") : date.toLocaleString();
+  }
+
+  // How far the review has got, "Hide all OCR issues", and the blocks a
+  // reviewer hid text in (views.review_view)
+  function reviewPanel(review, ocrIssues) {
+    const hidden = review.hidden || [];
+
+    const progress = el("p", {
+      class: review.open ? "note warn" : "note",
+      text: `${hidden.length} block${hidden.length === 1 ? "" : "s"} hidden · ${review.checked} checked · ${review.open} left to review. `
+        + (review.open ? "Validation turns PASS when none are left." : "Nothing is left to review."),
+    });
+
+    return [
+      progress,
+      ocrIssues.length ? ocrGroup(ocrIssues) : null,
+      hidden.length ? el("ul", { class: "plain-list" }, hidden.map(hiddenItem)) : null,
+    ];
+  }
+
+  // Every issue about badly read OCR text, as one line with one answer for
+  // all of them (review.py: hidden_all_report, sign_off_all, withdraw_all).
+  // Each place is listed, read-only, under a fold.
+  function ocrGroup(issues) {
+    const job = state.job;
+    const open = issues.filter((issue) => !issue.signed_off);
+    const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
+    const pages = [...new Set(issues.map((issue) => issue.page_number).filter((page) => page !== undefined && page !== null))]
+      .sort((a, b) => a - b);
+    const where = pages.length
+      ? ` (page${pages.length === 1 ? "" : "s"} ${pages.slice(0, 8).join(", ")}${pages.length > 8 ? " …" : ""})`
+      : "";
+
+    const message = el("p", { class: "review-message", role: "alert", hidden: true });
+    const fail = (text) => {
+      message.textContent = text;
+      message.hidden = false;
+    };
+
+    const name = el("input", {
+      class: "input", type: "text", placeholder: "Your name",
+      maxlength: "80", value: state.reviewer || "",
+    });
+
+    // Both answers record who gave them, and ask once more before applying
+    const answer = (path, question) => () => {
+      state.reviewer = name.value.trim();
+
+      if (!state.reviewer) {
+        fail("Enter your name: it is recorded with your review.");
+        name.focus();
+        return;
+      }
+
+      if (!window.confirm(question)) return;
+
+      sendReview(path, "POST", { reviewer: state.reviewer }, fail);
+    };
+
+    let answers = null;
+
+    if (!open.length) {
+      const signed = issues[0].signed_off;
+      answers = el("div", { class: "review-box" }, [
+        el("span", { class: "muted", text: `All checked by ${signed.reviewer} · ${formatTime(signed.signed_at)}` }),
+        el("button", {
+          type: "button", class: "button subtle", text: "Undo",
+          onclick: () => sendReview("sign-off-all", "DELETE", null, fail),
+        }),
+        message,
+      ]);
+    } else if (job.state === "completed") {
+      answers = el("div", { class: "review-box" }, [
+        el("label", { class: "review-name" }, ["Reviewer", name]),
+        el("button", {
+          type: "button", class: "button", text: "Hide all",
+          onclick: answer("hide-all", `Hide the text of all ${plural(open.length, "place")}? It is redacted from the sanitized copy, so the AI will not see it.`),
+        }),
+        el("button", {
+          type: "button", class: "button", text: "Checked, all fine",
+          onclick: answer("sign-off-all", `Approve all ${plural(open.length, "place")} as they are? Their text goes to the AI unread, including any PII the OCR misread.`),
+        }),
+        el("p", {
+          class: "muted review-hint",
+          text: (open.length < issues.length ? `${issues.length - open.length} already checked: the buttons answer the other ${open.length}. ` : "")
+            + "Hide all removes their text from the sanitized copy. Checked, all fine sends it to the AI as it is.",
+        }),
+        message,
+      ]);
+    }
+
+    return el("div", { class: "ocr-group" }, [
+      el("p", { class: "ocr-group-line" }, [
+        open.length ? badge("NEEDS REVIEW", "review") : badge("CHECKED", "pass"),
+        " ",
+        `${plural(issues.length, "place")} where OCR text was read with low confidence${where}`,
+      ]),
+      answers,
+      el("details", null, [
+        el("summary", { text: `Show the ${plural(issues.length, "place")}` }),
+        el("ul", null, issues.map((issue) => issueItem(issue, true))),
+      ]),
+    ]);
+  }
+
+  // One block a reviewer hid text in: block ID, types, who and when; never the text
+  function hiddenItem(entry) {
+    const types = entry.types.map((type) => (TYPE_LABELS[type] ? TYPE_LABELS[type][1] : humanize(type))).join(", ");
+    const place = [`block ${entry.block_id}`, entry.page_number ? `page ${entry.page_number}` : null].filter(Boolean).join(" · ");
+
+    return el("li", null, [
+      badge("HIDDEN", "pass"),
+      " ",
+      types,
+      el("span", { class: "muted" }, [
+        " — ",
+        inDocument(entry.block_id, entry.page_number)
+          ? el("button", {
+            type: "button", class: "link-button", text: place, title: "Show in extracted text",
+            onclick: () => showBlock(entry.block_id, entry.page_number),
+          })
+          : place,
+        entry.added_by ? ` · by ${entry.added_by} · ${formatTime(entry.added_at)}` : null,
+      ]),
+    ]);
+  }
+
   function checkList(checks) {
     return el("div", { class: "check-list" }, checks.map((check) => {
-      const issues = check.issues || [];
-      const more = check.issues_total - issues.length;
+      // Badly read OCR text is answered all at once, under Review (ocrGroup)
+      const grouped = (check.issues || []).filter((issue) => issue.unreadable);
+      const issues = (check.issues || []).filter((issue) => !issue.unreadable);
+      const more = check.issues_total - issues.length - grouped.length;
+      // PASS once a reviewer checked every issue (views.reviewed_validation)
+      const status = check.final_status || check.status;
+      const count = `${check.issues_total} issue${check.issues_total === 1 ? "" : "s"}`;
 
       return el("details", { class: "check", open: check.status !== "PASS" }, [
         el("summary", null, [
-          el("span", { class: "check-status" }, badge(statusLabel(check.status), statusClass(check.status))),
+          el("span", { class: "check-status" }, badge(statusLabel(status), statusClass(status))),
           el("span", { class: "check-name" }, [CHECKS[check.name] || humanize(check.name), el("small", { text: check.name })]),
-          el("span", { class: "muted nowrap", text: `${check.issues_total} issue${check.issues_total === 1 ? "" : "s"}` }),
+          el("span", { class: "muted nowrap", text: status !== check.status ? `${count}, all checked` : count }),
         ]),
         el("div", { class: "check-body" }, [
           check.notes.length ? el("ul", { class: "muted" }, check.notes.map((note) => el("li", { text: note }))) : null,
-          issues.length ? el("ul", null, issues.map(issueItem)) : el("p", { class: "muted", text: "No issues." }),
+          grouped.length
+            ? el("p", { class: "muted", text: `${grouped.length} place${grouped.length === 1 ? "" : "s"} where OCR text was read with low confidence: answered all together under Review, above.` })
+            : null,
+          issues.length
+            ? el("ul", null, issues.map((issue) => issueItem(issue)))
+            : grouped.length ? null : el("p", { class: "muted", text: "No issues." }),
           more > 0 ? el("p", { class: "muted", text: `…and ${more} more in the validation report.` }) : null,
         ]),
       ]);
@@ -1314,7 +1620,7 @@
   function renderValidationTab(container) {
     const job = state.job;
     const data = state.data.validation;
-    const verdict = data && data.validation ? data.validation.verdict : null;
+    const verdict = data && data.validation ? finalVerdict(job) || data.validation.verdict : null;
 
     append(container, [verdictBox(verdict), originalFileNote()]);
 
@@ -1330,6 +1636,15 @@
     if (!data || data.unavailable) {
       append(container, [unavailableNote(data, "The validation results are not available."), section("Downloads", downloadsBlock())]);
       return;
+    }
+
+    const review = data.review || {};
+    const ocrIssues = data.validation
+      ? data.validation.checks.flatMap((check) => (check.issues || []).filter((issue) => issue.unreadable))
+      : [];
+
+    if (data.validation && (review.needing_review || (review.hidden || []).length || ocrIssues.length)) {
+      append(container, section("Review", reviewPanel(review, ocrIssues)));
     }
 
     if (data.validation) append(container, section("Validation checks", checkList(data.validation.checks)));

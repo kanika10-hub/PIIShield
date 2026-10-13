@@ -39,8 +39,11 @@ Each check, and the verdict, is one of:
                     to scan, an image never read
 
 The verdict is the worst of the checks. Only a PASS document may be
-sent to an LLM: approved_copy() is the way to load one for that, and
-refuses any other, or a copy changed since it was validated.
+sent to an LLM, or a NEEDS_REVIEW one whose every issue a reviewer has
+signed off for this exact copy (<name>_review.json, see review.py and
+review_approval). A FAIL can never be signed off. approved_copy() is the
+way to load a copy for that, and refuses any other, or a copy changed
+since it was validated.
 
 Issues name the block, finding and rule, never the PII itself, so the
 validation report can be shared. Look a finding_id up in the PII report
@@ -66,8 +69,8 @@ from src.pii.redactor import (
 )
 
 
-# Change whenever the checks change
-VALIDATOR_VERSION = "1.3.0"
+# Change whenever the checks or the release rule change
+VALIDATOR_VERSION = "1.5.0"
 
 PASS, NEEDS_REVIEW, FAIL = "PASS", "NEEDS_REVIEW", "FAIL"
 SEVERITY = {PASS: 0, NEEDS_REVIEW: 1, FAIL: 2}
@@ -101,6 +104,16 @@ def is_false_positive(item):
     return item.get("review_status") == "false_positive"
 
 
+# The type of OCR text a reviewer hid because it was read too badly to
+# scan (review.py). A misreading is not a value: it is not searched for
+# anywhere else in the copy, nor in the exposure report
+UNREADABLE_TEXT = "UNREADABLE_TEXT"
+
+
+def is_unreadable_text(item):
+    return item.get("type") == UNREADABLE_TEXT
+
+
 # --------------------------------------------------
 # TEXT HELPERS
 # --------------------------------------------------
@@ -115,6 +128,14 @@ def only_tags(text):
     """
 
     return bool(text) and not REDACTION_TAG.sub("", text)
+
+
+def fully_redacted(text):
+    """
+    True if text holds redaction tags and nothing else but whitespace.
+    """
+
+    return bool(REDACTION_TAG.search(text or "")) and not REDACTION_TAG.sub("", text).strip()
 
 
 def only_tags_differ(original, sanitized):
@@ -376,13 +397,38 @@ def check_replacements(report, sanitized):
         if not REDACTION_TAG.fullmatch(replacement) or replacement not in text:
             issues.append(issue(FAIL, "the recorded redaction tag is not in the block", **where))
 
-        elif re.search(value_pattern(item["text"]), text):
+        # Searched outside the tags: a hidden OCR misreading such as ":" or
+        # "REDACTED" is not left behind because a tag spells it
+        elif re.search(value_pattern(item["text"]), REDACTION_TAG.sub("\0", text)):
             issues.append(issue(FAIL, "the value is still in its block", **where))
 
         else:
             replaced += 1
 
     return issues, [f"{replaced} findings replaced"]
+
+
+# The reasons check_ocr gives a low-confidence block and low-confidence
+# words that look like part of a value: keep them in step
+UNREADABLE_REASON = re.compile(
+    r"^OCR confidence \S+ is below \d+:|^\d+ OCR words that look like part of a value"
+)
+
+
+def unreadable_issue(check_name, item):
+    """
+    True for an ocr issue about OCR text read too badly to scan, whose
+    text a reviewer can hide: a low-confidence block, or low-confidence
+    words that look like part of a value. Not an image never read: it
+    has no text.
+    """
+
+    return (
+        check_name == "ocr"
+        and item.get("severity") == NEEDS_REVIEW
+        and bool(item.get("block_id"))
+        and UNREADABLE_REASON.search(item.get("reason") or "") is not None
+    )
 
 
 def check_ocr(document, report, sanitized):
@@ -392,10 +438,14 @@ def check_ocr(document, report, sanitized):
         a word (PDF word child, image OCR word) over a redacted value
         that still holds text: FAIL
         a block read by OCR with low confidence: misread PII ("Passpon
-        TK4820013") escapes detection, so a person must read it
+        TK4820013") escapes detection, so a person must read it. Not
+        once the redaction hid all of its text
         in a block read well on the whole, a low-confidence word that
         looks like part of a value and was not redacted: the same risk
         an image that could not be OCR'd: its text was never scanned
+
+    A reviewer can hide the text of the first two (review.py, see
+    unreadable_issue).
     """
 
     issues = []
@@ -451,16 +501,22 @@ def check_ocr(document, report, sanitized):
                 ))
 
     uncertain_words = 0
+    unreadable_hidden = 0
 
     for block_id, (page_number, block) in original_blocks.items():
         confidence = block.get("metadata", {}).get("ocr_confidence")
-
-        if (
+        low_confidence = (
             block["block_type"] != "word"
             and confidence is not None
             and confidence < LOW_OCR_CONFIDENCE
             and normalise(block.get("text") or "")
-        ):
+        )
+
+        # A block whose text the redaction hid in full leaves nothing to misread
+        if low_confidence and block_id in sanitized_blocks and fully_redacted(sanitized_blocks[block_id][1].get("text")):
+            unreadable_hidden += 1
+
+        elif low_confidence:
             issues.append(issue(
                 NEEDS_REVIEW,
                 f"OCR confidence {confidence} is below {LOW_OCR_CONFIDENCE}: "
@@ -495,6 +551,9 @@ def check_ocr(document, report, sanitized):
             ))
 
     notes.append(f"{words_hidden} OCR words over redacted values hold only tags")
+
+    if unreadable_hidden:
+        notes.append(f"{unreadable_hidden} low-confidence OCR blocks are fully redacted")
 
     if uncertain_words:
         notes.append(f"{uncertain_words} low-confidence OCR words that look like values need a look")
@@ -589,28 +648,27 @@ def check_rescan(report, sanitized, nlp_detector):
     return issues, notes
 
 
-def check_known_values(document, report, sanitized):
+def searched_values(document, report):
     """
-    The scan finds a value in one place but can miss it in another: a
-    table without the header that gave it away, OCR text, a name split
-    across blocks. Every string of the sanitized copy (text, words,
-    metadata) is searched for:
+    What check_known_values searches the sanitized copy for, each mapped
+    to the first finding it came from: (values, name_parts).
 
-        every value the report found: FAIL
-        each word of a name the report found ("Ifeoma" of "Ifeoma C.
-        Adeyemi"), and a name found as one word (a surname mention):
-        NEEDS_REVIEW, as a word alone may not identify anyone. The scan
-        decides by context whether such a word names a person ("Ford"
-        is reported, "Ford Motor Company" is not). Words the document
-        also uses in lowercase are ordinary words and are not searched.
+        values          every value the report found, but a name found
+                        as one word
+        name_parts      each word of a name the report found, and a name
+                        found as one word, unless the document also uses
+                        it in lowercase (an ordinary word)
+
+    Unreadable OCR text a reviewer hid (UNREADABLE_TEXT) is a misreading,
+    not a value, and is not searched for. review.py hides the name parts
+    left behind with the same rule.
     """
 
     findings = [
         item for item in report.get("findings", [])
-        if not is_false_positive(item) and normalise(item.get("text") or "")
+        if not is_false_positive(item) and not is_unreadable_text(item) and normalise(item.get("text") or "")
     ]
 
-    # Each value and name part -> the first finding it came from
     values = {}
 
     for item in findings:
@@ -633,6 +691,27 @@ def check_known_values(document, report, sanitized):
 
             if NAME_WORD.fullmatch(part) and part.lower() not in vocabulary and part not in values:
                 name_parts.setdefault(part, item["finding_id"])
+
+    return values, name_parts
+
+
+def check_known_values(document, report, sanitized):
+    """
+    The scan finds a value in one place but can miss it in another: a
+    table without the header that gave it away, OCR text, a name split
+    across blocks. Every string of the sanitized copy (text, words,
+    metadata) is searched for (see searched_values):
+
+        every value the report found: FAIL
+        each word of a name the report found ("Ifeoma" of "Ifeoma C.
+        Adeyemi"), and a name found as one word (a surname mention):
+        NEEDS_REVIEW, as a word alone may not identify anyone. The scan
+        decides by context whether such a word names a person ("Ford"
+        is reported, "Ford Motor Company" is not). Words the document
+        also uses in lowercase are ordinary words and are not searched.
+    """
+
+    values, name_parts = searched_values(document, report)
 
     value_regex = alternation(values)
     part_regex = alternation(name_parts)
@@ -929,13 +1008,139 @@ class NotApproved(Exception):
     """
 
 
+def review_path(json_path):
+    """
+    Where a reviewer's sign-offs for an extracted JSON file go: next to
+    it, as <name>_review.json (written by review.py). Its notes are free
+    text: handle it like the PII report.
+    """
+
+    json_path = Path(json_path)
+
+    return json_path.with_name(f"{json_path.stem}_review.json")
+
+
+def load_review(json_path):
+    """
+    The sign-offs for an extracted JSON file, or None if there are none.
+    A file that cannot be read signs off nothing.
+    """
+
+    try:
+        return json.loads(review_path(json_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def issue_key(check_name, item):
+    """
+    A short ID for one issue of one check, so a sign-off names exactly
+    the issue it was given for: any change to the issue changes its key.
+    """
+
+    text = json.dumps({"check": check_name, **item}, sort_keys=True, ensure_ascii=False)
+
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+
+def review_approval(validation, review=None):
+    """
+    Whether a validation report, with a reviewer's sign-offs (see
+    review.py), lets its sanitized copy go to an LLM:
+
+        PASS            yes
+        FAIL            never: a value known to remain cannot be signed off
+        NEEDS_REVIEW    only if every NEEDS_REVIEW issue was signed off for
+                        this validation of this exact copy (the review's
+                        sanitized_sha256 and validated_at), and no check
+                        holds more issues than the report lists
+
+    Returns approved, after_review (approved through sign-offs), signed
+    (issue key -> sign-off, only those that apply to this validation),
+    open and total (issues needing review, and those not yet signed off),
+    reason (why it is not approved, or None), and the status once the
+    review is counted: final_verdict (PASS when approved, otherwise the
+    verdict) and final_checks (check name -> status: a NEEDS_REVIEW
+    check whose every issue is listed and signed off is PASS).
+
+    The verdict in the validation report itself never changes: it is
+    what tells approved_copy that sign-offs must be checked.
+    """
+
+    verdict = validation.get("verdict")
+    checks = validation.get("checks", [])
+    needing_review = [
+        issue_key(check["name"], item)
+        for check in checks
+        for item in check.get("issues", [])
+        if item.get("severity") == NEEDS_REVIEW
+    ]
+
+    # Sign-offs given for another copy, or another validation of it, are void
+    current = bool(review) and all(
+        review.get(field) == validation.get(field) for field in ("document_id", "file_name", "validated_at")
+    ) and review.get("sanitized_sha256") == validation.get("files", {}).get("sanitized_sha256")
+
+    signed = {
+        entry["key"]: entry
+        for entry in (review.get("sign_offs", []) if current else [])
+        if entry.get("key") in needing_review
+    }
+
+    def final_status(check):
+        answered = (
+            check.get("status") == NEEDS_REVIEW
+            and check.get("issues_total", 0) == len(check.get("issues", []))
+            and all(issue_key(check["name"], item) in signed for item in check.get("issues", []))
+        )
+
+        return PASS if answered else check.get("status")
+
+    open_issues = sum(1 for key in needing_review if key not in signed)
+    approval = {
+        "approved": False,
+        "after_review": False,
+        "signed": signed,
+        "open": open_issues,
+        "total": len(needing_review),
+        "reason": None,
+        "final_verdict": verdict,
+        "final_checks": {check["name"]: final_status(check) for check in checks},
+    }
+
+    if verdict == PASS:
+        return {**approval, "approved": True}
+
+    if verdict == FAIL:
+        return {**approval, "reason": "a FAIL cannot be signed off: PII is known to remain"}
+
+    if verdict != NEEDS_REVIEW:
+        return {**approval, "reason": f"the validation verdict is {verdict}"}
+
+    cut = [
+        check["name"] for check in checks
+        if check.get("status") == NEEDS_REVIEW and check.get("issues_total", 0) > len(check.get("issues", []))
+    ]
+
+    if cut:
+        return {**approval, "reason": (
+            f"the {', '.join(cut)} check lists only some of its issues, so they cannot "
+            "all be signed off: fix them first"
+        )}
+
+    if open_issues:
+        return {**approval, "reason": f"{open_issues} of {len(needing_review)} issues needing review are not signed off"}
+
+    return {**approval, "approved": True, "after_review": True, "final_verdict": PASS}
+
+
 def approved_copy(json_path):
     """
     The sanitized copy of an extracted JSON file, to send to an LLM. The
     one way to load it for that: it raises NotApproved unless the copy's
-    validation report says PASS and the copy is byte for byte the one
-    that was validated. A FAIL, or a NEEDS_REVIEW nobody has resolved,
-    blocks it.
+    validation report says PASS, or NEEDS_REVIEW with every issue signed
+    off (review_approval), and the copy is byte for byte the one that was
+    validated. A FAIL, or a NEEDS_REVIEW nobody has resolved, blocks it.
     """
 
     _, sanitized_path = output_paths(json_path)
@@ -947,8 +1152,16 @@ def approved_copy(json_path):
     except (OSError, ValueError) as error:
         raise NotApproved(f"not validated: {error}") from error
 
-    if validation.get("verdict") != PASS:
-        raise NotApproved(f"the validation verdict is {validation.get('verdict')}: see {report_path}")
+    verdict = validation.get("verdict")
+
+    if verdict == NEEDS_REVIEW:
+        approval = review_approval(validation, load_review(json_path))
+
+        if not approval["approved"]:
+            raise NotApproved(f"the validation verdict is NEEDS_REVIEW ({approval['reason']}): see {report_path}")
+
+    elif verdict != PASS:
+        raise NotApproved(f"the validation verdict is {verdict}: see {report_path}")
 
     if hashlib.sha256(content).hexdigest() != validation.get("files", {}).get("sanitized_sha256"):
         raise NotApproved(f"{sanitized_path} has changed since it was validated")

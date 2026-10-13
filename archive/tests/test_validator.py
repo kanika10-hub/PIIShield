@@ -258,6 +258,36 @@ def case_low_confidence_ocr_needs_review():
     ], validation
 
 
+def case_hidden_unreadable_blocks_pass():
+    # A reviewer hid the badly read blocks (review.py): nothing is left to
+    # misread. The misreadings are not values: "REDACTED" and ":" are
+    # spelled by the tags, and are not searched for in the third block
+    first, second = "Passpon TK4820013,", "REDACTED :"
+    original = document(
+        block("b1", first, metadata={"ocr_confidence": 44.0}),
+        block("b2", second, metadata={"ocr_confidence": 30.0}),
+        block("b3", "Office hours: REDACTED forms are kept on site."),
+    )
+    hidden = [
+        finding(1, "b1", "UNREADABLE_TEXT", first, first),
+        finding(2, "b2", "UNREADABLE_TEXT", second, "REDACTED"),
+        finding(3, "b2", "UNREADABLE_TEXT", second, ":"),
+    ]
+    pii_report = report(*hidden)
+    validation = validate_document(original, pii_report, redact(original, pii_report), nlp)
+
+    # Only the first block hidden: the second still needs review
+    partly = report(hidden[0])
+    partial = validate_document(original, partly, redact(original, partly), nlp)
+    ocr = next(check for check in partial["checks"] if check["name"] == "ocr")
+
+    return [
+        validation["verdict"] == PASS, statuses(validation) == {},
+        statuses(partial) == {"ocr": NEEDS_REVIEW},
+        [item["block_id"] for item in ocr["issues"]] == ["b2"],
+    ], validation
+
+
 def ocr_paragraph(block_id, text, confidences):
     """
     An OCR'd paragraph whose word children carry these confidences.
@@ -503,6 +533,7 @@ CASES = [
     ("Ordinary words in a wrong name are not searched", case_ordinary_words_not_searched),
     ("A reviewed false positive kept in the text passes", case_false_positive_kept_passes),
     ("Low-confidence OCR text and unread images need review", case_low_confidence_ocr_needs_review),
+    ("Low-confidence OCR blocks a reviewer hid in full pass", case_hidden_unreadable_blocks_pass),
     ("One low-confidence value-like OCR word needs review", case_uncertain_value_word_needs_review),
     ("Uncertain OCR words already redacted, or holding no value, pass", case_uncertain_words_redacted_or_ordinary_pass),
     ("An OCR word left over a redacted value fails", case_ocr_word_left_visible_fails),

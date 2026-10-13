@@ -1,0 +1,408 @@
+{
+  "file": "due_diligence_report.pdf",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "Two-page vendor due diligence report with a text layer: running header and page numbers, numbered headings, a ruled key-personnel table, IP addresses, directors' dates of birth, passport, NI number, home address and IBAN in paragraphs, a surname mention, a visitor badge image and the file properties.",
+  "pii": [
+    {
+      "text": "Beatriz Moreno",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "beatriz.moreno@example.com",
+      "type": "EMAIL",
+      "where": "body"
+    },
+    {
+      "text": "+1 (415) 555-0138",
+      "type": "PHONE",
+      "where": "body"
+    },
+    {
+      "text": "Arjun Malhotra",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "arjun.malhotra@example.net",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "+44 20 7946 0774",
+      "type": "PHONE",
+      "where": "table"
+    },
+    {
+      "text": "Hannah Sørensen",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "h.sorensen@example.net",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "+44 20 7946 0819",
+      "type": "PHONE",
+      "where": "table"
+    },
+    {
+      "text": "192.0.2.10",
+      "type": "IP_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "192.0.2.40",
+      "type": "IP_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "192.0.2.15",
+      "type": "IP_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "Arjun Malhotra",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "1974-08-19",
+      "type": "DATE_OF_BIRTH",
+      "where": "body"
+    },
+    {
+      "text": "X4829173",
+      "type": "PASSPORT_NUMBER",
+      "where": "body"
+    },
+    {
+      "text": "9 Ferncliff Gardens, Leeds LS6 4QT",
+      "type": "POSTAL_ADDRESS",
+      "where": "body"
+    },
+    {
+      "text": "Elif Arslan",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "3 May 1983",
+      "type": "DATE_OF_BIRTH",
+      "where": "body"
+    },
+    {
+      "text": "QQ 45 67 89 B",
+      "type": "NATIONAL_ID",
+      "where": "body"
+    },
+    {
+      "text": "Malhotra",
+      "type": "PERSON_NAME",
+      "where": "surname mention"
+    },
+    {
+      "text": "DE89 3704 0044 0532 0130 00",
+      "type": "BANK_ACCOUNT",
+      "where": "body"
+    },
+    {
+      "text": "Elif Arslan",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "Beatriz Moreno",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "Beatriz Moreno",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "Halcyon Cloud Hosting Ltd",
+      "why": "company"
+    },
+    {
+      "text": "VND-2026-0577",
+      "why": "vendor reference"
+    },
+    {
+      "text": "30 September 2026",
+      "why": "date"
+    },
+    {
+      "text": "1 April 2025",
+      "why": "date"
+    },
+    {
+      "text": "Security lead",
+      "why": "job title"
+    },
+    {
+      "text": "Data protection officer",
+      "why": "job title"
+    },
+    {
+      "text": "VB-20931",
+      "why": "badge number"
+    },
+    {
+      "text": "14/10/2026",
+      "why": "date"
+    },
+    {
+      "text": "31 October 2026",
+      "why": "date"
+    }
+  ],
+  "structure": [
+    {
+      "text": "Cadence Group | Vendor Due Diligence | Confidential",
+      "kind": "paragraph",
+      "where": "header",
+      "page": 1
+    },
+    {
+      "text": "Vendor Due Diligence Report",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Vendor: Halcyon Cloud Hosting Ltd (vendor reference VND-2026-0577).\nAssessment completed on 30 September 2026 against questionnaire v4.2.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Assessor: Beatriz Moreno, beatriz.moreno@example.com,\ntelephone +1 (415) 555-0138.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "1. Summary",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Halcyon holds a current ISO 27001 certificate and a SOC 2 Type II report\ncovering 1 April 2025 to 31 March 2026. Three medium findings remain open.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "2. Key Personnel",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Name",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Role",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Email",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Phone",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 1,
+      "column": 4
+    },
+    {
+      "text": "Arjun Malhotra",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "Security lead",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "arjun.malhotra@example.net",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "+44 20 7946 0774",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 2,
+      "column": 4
+    },
+    {
+      "text": "Hannah Sørensen",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "Data protection officer",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "h.sorensen@example.net",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "+44 20 7946 0819",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 1,
+      "table": 1,
+      "row": 3,
+      "column": 4
+    },
+    {
+      "text": "3. Technical Testing",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Production servers sit in the range 192.0.2.10 to 192.0.2.40. The management\ninterface on 192.0.2.15 was reachable from the internet during testing.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Page 1 of 2",
+      "kind": "paragraph",
+      "where": "footer",
+      "page": 1
+    },
+    {
+      "text": "Cadence Group | Vendor Due Diligence | Confidential",
+      "kind": "paragraph",
+      "where": "header",
+      "page": 2
+    },
+    {
+      "text": "4. Identity Verification of Directors",
+      "kind": "heading",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "The director, Arjun Malhotra, born 1974-08-19, provided passport\nX4829173 and a utility bill for 9 Ferncliff Gardens, Leeds LS6 4QT.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "The company secretary, Elif Arslan, born 3 May 1983, provided her\nNational Insurance number QQ 45 67 89 B.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Mr Malhotra confirmed that no director holds another directorship\nwith a Cadence supplier.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "5. Banking",
+      "kind": "heading",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Deposits are refunded to the director's personal account,\nIBAN DE89 3704 0044 0532 0130 00.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Visitor badge issued for the on-site review:",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "VISITOR BADGE VB-20931\nName: Elif Arslan\nHost: Beatriz Moreno\nValid on: 14/10/2026",
+      "kind": "image_text",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "6. Conclusion",
+      "kind": "heading",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "The vendor is approved as Tier 2, on condition that the exposed\nmanagement interface is closed by 31 October 2026.",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Page 2 of 2",
+      "kind": "paragraph",
+      "where": "footer",
+      "page": 2
+    }
+  ]
+}

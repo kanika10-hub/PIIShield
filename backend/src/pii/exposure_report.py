@@ -5,8 +5,9 @@ what was done with it, without repeating any of the values.
     python -m src.pii.exposure_report output/risk_policy.json [output/risk_policy_pii.json]
 
 reads the extracted document <name>.json, its PII report <name>_pii.json,
-<name>_sanitized.json (the redaction audit) and <name>_validation.json,
-and writes <name>_exposure.json. It then rebuilds the combined report
+<name>_sanitized.json (the redaction audit), <name>_validation.json and,
+if a reviewer answered issues on the web page, <name>_review.json, and
+writes <name>_exposure.json. It then rebuilds the combined report
 over every exposure report in backend/output and its subfolders (for a
 document outside backend/output: in its own folder and subfolders):
 
@@ -21,8 +22,9 @@ A row, one per finding in the PII report:
                             "Slide 2", "Header, image text (OCR)",
                             "File properties, author"
     PII Type                PERSON_NAME, EMAIL, ...
-    Detector                NER (spaCy), Regex, or Rule (labels, table
-                            headers, surname mentions)
+    Detector                NER (spaCy), Regex, Rule (labels, table
+                            headers, surname mentions), or Manual review
+                            (a word a reviewer hid, see review.py)
     Confidence              the rule's confidence: a ranking, not a
                             probability (see detectors.finding)
     Action                  "Redacted", or why it was not
@@ -30,7 +32,9 @@ A row, one per finding in the PII report:
                             names this finding (a value still in the
                             sanitized copy, an OCR word left showing).
                             The validator keeps MAX_ISSUES per check:
-                            past that, compare residual_exposure_total
+                            past that, compare residual_exposure_total.
+                            An issue a reviewer signed off is described
+                            with "[checked by <reviewer>]"
 
 and, for traceability, the finding_id (the value is in the PII report
 under it), block_id, page, table cell, character offsets and rule_id.
@@ -40,7 +44,8 @@ are left out of the rows: text, context (a row label can be a name),
 context_trigger (a surname mention names its people) and
 matched_pattern. Before anything is written, every string in the report
 is searched for every value the PII report found; a match refuses the
-report rather than write it.
+report rather than write it. Unreadable OCR text a reviewer hid
+(UNREADABLE_TEXT) is a misreading, not a value, and is not searched for.
 
 The report is refused if its inputs are not one run: the PII report,
 the sanitized copy and the validation report must be for this document
@@ -54,8 +59,15 @@ and the same PII scan.
     summary         total_findings, redacted, not_redacted,
                     flagged_by_validation, by_type (found and redacted),
                     by_detector, by_action, by_place (page, slide or part)
-    validation      verdict, may_send_to_llm, each check's status, and
-                    residual_exposure: every validator issue, with its check
+    validation      verdict, may_send_to_llm (what approved_copy decides:
+                    PASS, or NEEDS_REVIEW with every issue signed off),
+                    approved_after_review, final_verdict (PASS once the
+                    copy may go, otherwise the verdict), each check's
+                    status, and residual_exposure: every validator issue,
+                    with its check
+    review          manual_findings (finding_id, type, added_by, added_at)
+                    and sign_offs (the issue's check, finding_id, block_id
+                    and reason, the reviewer and the time)
     coverage_gaps   the scan's extraction warnings: places PII could hide
                     from it
     rows            as above
@@ -71,12 +83,13 @@ from pathlib import Path
 from src.pii.document_scanner import findings_path
 from src.pii.redactor import output_paths, save_json
 from src.pii.validator import (
-    PASS, SEVERITY, alternation, blocks_by_id, normalise, validation_path, worst
+    NEEDS_REVIEW, PASS, SEVERITY, alternation, blocks_by_id, is_unreadable_text, issue_key,
+    load_review, normalise, review_approval, validation_path, worst
 )
 
 
 # Change whenever the report's rows or summary change
-EXPOSURE_VERSION = "1.0.0"
+EXPOSURE_VERSION = "1.2.0"
 
 COMBINED_NAME = "exposure_report"
 
@@ -98,7 +111,7 @@ PARTS = {
     "comment": "Comment",
 }
 
-DETECTOR_LABELS = {"nlp": "NER", "regex": "Regex"}
+DETECTOR_LABELS = {"nlp": "NER", "regex": "Regex", "manual": "Manual review"}
 
 ACTIONS = {
     "redacted": "Redacted",
@@ -218,12 +231,13 @@ def detector_label(item):
 
 def validation_issues(validation):
     """
-    The validator's issues, each with the check that raised it, and
-    those that name a finding, by finding_id.
+    The validator's issues, each with the check that raised it and its
+    key (validator.issue_key, which a sign-off names), and those that
+    name a finding, by finding_id.
     """
 
     issues = [
-        {"check": check["name"], **item}
+        {"check": check["name"], **item, "key": issue_key(check["name"], item)}
         for check in validation.get("checks", [])
         for item in check.get("issues", [])
     ]
@@ -237,15 +251,58 @@ def validation_issues(validation):
     return issues, by_finding
 
 
-def describe(item):
+def describe(item, signed=None):
+    """
+    One validator issue, as a row shows it. signed: the sign-offs that
+    apply (validator.review_approval), by issue key.
+    """
+
     count = f" ({item['occurrences']}x)" if "occurrences" in item else ""
+    sign_off = (signed or {}).get(item.get("key"))
+    checked = f" [checked by {sign_off['reviewer']}]" if sign_off else ""
 
-    return f"{item['severity']} {item['check']}: {item['reason']}{count}"
+    return f"{item['severity']} {item['check']}: {item['reason']}{count}{checked}"
 
 
-def build_rows(document, report, sanitized, validation):
+def review_section(report, validation, approval):
+    """
+    What the reviewer did: the words they hid (manual findings) and the
+    issues they signed off. Names, times and IDs only: the PII stays in
+    the PII report, and the review file's own fields are not copied.
+    """
+
+    issues, _ = validation_issues(validation)
+
+    return {
+        "manual_findings": [
+            {
+                "finding_id": item.get("finding_id"),
+                "type": item.get("type"),
+                "added_by": (item.get("review") or {}).get("added_by"),
+                "added_at": (item.get("review") or {}).get("added_at"),
+            }
+            for item in report.get("findings", [])
+            if item.get("detector") == "manual"
+        ],
+        "sign_offs": [
+            {
+                "check": item["check"],
+                "finding_id": item.get("finding_id"),
+                "block_id": item.get("block_id"),
+                "reason": item["reason"],
+                "reviewer": approval["signed"][item["key"]].get("reviewer"),
+                "signed_at": approval["signed"][item["key"]].get("signed_at"),
+            }
+            for item in issues
+            if item["key"] in approval["signed"]
+        ],
+    }
+
+
+def build_rows(document, report, sanitized, validation, signed=None):
     """
     One row per finding, in report order. A row holds no PII value.
+    signed: the sign-offs that apply, by issue key.
     """
 
     blocks = blocks_by_id(document)
@@ -288,7 +345,7 @@ def build_rows(document, report, sanitized, validation):
             "replacement": entry.get("replacement"),
             "redaction_reason": entry.get("reason"),
             "validation": worst(issue["severity"] for issue in issues),
-            "validation_issues": [describe(issue) for issue in issues],
+            "validation_issues": [describe(issue, signed) for issue in issues],
         })
 
     return rows
@@ -325,13 +382,14 @@ def report_strings(node, path=""):
 def check_no_values(exposure, report):
     """
     Refuse an exposure report that holds any value the PII report found,
-    false positives included.
+    false positives included. Not unreadable OCR text: a misread ":" or
+    "the" would refuse every report.
     """
 
     pattern = alternation({
         normalise(item.get("text") or "")
         for item in report.get("findings", [])
-        if normalise(item.get("text") or "")
+        if normalise(item.get("text") or "") and not is_unreadable_text(item)
     })
 
     if pattern is None:
@@ -346,10 +404,11 @@ def check_no_values(exposure, report):
 # REPORT
 # --------------------------------------------------
 
-def build_exposure_report(document, report, sanitized, validation):
+def build_exposure_report(document, report, sanitized, validation, review=None):
     """
     The exposure report of one document (see the module docstring),
-    from the outputs of steps 1-4.
+    from the outputs of steps 1-4 and the reviewer's sign-offs, if any
+    (<name>_review.json).
 
     document is the extractor's JSON: a dictionary, or the
     ExtractedDocument an extraction pipeline still holds in memory.
@@ -360,7 +419,8 @@ def build_exposure_report(document, report, sanitized, validation):
 
     check_inputs(document, report, sanitized, validation)
 
-    rows = build_rows(document, report, sanitized, validation)
+    approval = review_approval(validation, review)
+    rows = build_rows(document, report, sanitized, validation, approval["signed"])
     redaction = sanitized["metadata"]["redaction"]
     issues, _ = validation_issues(validation)
     verdict = validation.get("verdict")
@@ -399,13 +459,17 @@ def build_exposure_report(document, report, sanitized, validation):
         },
         "validation": {
             "verdict": verdict,
-            "may_send_to_llm": verdict == PASS,
+            # What approved_copy decides, but for the copy's hash, checked when it is loaded
+            "may_send_to_llm": approval["approved"],
+            "approved_after_review": approval["after_review"],
+            "final_verdict": approval["final_verdict"],
             "checks": validation.get("summary", {}),
             "residual_exposure_total": sum(
                 check.get("issues_total", 0) for check in validation.get("checks", [])
             ),
             "residual_exposure": sorted(issues, key=lambda item: -SEVERITY.get(item["severity"], 0)),
         },
+        "review": review_section(report, validation, approval),
         "coverage_gaps": list((report.get("summary") or {}).get("extraction_warnings", [])),
         "rows": rows,
     }
@@ -464,7 +528,7 @@ def exposure_file(json_path, report_path=None):
         with open(path, "r", encoding="utf-8") as file:
             loaded.append(json.load(file))
 
-    exposure = build_exposure_report(*loaded)
+    exposure = build_exposure_report(*loaded, review=load_review(json_path))
     exposure["files"] = {
         "document": str(json_path),
         "report": str(report_path),
@@ -532,7 +596,26 @@ def verdict_text(exposure):
     if verdict == "FAIL":
         return "FAIL: PII remains, or the copy does not match its document. Do not send it to an LLM"
 
+    # Exposure reports from before reviews were recorded have no such field
+    if verdict == NEEDS_REVIEW and exposure["validation"].get("approved_after_review"):
+        return (
+            "PASS after review: validation raised issues that needed review (NEEDS_REVIEW), and "
+            "a reviewer checked every one (see Review). The sanitized copy may be sent to an LLM"
+        )
+
     return f"{verdict}: do not send the sanitized copy to an LLM until a person has reviewed the issues"
+
+
+def verdict_label(exposure):
+    """
+    The verdict as the summary table shows it: PASS after a review that
+    approved the copy.
+    """
+
+    if exposure["validation"]["verdict"] == NEEDS_REVIEW and exposure["validation"].get("approved_after_review"):
+        return "PASS (after review)"
+
+    return exposure["validation"]["verdict"]
 
 
 def markdown(exposures, folder):
@@ -567,7 +650,7 @@ def markdown(exposures, folder):
                     exposure["file_name"], exposure["source_type"],
                     exposure["summary"]["total_findings"], exposure["summary"]["redacted"],
                     exposure["summary"]["not_redacted"], exposure["summary"]["flagged_by_validation"],
-                    exposure["validation"]["verdict"],
+                    verdict_label(exposure),
                     "Yes" if exposure["validation"]["may_send_to_llm"] else "No",
                 ]
                 for exposure in exposures
@@ -633,6 +716,33 @@ def markdown(exposures, folder):
             )
         else:
             lines.append("None: every check passed.")
+
+        review = exposure.get("review") or {}
+
+        if review.get("manual_findings") or review.get("sign_offs"):
+            lines += ["", "### Review", ""]
+
+            if review.get("manual_findings"):
+                lines += markdown_table(
+                    ["Hidden by a reviewer", "PII Type", "Reviewer", "When"],
+                    [
+                        [item["finding_id"], item["type"], item["added_by"], item["added_at"]]
+                        for item in review["manual_findings"]
+                    ]
+                )
+                lines.append("")
+
+            if review.get("sign_offs"):
+                lines += markdown_table(
+                    ["Checked by a reviewer", "Finding ID", "Where", "Reason", "Reviewer", "When"],
+                    [
+                        [
+                            item["check"], item.get("finding_id"), item.get("block_id"), item["reason"],
+                            item["reviewer"], item["signed_at"],
+                        ]
+                        for item in review["sign_offs"]
+                    ]
+                )
 
         lines += ["", "### Coverage gaps", ""]
         lines += [f"- {warning}" for warning in exposure["coverage_gaps"]] or ["None reported by the scan."]

@@ -8,11 +8,15 @@ is read from the files the pipeline wrote; nothing is computed again.
     findings_view(report, exposure)         the PII report's findings,
                                             with each one's location and
                                             what was done with it
-    validation_view(report, sanitized, validation, exposure)
+    validation_view(report, sanitized, validation, exposure, review)
                                             the verdict, every check and
-                                            issue, the extraction warnings
+                                            issue, how far the review has
+                                            got, the extraction warnings
                                             and the redaction's errors
 """
+
+from src.pii.review import MANUAL_DETECTOR, can_hide
+from src.pii.validator import issue_key, review_approval, unreadable_issue
 
 PAGE_LABELS = {"PDF": "Page", "PPTX": "Slide"}
 
@@ -163,19 +167,111 @@ def findings_view(report, exposure=None):
     }
 
 
-def validation_view(report, sanitized=None, validation=None, exposure=None):
+def reviewed_validation(validation, review):
+    """
+    The validation report with each issue's key (what a review answer
+    names), whether "Hide it" can fix it, and its sign-off, if any; and
+    the status of the document and of each check once the sign-offs are
+    counted (final_verdict, final_status: see review_approval).
+    """
+
+    approval = review_approval(validation, review)
+
+    def issue_view(check_name, item):
+        key = issue_key(check_name, item)
+        signed = approval["signed"].get(key)
+
+        return {
+            **item,
+            "key": key,
+            "can_hide": can_hide(check_name, item),
+            # Badly read OCR text: the page answers these all at once
+            "unreadable": unreadable_issue(check_name, item),
+            "signed_off": {"reviewer": signed.get("reviewer"), "signed_at": signed.get("signed_at")} if signed else None,
+        }
+
+    return {
+        **validation,
+        "final_verdict": approval["final_verdict"],
+        "checks": [
+            {
+                **check,
+                "final_status": approval["final_checks"].get(check["name"], check.get("status")),
+                "issues": [issue_view(check["name"], item) for item in check.get("issues", [])],
+            }
+            for check in validation.get("checks", [])
+        ],
+    }
+
+
+def review_view(report, validation, review):
+    """
+    How far the review has got: the blocks a reviewer hid text in (their
+    manual findings by block: IDs, types, who and when, never the text),
+    the issues checked and still open, and how many OCR issues "Hide all"
+    would hide.
+    """
+
+    hidden = {}
+
+    for item in report.get("findings", []):
+        if item.get("detector") != MANUAL_DETECTOR:
+            continue
+
+        added = item.get("review") or {}
+        entry = hidden.setdefault(item.get("block_id"), {
+            "block_id": item.get("block_id"),
+            "page_number": item.get("page_number"),
+            "types": [],
+            "findings": 0,
+            "added_by": added.get("added_by"),
+            "added_at": added.get("added_at"),
+        })
+        entry["findings"] += 1
+
+        if item.get("type") not in entry["types"]:
+            entry["types"].append(item.get("type"))
+
+        # The latest answer that hid text here
+        if (added.get("added_at") or "") > (entry["added_at"] or ""):
+            entry["added_by"], entry["added_at"] = added.get("added_by"), added.get("added_at")
+
+    approval = review_approval(validation, review) if validation else None
+
+    return {
+        "hidden": list(hidden.values()),
+        "checked": len(approval["signed"]) if approval else 0,
+        "open": approval["open"] if approval else 0,
+        "needing_review": approval["total"] if approval else 0,
+        "ocr_hideable": sum(
+            1
+            for check in (validation or {}).get("checks", [])
+            for item in check.get("issues", [])
+            if unreadable_issue(check["name"], item) and issue_key(check["name"], item) not in approval["signed"]
+        ),
+    }
+
+
+def validation_view(report, sanitized=None, validation=None, exposure=None, review=None):
     """
     Everything the page shows about whether the sanitized copy is safe:
-    the verdict and each check with its issues, the scan's extraction
-    warnings, the redaction's errors and warnings, and the exposure
-    summary. None of it holds a PII value.
+    the verdict and each check with its issues (and their sign-offs), how
+    far the review has got, the scan's extraction warnings, the
+    redaction's errors and warnings, and the exposure summary. None of it
+    holds a PII value.
     """
+
+    progress = review_view(report, validation, review)
+
+    if validation:
+        validation = reviewed_validation(validation, review)
 
     redaction = (sanitized or {}).get("metadata", {}).get("redaction") or {}
 
     return {
         "report_status": report.get("status"),
         "report_error": report.get("error"),
+        "review": progress,
         "extraction_warnings": (report.get("summary") or {}).get("extraction_warnings", []),
         "redaction": {
             "status": redaction.get("status"),

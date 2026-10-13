@@ -1,0 +1,360 @@
+{
+  "file": "tprm_training.pptx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "Third-party risk training deck: title slide, contact bullets, a risk-tier table with no PII, a vendor-record screenshot, grouped text boxes, speaker notes and file properties.",
+  "pii": [
+    {
+      "text": "Nkechi Adeyemi",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Nkechi Adeyemi",
+      "type": "PERSON_NAME",
+      "where": "title slide"
+    },
+    {
+      "text": "Nkechi Adeyemi",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "nkechi.adeyemi@example.com",
+      "type": "EMAIL",
+      "where": "bullet"
+    },
+    {
+      "text": "Oliver Brandt",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "+1 (646) 555-0127",
+      "type": "PHONE",
+      "where": "bullet"
+    },
+    {
+      "text": "Mei Lin Zhou",
+      "type": "PERSON_NAME",
+      "where": "bullet"
+    },
+    {
+      "text": "mei.zhou@example.com",
+      "type": "EMAIL",
+      "where": "bullet"
+    },
+    {
+      "text": "Oliver Brandt",
+      "type": "PERSON_NAME",
+      "where": "speaker notes"
+    },
+    {
+      "text": "Ama Owusu",
+      "type": "PERSON_NAME",
+      "where": "speaker notes"
+    },
+    {
+      "text": "+44 7700 900311",
+      "type": "PHONE",
+      "where": "speaker notes"
+    },
+    {
+      "text": "Gareth Pryce",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "gareth.pryce@example.com",
+      "type": "EMAIL",
+      "where": "image (OCR)"
+    },
+    {
+      "text": "203.0.113.57",
+      "type": "IP_ADDRESS",
+      "where": "image (OCR)"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "Third-Party Risk Management: Analyst Training",
+      "why": "document title"
+    },
+    {
+      "text": "Learning and Development",
+      "why": "team name"
+    },
+    {
+      "text": "September 2026",
+      "why": "month"
+    },
+    {
+      "text": "Third-Party Risk Committee",
+      "why": "committee name"
+    },
+    {
+      "text": "Fabrikam Payroll Services",
+      "why": "company"
+    },
+    {
+      "text": "Contoso Facilities",
+      "why": "company"
+    },
+    {
+      "text": "Northwind Stationery",
+      "why": "company"
+    },
+    {
+      "text": "POL-TPRM-002",
+      "why": "policy reference"
+    }
+  ],
+  "structure": [
+    {
+      "text": "Third-Party Risk Management: Analyst Training",
+      "kind": "heading",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Presented by Nkechi Adeyemi, TPRM Lead | September 2026",
+      "kind": "paragraph",
+      "where": "body",
+      "page": 1
+    },
+    {
+      "text": "Your TPRM Contacts",
+      "kind": "heading",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Programme lead: Nkechi Adeyemi (nkechi.adeyemi@example.com)",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Assessment queries: Oliver Brandt, +1 (646) 555-0127",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "OneTrust administrator: Mei Lin Zhou, mei.zhou@example.com",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "Escalations go to the Third-Party Risk Committee, which meets monthly",
+      "kind": "list_item",
+      "where": "body",
+      "page": 2
+    },
+    {
+      "text": "If Oliver Brandt is away, assessment queries go to his deputy Ama Owusu on +44 7700 900311.",
+      "kind": "paragraph",
+      "where": "notes",
+      "page": 2
+    },
+    {
+      "text": "Risk Tiers and Review Cadence",
+      "kind": "heading",
+      "where": "body",
+      "page": 3
+    },
+    {
+      "text": "Tier",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Criteria",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Review cadence",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 3
+    },
+    {
+      "text": "Example vendor",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 1,
+      "column": 4
+    },
+    {
+      "text": "Tier 1",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "Critical service or access to customer data",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "Every 12 months",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 3
+    },
+    {
+      "text": "Fabrikam Payroll Services",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 2,
+      "column": 4
+    },
+    {
+      "text": "Tier 2",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "Important service, limited data access",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "Every 24 months",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 3
+    },
+    {
+      "text": "Contoso Facilities",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 3,
+      "column": 4
+    },
+    {
+      "text": "Tier 3",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 4,
+      "column": 1
+    },
+    {
+      "text": "Low risk, no data access",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 4,
+      "column": 2
+    },
+    {
+      "text": "At renewal",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 4,
+      "column": 3
+    },
+    {
+      "text": "Northwind Stationery",
+      "kind": "table_cell",
+      "where": "body",
+      "page": 3,
+      "table": 1,
+      "row": 4,
+      "column": 4
+    },
+    {
+      "text": "Worked Example: Vendor Record",
+      "kind": "heading",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "VENDOR RECORD VR-10442\nVendor: Fabrikam Payroll Services\nRelationship owner: Gareth Pryce\nOwner email: gareth.pryce@example.com\nLast sign-in from: 203.0.113.57\nRisk tier: 1 (Critical)",
+      "kind": "image_text",
+      "where": "body",
+      "page": 4
+    },
+    {
+      "text": "Screenshot from the OneTrust training tenant",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 4
+    },
+    {
+      "text": "Point out that the relationship owner's details are visible in the screenshot, which is why exports must be redacted.",
+      "kind": "paragraph",
+      "where": "notes",
+      "page": 4
+    },
+    {
+      "text": "Handling Evidence",
+      "kind": "heading",
+      "where": "body",
+      "page": 5
+    },
+    {
+      "text": "Do: request evidence through the OneTrust portal and check it against the questionnaire.",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 5
+    },
+    {
+      "text": "Don't: paste passport scans or bank letters into tickets or chat.",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 5
+    },
+    {
+      "text": "Retention: evidence is kept for 7 years after the contract ends (POL-TPRM-002).",
+      "kind": "paragraph",
+      "where": "text_box",
+      "page": 5
+    }
+  ]
+}

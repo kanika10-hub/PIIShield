@@ -547,11 +547,13 @@ look up the `finding_id` in the `_pii.json`.
 
 **The release gate.** `approved_copy(json_path)` in `validator.py` is **the only
 way code should load a sanitized copy to send to an LLM**. It returns the
-document only if its validation report says PASS **and** the file is byte for
-byte the one that was validated: the report records its SHA-256 fingerprint.
-Otherwise it raises `NotApproved` with the reason. So a FAIL, an unresolved
-NEEDS_REVIEW, a copy edited after validation, or a copy never validated are all
-blocked. `main.py` uses the same gate for its final `Approved`/`Blocked` line.
+document only if its validation report says PASS (or NEEDS_REVIEW with every
+issue signed off by a reviewer, see "Resolve NEEDS_REVIEW in the web UI") **and**
+the file is byte for byte the one that was validated: the report records its
+SHA-256 fingerprint. Otherwise it raises `NotApproved` with the reason. So a
+FAIL, an unresolved NEEDS_REVIEW, a copy edited after validation, or a copy
+never validated are all blocked. `main.py` uses the same gate for its final
+`Approved`/`Blocked` line.
 
 ### Step 5: Report the exposure (`src/pii/exposure_report.py`)
 
@@ -771,6 +773,48 @@ checks that it passed validation and hasn't changed since.
    python -m src.pii.exposure_report output/<job_id>/<name>.json
    ```
    (Don't use `main.py` here: it rescans and replaces the `_pii.json`, losing your edits.)
+
+**Resolve NEEDS_REVIEW in the web UI**
+
+On the **Validation** tab, select the **NEEDS REVIEW** badge of an issue, type
+your name, and choose:
+
+- **Hide it**: the text the issue is about is added to `_pii.json` as manual
+  findings (`M-0001`, …), and redaction, validation and the audit report run
+  again. The issue then clears only if the text is really gone. It hides:
+  - for "part of a name … is still in the sanitized copy": the words left
+    behind (`PERSON_NAME`);
+  - for "OCR confidence … is below 60": all the text of that block
+    (`UNREADABLE_TEXT`; values already found in it keep their own tags);
+  - for "OCR words that look like part of a value …": those words, wherever
+    they stand in the block (`UNREADABLE_TEXT`).
+
+  The page offers it one issue at a time for name parts, and for the two OCR
+  issues only all together (see below).
+- **Checked, it's fine**: records that a person checked this issue (your name
+  and the time, in `_review.json`). The badge then reads **CHECKED**; select it
+  again to undo.
+
+The **Review** section above the checks counts the blocks hidden, the issues
+checked and those left, and lists each hidden block with a green **HIDDEN**
+badge (block ID, who and when; never the text). The two OCR issues above are
+answered there all together, on one line ("N places where OCR text was read
+with low confidence"; each place is listed under **Show the N places**):
+
+- **Hide all** hides the text of every such place not checked as fine, then
+  runs the checks once.
+- **Checked, all fine** approves every place as it is, in one click (**Undo**
+  takes it back). Their text then goes to the AI unread, including any PII the
+  OCR misread.
+
+Once every NEEDS_REVIEW issue is hidden or checked, validation shows **PASS
+(after review)** and the copy is **Approved for AI processing**. The audit
+report lists who hid and checked what. `_validation.json` keeps the verdict the
+validator gave (NEEDS_REVIEW), because the release gate reads it to know the
+checks must be verified. A FAIL cannot be checked off. Hiding text makes a new
+copy: checks on issues the hiding did not change are kept, and the others must
+be checked again. A new scan of the document (`main.py` or a new upload) starts
+over without any of them.
 
 **Add a new PII type**
 

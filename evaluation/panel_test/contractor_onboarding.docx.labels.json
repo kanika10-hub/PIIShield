@@ -1,0 +1,387 @@
+{
+  "file": "contractor_onboarding.docx",
+  "synthetic": true,
+  "expected_outcome": "processed",
+  "description": "Contractor onboarding form: a details table (label | value) with a three-line home address, an IBAN and an employee ID in sentences, a bulleted screening list with a referee and a surname mention, an approval stamp image, a reviewer's comment, the header, footer and file properties.",
+  "pii": [
+    {
+      "text": "Claire Whitaker",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Henrik Lund",
+      "type": "PERSON_NAME",
+      "where": "properties"
+    },
+    {
+      "text": "Claire Whitaker",
+      "type": "PERSON_NAME",
+      "where": "footer"
+    },
+    {
+      "text": "Siobhan Gallagher",
+      "type": "PERSON_NAME",
+      "where": "table"
+    },
+    {
+      "text": "14/09/1986",
+      "type": "DATE_OF_BIRTH",
+      "where": "table"
+    },
+    {
+      "text": "27 Kingsley Road\nBristol\nBS7 8LQ",
+      "type": "POSTAL_ADDRESS",
+      "where": "table"
+    },
+    {
+      "text": "siobhan.gallagher@example.com",
+      "type": "EMAIL",
+      "where": "table"
+    },
+    {
+      "text": "07700 900417",
+      "type": "PHONE",
+      "where": "table"
+    },
+    {
+      "text": "QQ 88 77 66 D",
+      "type": "NATIONAL_ID",
+      "where": "table"
+    },
+    {
+      "text": "548120773",
+      "type": "PASSPORT_NUMBER",
+      "where": "table"
+    },
+    {
+      "text": "GB29 NWBK 6016 1331 9268 19",
+      "type": "BANK_ACCOUNT",
+      "where": "body"
+    },
+    {
+      "text": "Marcus Oyelaran",
+      "type": "PERSON_NAME",
+      "where": "body"
+    },
+    {
+      "text": "EMP-30418",
+      "type": "EMPLOYEE_ID",
+      "where": "body"
+    },
+    {
+      "text": "Henrik Lund",
+      "type": "PERSON_NAME",
+      "where": "comment"
+    },
+    {
+      "text": "Tomás Herrera",
+      "type": "PERSON_NAME",
+      "where": "list item"
+    },
+    {
+      "text": "0161 496 0732",
+      "type": "PHONE",
+      "where": "list item"
+    },
+    {
+      "text": "Gallagher",
+      "type": "PERSON_NAME",
+      "where": "surname mention"
+    },
+    {
+      "text": "Marcus Oyelaran",
+      "type": "PERSON_NAME",
+      "where": "image (OCR)"
+    }
+  ],
+  "not_pii": [
+    {
+      "text": "Contractor Onboarding Form",
+      "why": "document title"
+    },
+    {
+      "text": "PRC-F-11",
+      "why": "form reference"
+    },
+    {
+      "text": "PRJ-2026-044",
+      "why": "project code"
+    },
+    {
+      "text": "2 March 2026",
+      "why": "start date"
+    },
+    {
+      "text": "£650",
+      "why": "amount"
+    },
+    {
+      "text": "Northfield Data Services",
+      "why": "company name"
+    },
+    {
+      "text": "08451277",
+      "why": "company registration number"
+    },
+    {
+      "text": "£500",
+      "why": "amount"
+    },
+    {
+      "text": "18 February 2026",
+      "why": "date"
+    },
+    {
+      "text": "RTW-77120",
+      "why": "case reference"
+    },
+    {
+      "text": "24/02/2026",
+      "why": "approval date"
+    }
+  ],
+  "structure": [
+    {
+      "text": "Cadence Group | Procurement | Confidential",
+      "kind": "paragraph",
+      "where": "header"
+    },
+    {
+      "text": "Form PRC-F-11 v2.3 | Form owner: Claire Whitaker",
+      "kind": "paragraph",
+      "where": "footer"
+    },
+    {
+      "text": "Contractor Onboarding Form",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "This form records the onboarding of an independent contractor to the Vendor Risk Remediation project (PRJ-2026-044). The engagement starts on 2 March 2026 and runs for six months at a day rate of £650.",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "1. Contractor details",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Field",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 1
+    },
+    {
+      "text": "Details",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 1,
+      "column": 2
+    },
+    {
+      "text": "Full name",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 1
+    },
+    {
+      "text": "Siobhan Gallagher",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 2,
+      "column": 2
+    },
+    {
+      "text": "Trading name",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 1
+    },
+    {
+      "text": "Northfield Data Services",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 3,
+      "column": 2
+    },
+    {
+      "text": "Company number",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 1
+    },
+    {
+      "text": "08451277",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 4,
+      "column": 2
+    },
+    {
+      "text": "Date of birth",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 5,
+      "column": 1
+    },
+    {
+      "text": "14/09/1986",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 5,
+      "column": 2
+    },
+    {
+      "text": "Home address",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 6,
+      "column": 1
+    },
+    {
+      "text": "27 Kingsley Road\nBristol\nBS7 8LQ",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 6,
+      "column": 2
+    },
+    {
+      "text": "Email",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 7,
+      "column": 1
+    },
+    {
+      "text": "siobhan.gallagher@example.com",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 7,
+      "column": 2
+    },
+    {
+      "text": "Mobile",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 8,
+      "column": 1
+    },
+    {
+      "text": "07700 900417",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 8,
+      "column": 2
+    },
+    {
+      "text": "National Insurance number",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 9,
+      "column": 1
+    },
+    {
+      "text": "QQ 88 77 66 D",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 9,
+      "column": 2
+    },
+    {
+      "text": "Passport number",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 10,
+      "column": 1
+    },
+    {
+      "text": "548120773",
+      "kind": "table_cell",
+      "where": "body",
+      "table": 1,
+      "row": 10,
+      "column": 2
+    },
+    {
+      "text": "2. Payment details",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Monthly invoices are paid into her personal account, IBAN GB29 NWBK 6016 1331 9268 19. Expenses above £500 need prior approval from the engagement manager, Marcus Oyelaran (employee ID EMP-30418).",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "Check the IBAN against the bank letter before the first payment.",
+      "kind": "paragraph",
+      "where": "comment",
+      "anchor": "Monthly invoices are paid into her personal account, IBAN GB29 NWBK 6016 1331 9268 19. Expenses above £500 need prior approval from the engagement manager, Marcus Oyelaran (employee ID EMP-30418)."
+    },
+    {
+      "text": "3. Background screening",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Right-to-work check completed on 18 February 2026 (case RTW-77120).",
+      "kind": "list_item",
+      "where": "body"
+    },
+    {
+      "text": "Credit reference check returned no adverse findings.",
+      "kind": "list_item",
+      "where": "body"
+    },
+    {
+      "text": "Employment reference given by her previous manager, Tomás Herrera, on 0161 496 0732.",
+      "kind": "list_item",
+      "where": "body"
+    },
+    {
+      "text": "Ms Gallagher must return the signed NDA before system access is granted.",
+      "kind": "list_item",
+      "where": "body"
+    },
+    {
+      "text": "4. Approval",
+      "kind": "heading",
+      "where": "body"
+    },
+    {
+      "text": "Approval stamp (scanned):",
+      "kind": "paragraph",
+      "where": "body"
+    },
+    {
+      "text": "APPROVED - PROCUREMENT\nApproved by: Marcus Oyelaran\nDate: 24/02/2026",
+      "kind": "image_text",
+      "where": "body"
+    }
+  ]
+}

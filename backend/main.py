@@ -76,7 +76,7 @@ from src.pii.exposure_report import (
 from src.pii.redactor import output_paths, redact_file
 from src.pii.validator import (
     EXIT_CODES, FAIL, NEEDS_REVIEW, PASS, NotApproved, approved_copy,
-    print_validation, validate_file, validation_path
+    print_validation, review_path, validate_file, validation_path
 )
 from src.structure.heading_classifier import classify_headings
 from src.structure.pdf_tables import reconstruct_tables
@@ -341,7 +341,8 @@ def main():
     outputs = pipeline_outputs(json_path)
     report_path = outputs[0]
 
-    delete(outputs if already_extracted else [json_path, *outputs])
+    # A reviewer's sign-offs (web page) were for the copy about to be replaced
+    delete([*(outputs if already_extracted else [json_path, *outputs]), review_path(json_path)])
     write_combined(combined_folder(json_path))
 
     try:

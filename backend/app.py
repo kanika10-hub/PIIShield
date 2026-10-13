@@ -21,6 +21,20 @@ API, all JSON:
     GET    /api/jobs/<id>/download/<file>   extracted, findings, sanitized,
                                             validation, audit-json or audit-md
     DELETE /api/jobs/<id>                   delete the job's files
+
+    Review of a finished job's validation issues (src/pii/review.py), each
+    named by its key; the body is JSON. Each queues the job again (202):
+
+    POST   /api/jobs/<id>/review/hide              {key, reviewer}: hide the
+                                                   issue's text
+    POST   /api/jobs/<id>/review/hide-all          {reviewer}: hide the text
+                                                   of every OCR issue at once
+    POST   /api/jobs/<id>/review/sign-off-all      {reviewer}: "checked, all
+                                                   fine" for every OCR issue
+    DELETE /api/jobs/<id>/review/sign-off-all      undo that
+    POST   /api/jobs/<id>/review/sign-offs         {key, reviewer}: "checked,
+                                                   it's fine"
+    DELETE /api/jobs/<id>/review/sign-offs/<key>   undo a sign-off
 """
 
 import json
@@ -32,8 +46,9 @@ from flask import Flask, Response, abort, jsonify, request, send_file
 from src.pii.document_scanner import findings_path
 from src.pii.exposure_report import exposure_path, markdown
 from src.pii.redactor import output_paths
-from src.pii.validator import validation_path
-from src.web.jobs import InputRejected, Jobs
+from src.pii.review import ReviewError
+from src.pii.validator import review_path, validation_path
+from src.web.jobs import InputRejected, JobBusy, Jobs
 from src.web.views import document_view, findings_view, validation_view
 
 
@@ -45,7 +60,7 @@ MAX_UPLOAD_MB = 100
 
 # Raise with any change to the API the page relies on: a page served
 # beside a server still running older code then says to restart it
-API_VERSION = 2
+API_VERSION = 3
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
@@ -117,6 +132,7 @@ def job_files(job):
         "sanitized": sanitized_path,
         "validation": validation_path(json_path),
         "exposure": exposure_path(json_path),
+        "review": review_path(json_path),
     }
 
 
@@ -220,11 +236,67 @@ def get_validation(job_id):
     if report is None:
         abort(404, description="The PII report is not available for this scan.")
 
-    view = validation_view(report, load(files["sanitized"]), load(files["validation"]), load(files["exposure"]))
+    view = validation_view(
+        report, load(files["sanitized"]), load(files["validation"]), load(files["exposure"]), load(files["review"])
+    )
     view["approved"] = job.to_dict()["result"].get("approved", False)
     view["approval_reason"] = job.to_dict()["result"].get("reason")
 
     return jsonify(view)
+
+
+def review_answer(job_id, answer, body=True):
+    """
+    Apply a reviewer's answer to a job's validation issue: answer(job,
+    body). The page then polls the job, queued again, until it finishes.
+    """
+
+    job = job_or_404(job_id)
+
+    # JSON only: a form posted from another website is refused
+    data = request.get_json(silent=True) if body else {}
+
+    if not isinstance(data, dict):
+        return api_error("Send the answer as a JSON object.", 400)
+
+    try:
+        answer(job, data)
+    except ReviewError as error:
+        return api_error(str(error), 400)
+    except JobBusy as error:
+        return api_error(str(error), 409)
+
+    return jsonify(job.to_dict()), 202
+
+
+@app.post("/api/jobs/<job_id>/review/hide")
+def review_hide(job_id):
+    return review_answer(job_id, lambda job, data: jobs.hide(job, str(data.get("key", "")), data.get("reviewer")))
+
+
+@app.post("/api/jobs/<job_id>/review/hide-all")
+def review_hide_all(job_id):
+    return review_answer(job_id, lambda job, data: jobs.hide_all(job, data.get("reviewer")))
+
+
+@app.post("/api/jobs/<job_id>/review/sign-off-all")
+def review_sign_off_all(job_id):
+    return review_answer(job_id, lambda job, data: jobs.sign_off_all(job, data.get("reviewer")))
+
+
+@app.delete("/api/jobs/<job_id>/review/sign-off-all")
+def review_withdraw_all(job_id):
+    return review_answer(job_id, lambda job, _: jobs.withdraw_all(job), body=False)
+
+
+@app.post("/api/jobs/<job_id>/review/sign-offs")
+def review_sign_off(job_id):
+    return review_answer(job_id, lambda job, data: jobs.sign_off(job, str(data.get("key", "")), data.get("reviewer")))
+
+
+@app.delete("/api/jobs/<job_id>/review/sign-offs/<key>")
+def review_withdraw(job_id, key):
+    return review_answer(job_id, lambda job, _: jobs.withdraw(job, key), body=False)
 
 
 @app.get("/api/jobs/<job_id>/download/<name>")
