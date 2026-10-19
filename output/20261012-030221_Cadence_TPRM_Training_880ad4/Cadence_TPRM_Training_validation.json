@@ -1,0 +1,173 @@
+{
+  "validator_version": "1.1.0",
+  "validated_at": "2026-10-11T21:32:48+00:00",
+  "document_id": "Cadence_TPRM_Training",
+  "file_name": "Cadence_TPRM_Training.docx",
+  "report_scan_timestamp": "2026-10-11T21:32:44+00:00",
+  "verdict": "FAIL",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "NEEDS_REVIEW",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "FAIL",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "56 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "56 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "NEEDS_REVIEW",
+      "issues_total": 4,
+      "notes": [
+        "31 OCR words over redacted values hold only tags",
+        "9 images held redacted values: the image files themselves still show them (see image.word_boxes in the PII report)"
+      ],
+      "issues": [
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_27",
+          "page_number": 1,
+          "reason": "OCR confidence 51.1 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "section_1_header_image_1",
+          "page_number": 1,
+          "reason": "OCR confidence 44.1 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "section_1_first_page_header_image_3",
+          "page_number": 1,
+          "reason": "OCR confidence 16.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "section_2_first_page_header_image_1",
+          "page_number": 1,
+          "reason": "OCR confidence 16.0 is below 60: misread PII cannot be detected"
+        }
+      ]
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1371 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "FAIL",
+      "issues_total": 4,
+      "notes": [
+        "30 values and 42 name parts searched in 10842 strings"
+      ],
+      "issues": [
+        {
+          "severity": "FAIL",
+          "finding_id": "F-0035",
+          "occurrences": 2,
+          "locations": [
+            "image_24.text",
+            "image_24.metadata.words[128].text"
+          ],
+          "reason": "a value the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0052",
+          "occurrences": 28,
+          "locations": [
+            "image_31.text",
+            "image_31.metadata.words[64].text",
+            "image_31.metadata.words[67].text",
+            "image_34.text",
+            "image_34.metadata.words[68].text",
+            "image_34.metadata.words[71].text",
+            "image_34.metadata.words[78].text",
+            "image_34.metadata.words[81].text",
+            "image_34.metadata.words[88].text",
+            "image_34.metadata.words[91].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0050",
+          "occurrences": 2,
+          "locations": [
+            "paragraph_99.text",
+            "paragraph_232.text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0026",
+          "occurrences": 2,
+          "locations": [
+            "image_6.text",
+            "image_6.metadata.words[85].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        }
+      ]
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1410 blocks compared on 1 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261012-030221_Cadence_TPRM_Training_880ad4\\Cadence_TPRM_Training.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261012-030221_Cadence_TPRM_Training_880ad4\\Cadence_TPRM_Training_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261012-030221_Cadence_TPRM_Training_880ad4\\Cadence_TPRM_Training_sanitized.json",
+    "sanitized_sha256": "f8473771d12f3acb58664c0bbf2f0d9bc8be3b14fa8285fce389a6563a339d48"
+  }
+}

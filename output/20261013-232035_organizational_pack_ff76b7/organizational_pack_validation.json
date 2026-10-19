@@ -1,0 +1,98 @@
+{
+  "validator_version": "1.3.0",
+  "validated_at": "2026-10-13T18:05:16+00:00",
+  "document_id": "organizational_pack",
+  "file_name": "organizational_pack.pptx",
+  "report_scan_timestamp": "2026-10-13T18:05:15+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 OCR words over redacted values hold only tags"
+      ],
+      "issues": []
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "9 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "409 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "61 values and 34 name parts searched in 2966 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "413 blocks compared on 9 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "output\\20261013-232035_organizational_pack_ff76b7\\organizational_pack.json",
+    "report": "output\\20261013-232035_organizational_pack_ff76b7\\organizational_pack_pii.json",
+    "sanitized": "output\\20261013-232035_organizational_pack_ff76b7\\organizational_pack_sanitized.json",
+    "sanitized_sha256": "9a40e4c395e36d12cfe069ec260413adfc9a198034f7913a768e8ab6b1742c90"
+  }
+}

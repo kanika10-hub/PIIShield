@@ -1,0 +1,361 @@
+{
+  "validator_version": "1.2.0",
+  "validated_at": "2026-10-12T07:56:05+00:00",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "report_scan_timestamp": "2026-10-12T07:55:58+00:00",
+  "verdict": "FAIL",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "NEEDS_REVIEW",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "FAIL",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1 groups of overlapping findings, each redacted as one span: p13_t1_row_3_cell_3 (F-0283, F-0284)",
+        "882 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "882 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "NEEDS_REVIEW",
+      "issues_total": 23,
+      "notes": [
+        "1813 OCR words over redacted values hold only tags"
+      ],
+      "issues": [
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p1_b3",
+          "page_number": 1,
+          "reason": "OCR confidence 35.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p6_b18",
+          "page_number": 6,
+          "reason": "OCR confidence 44.7 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p6_b21",
+          "page_number": 6,
+          "reason": "OCR confidence 26.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p15_b8",
+          "page_number": 15,
+          "reason": "OCR confidence 57.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b12",
+          "page_number": 18,
+          "reason": "OCR confidence 10.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b14",
+          "page_number": 18,
+          "reason": "OCR confidence 44.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b36",
+          "page_number": 18,
+          "reason": "OCR confidence 26.6 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b40",
+          "page_number": 18,
+          "reason": "OCR confidence 21.8 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b41",
+          "page_number": 18,
+          "reason": "OCR confidence 47.5 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b42",
+          "page_number": 18,
+          "reason": "OCR confidence 41.7 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b43",
+          "page_number": 18,
+          "reason": "OCR confidence 46.5 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b44",
+          "page_number": 18,
+          "reason": "OCR confidence 54.5 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b46",
+          "page_number": 18,
+          "reason": "OCR confidence 50.5 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b51",
+          "page_number": 18,
+          "reason": "OCR confidence 52.4 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p18_b52",
+          "page_number": 18,
+          "reason": "OCR confidence 58.5 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p19_b15",
+          "page_number": 19,
+          "reason": "OCR confidence 30.3 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p19_b18",
+          "page_number": 19,
+          "reason": "OCR confidence 47.3 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p19_b19",
+          "page_number": 19,
+          "reason": "OCR confidence 56.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p20_b18",
+          "page_number": 20,
+          "reason": "OCR confidence 38.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p20_b21",
+          "page_number": 20,
+          "reason": "OCR confidence 36.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p22_b18",
+          "page_number": 22,
+          "reason": "OCR confidence 13.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p26_b12",
+          "page_number": 26,
+          "reason": "OCR confidence 20.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "p35_b11",
+          "page_number": 35,
+          "reason": "OCR confidence 38.3 is below 60: misread PII cannot be detected"
+        }
+      ]
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "35 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "2959 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "FAIL",
+      "issues_total": 11,
+      "notes": [
+        "230 values and 91 name parts searched in 81043 strings"
+      ],
+      "issues": [
+        {
+          "severity": "FAIL",
+          "finding_id": "F-0617",
+          "occurrences": 2,
+          "locations": [
+            "p25_t3_row_3_cell_2.text",
+            "p25_t3_row_3_cell_2.children[0].text"
+          ],
+          "reason": "a value the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0431",
+          "occurrences": 86,
+          "locations": [
+            "p1_b7.text",
+            "p1_b7.children[0].text",
+            "p1_b8.text",
+            "p1_b8.children[5].text",
+            "p2_b24.text",
+            "p2_b24.children[0].text",
+            "p3_b3.text",
+            "p3_b3.children[0].text",
+            "p3_b15.text",
+            "p3_b15.children[4].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0146",
+          "occurrences": 4,
+          "locations": [
+            "p8_b20.text",
+            "p8_b20.children[42].text",
+            "p17_b27.text",
+            "p17_b27.children[38].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0049",
+          "occurrences": 4,
+          "locations": [
+            "p27_t3_row_2_cell_3.text",
+            "p27_t3_row_2_cell_3.children[0].text",
+            "p30_t3_row_5_cell_3.text",
+            "p30_t3_row_5_cell_3.children[0].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0098",
+          "occurrences": 2,
+          "locations": [
+            "p6_b7.text",
+            "p6_b7.children[4].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0001",
+          "occurrences": 2,
+          "locations": [
+            "p12_b6.text",
+            "p12_b6.children[40].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0024",
+          "occurrences": 2,
+          "locations": [
+            "p12_b6.text",
+            "p12_b6.children[69].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0242",
+          "occurrences": 2,
+          "locations": [
+            "p18_t2_row_5_cell_2.text",
+            "p18_t2_row_5_cell_2.children[0].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0527",
+          "occurrences": 2,
+          "locations": [
+            "p22_b24.text",
+            "p22_b24.children[21].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0156",
+          "occurrences": 2,
+          "locations": [
+            "p22_b24.text",
+            "p22_b24.children[26].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0089",
+          "occurrences": 2,
+          "locations": [
+            "p23_t2_row_2_cell_4.text",
+            "p23_t2_row_2_cell_4.children[0].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        }
+      ]
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "20639 blocks compared on 35 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "output\\20261012-030416_Cadence_Group_Risk_Management_Policy_v6._42f3fb\\Cadence_Group_Risk_Management_Policy__v6.0.json",
+    "report": "output\\20261012-030416_Cadence_Group_Risk_Management_Policy_v6._42f3fb\\Cadence_Group_Risk_Management_Policy__v6.0_pii.json",
+    "sanitized": "output\\20261012-030416_Cadence_Group_Risk_Management_Policy_v6._42f3fb\\Cadence_Group_Risk_Management_Policy__v6.0_sanitized.json",
+    "sanitized_sha256": "7208d9747fa160989f99f1c99a5681b8f6c60128b36b08746ad92026a172463d"
+  }
+}

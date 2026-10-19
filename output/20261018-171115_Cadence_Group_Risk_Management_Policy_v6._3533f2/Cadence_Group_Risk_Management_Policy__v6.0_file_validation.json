@@ -1,0 +1,159 @@
+{
+  "file_validator_version": "1.2.0",
+  "validated_at": "2026-10-18T11:50:09+00:00",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "report_scan_timestamp": "2026-10-18T11:43:03+00:00",
+  "verdict": "FAIL",
+  "summary": {
+    "redaction": "PASS",
+    "text": "PASS",
+    "rescan": "FAIL",
+    "known_values": "FAIL",
+    "unread": "PASS"
+  },
+  "checks": [
+    {
+      "name": "redaction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "988 findings redacted, 0 images changed, 0 values replaced in other places"
+      ],
+      "issues": []
+    },
+    {
+      "name": "text",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 pages compared word by word, 35 scanned pages read again by OCR",
+        "5 texts compared (file properties)"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "FAIL",
+      "issues_total": 7,
+      "notes": [
+        "2936 blocks rescanned"
+      ],
+      "issues": [
+        {
+          "severity": "FAIL",
+          "block_id": "p6_b10",
+          "page_number": 6,
+          "reason": "EMPLOYEE_ID found by EMPLOYEE_ID_PREFIX"
+        },
+        {
+          "severity": "FAIL",
+          "block_id": "p7_b3",
+          "page_number": 7,
+          "reason": "PERSON_NAME found by PERSON_LABELLED"
+        },
+        {
+          "severity": "FAIL",
+          "block_id": "p12_b6",
+          "page_number": 12,
+          "reason": "PERSON_NAME found by PERSON_NER"
+        },
+        {
+          "severity": "FAIL",
+          "block_id": "p18_b34",
+          "page_number": 18,
+          "reason": "PERSON_NAME found by PERSON_NER"
+        },
+        {
+          "severity": "FAIL",
+          "block_id": "p18_b39",
+          "page_number": 18,
+          "reason": "EMAIL found by EMAIL_REGEX"
+        },
+        {
+          "severity": "FAIL",
+          "block_id": "p22_b14_2",
+          "page_number": 22,
+          "reason": "PERSON_NAME found by PERSON_LABELLED"
+        },
+        {
+          "severity": "FAIL",
+          "block_id": "p25_t2_row_2_cell_1",
+          "page_number": 25,
+          "reason": "PERSON_NAME found by PERSON_SURNAME"
+        }
+      ]
+    },
+    {
+      "name": "known_values",
+      "status": "FAIL",
+      "issues_total": 5,
+      "notes": [
+        "254 values and 91 name parts searched in 3403 strings",
+        "1 name parts are in the sanitized copy too: its review answered for them"
+      ],
+      "issues": [
+        {
+          "severity": "FAIL",
+          "finding_id": "F-0002",
+          "occurrences": 1,
+          "locations": [
+            "p6_b10"
+          ],
+          "reason": "a value the scan found is still in the redacted file"
+        },
+        {
+          "severity": "FAIL",
+          "finding_id": "F-0362",
+          "occurrences": 1,
+          "locations": [
+            "p12_b6"
+          ],
+          "reason": "a value the scan found is still in the redacted file"
+        },
+        {
+          "severity": "FAIL",
+          "finding_id": "F-0096",
+          "occurrences": 1,
+          "locations": [
+            "p18_b31"
+          ],
+          "reason": "a value the scan found is still in the redacted file"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0085",
+          "occurrences": 1,
+          "locations": [
+            "p18_b32"
+          ],
+          "reason": "part of a name the scan found is in the redacted file, but not in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0239",
+          "occurrences": 1,
+          "locations": [
+            "p18_b32"
+          ],
+          "reason": "part of a name the scan found is in the redacted file, but not in the sanitized copy"
+        }
+      ]
+    },
+    {
+      "name": "unread",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 images in the file, 0 shown by blocks"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "redacted": "D:\\optiv\\optivcase2\\backend\\output\\20261018-171115_Cadence_Group_Risk_Management_Policy_v6._3533f2\\Cadence_Group_Risk_Management_Policy__v6.0_redacted.pdf",
+    "redacted_sha256": "9a16a5502123a54c0e1b588e181718b1a5ff43db27e2108d1d6611e0b4c15aec",
+    "deleted": true,
+    "copy_validated_at": "2026-10-18T11:48:13+00:00"
+  }
+}

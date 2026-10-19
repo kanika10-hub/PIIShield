@@ -1,0 +1,25 @@
+{
+  "file_redactor_version": "1.1.0",
+  "redacted_at": "2026-10-18T06:12:41+00:00",
+  "document_id": "tprm_training",
+  "file_name": "tprm_training.docx",
+  "report_scan_timestamp": "2026-10-17T17:49:58+00:00",
+  "status": "completed",
+  "summary": {
+    "findings": 56,
+    "redacted": 56,
+    "skipped": 0,
+    "failed": 0,
+    "spans_replaced": 56,
+    "images_redacted": 10,
+    "values_swept": 0,
+    "svg_copies_removed": 1
+  },
+  "errors": [],
+  "files": {
+    "source": "uploads\\20261017-231918_tprm_training_1edd7a\\tprm_training.docx",
+    "source_sha256": "b154a86d70928b70792a04e53753ee2390d954395b74a743704da82b822e3813",
+    "redacted": "output\\20261017-231918_tprm_training_1edd7a\\tprm_training_redacted.docx",
+    "redacted_sha256": "59e0acfe82ff576aa06bdbf065138cf3daf1d351f7c0e2db655a9c11d50617dc"
+  }
+}

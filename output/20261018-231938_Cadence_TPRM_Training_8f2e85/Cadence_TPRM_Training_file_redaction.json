@@ -1,0 +1,43 @@
+{
+  "file_redactor_version": "1.3.0",
+  "redacted_at": "2026-10-18T19:07:26+00:00",
+  "document_id": "Cadence_TPRM_Training",
+  "file_name": "Cadence_TPRM_Training.docx",
+  "report_scan_timestamp": "2026-10-18T17:50:18+00:00",
+  "status": "needs_review",
+  "redaction_pass": 1,
+  "leftovers": [],
+  "summary": {
+    "findings": 88,
+    "redacted": 85,
+    "skipped": 0,
+    "failed": 3,
+    "spans_replaced": 85,
+    "images_redacted": 17,
+    "values_swept": 6,
+    "svg_copies_removed": 1
+  },
+  "errors": [
+    {
+      "block_id": "section_1_header_image_1",
+      "finding_id": "M-0030",
+      "reason": "None images cannot be written back"
+    },
+    {
+      "block_id": "section_1_first_page_header_image_3",
+      "finding_id": "M-0031",
+      "reason": "None images cannot be written back"
+    },
+    {
+      "block_id": "section_2_first_page_header_image_1",
+      "finding_id": "M-0032",
+      "reason": "None images cannot be written back"
+    }
+  ],
+  "files": {
+    "source": "D:\\optiv\\optivcase2\\backend\\uploads\\20261018-231938_Cadence_TPRM_Training_8f2e85\\Cadence_TPRM_Training.docx",
+    "source_sha256": "b154a86d70928b70792a04e53753ee2390d954395b74a743704da82b822e3813",
+    "redacted": "D:\\optiv\\optivcase2\\backend\\output\\20261018-231938_Cadence_TPRM_Training_8f2e85\\Cadence_TPRM_Training_redacted.docx",
+    "redacted_sha256": "2892663bfb6192ee3a19e4b6ce15c3acb040e737a787d50d73547b082af32cd3"
+  }
+}

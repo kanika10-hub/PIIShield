@@ -1,0 +1,25 @@
+{
+  "file_redactor_version": "1.1.0",
+  "redacted_at": "2026-10-18T06:12:34+00:00",
+  "document_id": "organizational_pack",
+  "file_name": "organizational_pack.pptx",
+  "report_scan_timestamp": "2026-10-17T17:49:12+00:00",
+  "status": "completed",
+  "summary": {
+    "findings": 124,
+    "redacted": 124,
+    "skipped": 0,
+    "failed": 0,
+    "spans_replaced": 124,
+    "images_redacted": 0,
+    "values_swept": 0,
+    "svg_copies_removed": 0
+  },
+  "errors": [],
+  "files": {
+    "source": "uploads\\20261017-231910_organizational_pack_fb1b5f\\organizational_pack.pptx",
+    "source_sha256": "3803c99e0109cf376fe7ee52b0c1354d81b68e7aa46a0fdcc3adcfb1653ea9c2",
+    "redacted": "output\\20261017-231910_organizational_pack_fb1b5f\\organizational_pack_redacted.pptx",
+    "redacted_sha256": "d81ef594202b3fd5cc157dbcd1a24e574729dec66a2a83548ed89ca5383ad587"
+  }
+}

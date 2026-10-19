@@ -1,0 +1,27 @@
+{
+  "file_redactor_version": "1.2.0",
+  "redacted_at": "2026-10-18T11:48:28+00:00",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "report_scan_timestamp": "2026-10-18T11:43:03+00:00",
+  "status": "completed",
+  "summary": {
+    "findings": 988,
+    "redacted": 988,
+    "skipped": 0,
+    "failed": 0,
+    "spans_replaced": 984,
+    "images_redacted": 0,
+    "values_swept": 0,
+    "annotations_removed": 0,
+    "attachments_removed": 0,
+    "tags_not_written": 108
+  },
+  "errors": [],
+  "files": {
+    "source": "D:\\optiv\\optivcase2\\backend\\uploads\\20261018-171115_Cadence_Group_Risk_Management_Policy_v6._3533f2\\Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+    "source_sha256": "3f4b5db17d2e2694630fe4244754a270d4c0dde68ef009ee0495e43a2bf606f3",
+    "redacted": "D:\\optiv\\optivcase2\\backend\\output\\20261018-171115_Cadence_Group_Risk_Management_Policy_v6._3533f2\\Cadence_Group_Risk_Management_Policy__v6.0_redacted.pdf",
+    "redacted_sha256": "9a16a5502123a54c0e1b588e181718b1a5ff43db27e2108d1d6611e0b4c15aec"
+  }
+}

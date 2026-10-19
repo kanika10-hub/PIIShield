@@ -1,0 +1,184 @@
+{
+  "file_validator_version": "1.3.0",
+  "validated_at": "2026-10-18T17:09:34+00:00",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "report_scan_timestamp": "2026-10-18T17:01:04+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "redaction": "PASS",
+    "text": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "unread": "PASS"
+  },
+  "checks": [
+    {
+      "name": "redaction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "946 findings redacted, 0 images changed, 0 values replaced in other places"
+      ],
+      "issues": []
+    },
+    {
+      "name": "text",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 pages compared word by word, 35 scanned pages read again by OCR",
+        "5 texts compared (file properties)"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "2940 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "254 values and 91 name parts searched in 3406 strings",
+        "2 name parts are in the sanitized copy too: its review answered for them"
+      ],
+      "issues": []
+    },
+    {
+      "name": "unread",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 images in the file, 0 shown by blocks"
+      ],
+      "issues": []
+    }
+  ],
+  "redaction_pass": 2,
+  "leftovers": [
+    {
+      "page_number": 7,
+      "box": [
+        507.5,
+        131.5,
+        517.0,
+        137.5
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 7,
+      "box": [
+        83.75,
+        138.75,
+        422.25,
+        150.75
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 12,
+      "box": [
+        401.0,
+        168.5,
+        419.0,
+        173.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        341.5,
+        569.0,
+        362.5,
+        573.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        273.75,
+        613.5,
+        310.25,
+        618.0
+      ],
+      "type": "EMAIL",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 22,
+      "box": [
+        442.75,
+        555.75,
+        528.25,
+        564.75
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 25,
+      "box": [
+        77.5,
+        478.75,
+        139.25,
+        487.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        342.0,
+        523.25,
+        362.75,
+        528.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        348.75,
+        531.0,
+        361.75,
+        535.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        348.5,
+        553.75,
+        360.25,
+        558.25
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    }
+  ],
+  "leftovers_complete": false,
+  "files": {
+    "redacted": "D:\\optiv\\optivcase2\\backend\\output\\20261018-222919_Cadence_Group_Risk_Management_Policy_v6._1af22b\\Cadence_Group_Risk_Management_Policy__v6.0_redacted.pdf",
+    "redacted_sha256": "0e2749b356e1bf5d30a9ebd5813397c5ce5d81262ed48dec6c4fcab10b6cbb78",
+    "deleted": false,
+    "copy_validated_at": "2026-10-18T17:05:43+00:00"
+  }
+}

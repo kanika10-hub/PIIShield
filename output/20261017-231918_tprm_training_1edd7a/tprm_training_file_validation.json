@@ -1,0 +1,69 @@
+{
+  "file_validator_version": "1.1.0",
+  "validated_at": "2026-10-18T06:13:26+00:00",
+  "document_id": "tprm_training",
+  "file_name": "tprm_training.docx",
+  "report_scan_timestamp": "2026-10-17T17:49:58+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "redaction": "PASS",
+    "text": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "unread": "PASS"
+  },
+  "checks": [
+    {
+      "name": "redaction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "56 findings redacted, 10 images changed, 0 values replaced in other places"
+      ],
+      "issues": []
+    },
+    {
+      "name": "text",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1416 texts compared"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1371 blocks rescanned",
+        "1 detections are low-confidence OCR misreadings of image pixels that were not changed, and were read with confidence before, with no PII"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "26 values and 45 name parts searched in 106947 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "unread",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "40 images in the file, 45 shown by blocks"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "redacted": "output\\20261017-231918_tprm_training_1edd7a\\tprm_training_redacted.docx",
+    "redacted_sha256": "59e0acfe82ff576aa06bdbf065138cf3daf1d351f7c0e2db655a9c11d50617dc",
+    "deleted": false,
+    "copy_validated_at": "2026-10-17T17:50:19+00:00"
+  }
+}

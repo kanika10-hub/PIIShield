@@ -1,0 +1,98 @@
+{
+  "validator_version": "1.5.0",
+  "validated_at": "2026-10-18T17:33:32+00:00",
+  "document_id": "Cadence_Financial_Group_Organizational_Pack",
+  "file_name": "Cadence_Financial_Group_Organizational_Pack.pptx",
+  "report_scan_timestamp": "2026-10-18T17:33:31+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 OCR words over redacted values hold only tags"
+      ],
+      "issues": []
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "9 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "409 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "61 values and 34 name parts searched in 2966 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "413 blocks compared on 9 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261018-230330_Cadence_Financial_Group_Organizational_P_ce1c49\\Cadence_Financial_Group_Organizational_Pack.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261018-230330_Cadence_Financial_Group_Organizational_P_ce1c49\\Cadence_Financial_Group_Organizational_Pack_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261018-230330_Cadence_Financial_Group_Organizational_P_ce1c49\\Cadence_Financial_Group_Organizational_Pack_sanitized.json",
+    "sanitized_sha256": "0feade445e5d40ce661e35895c102374197e6f5da5d5f133b0dfafa80289a8c6"
+  }
+}

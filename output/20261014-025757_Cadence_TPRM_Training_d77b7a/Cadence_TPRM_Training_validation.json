@@ -1,0 +1,185 @@
+{
+  "validator_version": "1.5.0",
+  "validated_at": "2026-10-13T21:33:07+00:00",
+  "document_id": "Cadence_TPRM_Training",
+  "file_name": "Cadence_TPRM_Training.docx",
+  "report_scan_timestamp": "2026-10-13T21:28:36+00:00",
+  "verdict": "NEEDS_REVIEW",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "NEEDS_REVIEW",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "62 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "62 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "NEEDS_REVIEW",
+      "issues_total": 14,
+      "notes": [
+        "52 OCR words over redacted values hold only tags",
+        "16 low-confidence OCR words that look like values need a look",
+        "11 images held redacted values: the image files themselves still show them (see image.word_boxes in the PII report)"
+      ],
+      "issues": [
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_16",
+          "page_number": 1,
+          "reason": "2 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_18",
+          "page_number": 1,
+          "reason": "2 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_20",
+          "page_number": 1,
+          "reason": "3 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_22",
+          "page_number": 1,
+          "reason": "1 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_25",
+          "page_number": 1,
+          "reason": "1 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_26",
+          "page_number": 1,
+          "reason": "1 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_27",
+          "page_number": 1,
+          "reason": "OCR confidence 51.1 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_28",
+          "page_number": 1,
+          "reason": "1 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_29",
+          "page_number": 1,
+          "reason": "2 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_31",
+          "page_number": 1,
+          "reason": "2 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "image_32",
+          "page_number": 1,
+          "reason": "1 OCR words that look like part of a value were read with confidence below 60: a misread value cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "section_1_header_image_1",
+          "page_number": 1,
+          "reason": "OCR confidence 44.1 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "section_1_first_page_header_image_3",
+          "page_number": 1,
+          "reason": "OCR confidence 16.0 is below 60: misread PII cannot be detected"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "block_id": "section_2_first_page_header_image_1",
+          "page_number": 1,
+          "reason": "OCR confidence 16.0 is below 60: misread PII cannot be detected"
+        }
+      ]
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1371 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "26 values and 45 name parts searched in 10872 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1410 blocks compared on 1 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261014-025757_Cadence_TPRM_Training_d77b7a\\Cadence_TPRM_Training.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261014-025757_Cadence_TPRM_Training_d77b7a\\Cadence_TPRM_Training_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261014-025757_Cadence_TPRM_Training_d77b7a\\Cadence_TPRM_Training_sanitized.json",
+    "sanitized_sha256": "7122ec10071454f066b4989826009c77e0e325f090498e3b23909d85c2bf0a9c"
+  }
+}

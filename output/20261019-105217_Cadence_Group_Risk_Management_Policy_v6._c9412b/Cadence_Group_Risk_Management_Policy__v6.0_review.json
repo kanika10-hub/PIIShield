@@ -1,0 +1,285 @@
+{
+  "review_version": "1.0.0",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "validated_at": "2026-10-19T05:24:19+00:00",
+  "sanitized_sha256": "e41b4ce247f167209c7e6fb5650a5618e1b37f08635cd8e56fc95c2201f98087",
+  "sign_offs": [
+    {
+      "key": "f0cb429a2d3ab919",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "0923560567cea8a5",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "a5e41def9b546f49",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "f097a574d33afb79",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "0093f5fe9a3507fe",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "f5474c1da3657674",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "97eb323f5b947922",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "e2e5e5abe895cec0",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "16f7783f8dd44408",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "0671d8309bcc9568",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "e2f750c6576df786",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "edfe15e80fa78316",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "474b193331000469",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "e5a7ed56a134e00e",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "e65dd4877b9ffe57",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "2b47ce88a7ea5627",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "9e5c8551877c253e",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "a31a75c0315527ae",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "5d6c2d26fd1e38f0",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "b7f6311d0fe3a8ae",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "0a2fc29b77d73c2b",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "b38b5ddd874dbb2a",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "020531e09e1e64f5",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "07ea8f9473dada90",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "9138a9e77947e8d7",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "d2ec4d621681db73",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "4b7421dc94e3664e",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "6462fcffdf61607b",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "3f1b50ae7cfc44cf",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "8d03315eb003b5b2",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "496ab470991f6bc3",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "e0aa14e1772c2691",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "324de2e02174f8c8",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "4c5d113ba54ebbc7",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "5a3af7d801e4c39c",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "f90f55e630409b16",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "6f43e2cc39f2a6f3",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "0a735b771fddbb51",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "706308e55424cb08",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "3ae259c03437d18f",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "94dc38abd6c3ea05",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "2226bddabb8bf4f6",
+      "check": "ocr",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:21+00:00"
+    },
+    {
+      "key": "a27d103e58c9bfc6",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:32+00:00"
+    },
+    {
+      "key": "d7fe28b1cf6cd3d9",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:39+00:00"
+    },
+    {
+      "key": "ff869f0428f759e7",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:45+00:00"
+    },
+    {
+      "key": "6bd2ca8933f765d1",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-19T05:31:51+00:00"
+    }
+  ]
+}

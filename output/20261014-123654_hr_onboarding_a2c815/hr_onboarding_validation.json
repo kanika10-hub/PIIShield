@@ -1,0 +1,99 @@
+{
+  "validator_version": "1.5.0",
+  "validated_at": "2026-10-14T07:06:55+00:00",
+  "document_id": "hr_onboarding",
+  "file_name": "hr_onboarding.docx",
+  "report_scan_timestamp": "2026-10-14T07:06:55+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "23 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "23 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "5 OCR words over redacted values hold only tags",
+        "1 images held redacted values: the image files themselves still show them (see image.word_boxes in the PII report)"
+      ],
+      "issues": []
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "31 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "22 values and 18 name parts searched in 280 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "24 blocks compared on 1 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261014-123654_hr_onboarding_a2c815\\hr_onboarding.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261014-123654_hr_onboarding_a2c815\\hr_onboarding_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261014-123654_hr_onboarding_a2c815\\hr_onboarding_sanitized.json",
+    "sanitized_sha256": "8657f2696a478d169ce2c20540f20e478adc0e3ef6141e01663236b9dc2d535b"
+  }
+}

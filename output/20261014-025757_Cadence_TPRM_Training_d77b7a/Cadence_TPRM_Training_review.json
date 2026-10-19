@@ -1,0 +1,27 @@
+{
+  "review_version": "1.0.0",
+  "document_id": "Cadence_TPRM_Training",
+  "file_name": "Cadence_TPRM_Training.docx",
+  "validated_at": "2026-10-13T21:33:07+00:00",
+  "sanitized_sha256": "7122ec10071454f066b4989826009c77e0e325f090498e3b23909d85c2bf0a9c",
+  "sign_offs": [
+    {
+      "key": "5d37d1d099178af8",
+      "check": "ocr",
+      "reviewer": "john",
+      "signed_at": "2026-10-13T21:32:38+00:00"
+    },
+    {
+      "key": "54e36115fae55e29",
+      "check": "ocr",
+      "reviewer": "john",
+      "signed_at": "2026-10-13T21:32:42+00:00"
+    },
+    {
+      "key": "9f9ffc81057ea923",
+      "check": "ocr",
+      "reviewer": "john",
+      "signed_at": "2026-10-13T21:33:11+00:00"
+    }
+  ]
+}

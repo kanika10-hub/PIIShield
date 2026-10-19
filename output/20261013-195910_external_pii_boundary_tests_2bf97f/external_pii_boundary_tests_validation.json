@@ -1,0 +1,99 @@
+{
+  "validator_version": "1.2.0",
+  "validated_at": "2026-10-13T14:29:10+00:00",
+  "document_id": "external_pii_boundary_tests",
+  "file_name": "external_pii_boundary_tests.pptx",
+  "report_scan_timestamp": "2026-10-13T14:29:10+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "18 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "18 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "4 OCR words over redacted values hold only tags",
+        "1 images held redacted values: the image files themselves still show them (see image.word_boxes in the PII report)"
+      ],
+      "issues": []
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "3 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "33 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "18 values and 9 name parts searched in 301 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "32 blocks compared on 3 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261013-195910_external_pii_boundary_tests_2bf97f\\external_pii_boundary_tests.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261013-195910_external_pii_boundary_tests_2bf97f\\external_pii_boundary_tests_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261013-195910_external_pii_boundary_tests_2bf97f\\external_pii_boundary_tests_sanitized.json",
+    "sanitized_sha256": "89cc3e116976f976dc41a1f39b4975a965882a8d821c7395953bcd04ed292ac5"
+  }
+}

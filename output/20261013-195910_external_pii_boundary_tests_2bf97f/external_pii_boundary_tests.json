@@ -1,0 +1,716 @@
+{
+  "document_id": "external_pii_boundary_tests",
+  "file_name": "external_pii_boundary_tests.pptx",
+  "source_type": "PPTX",
+  "extraction_method": "mixed",
+  "pages": [
+    {
+      "page_number": 1,
+      "metadata": {
+        "content_type": "slide",
+        "extraction_method": "native",
+        "width": 720.0,
+        "height": 540.0,
+        "layout": "Title Only",
+        "hidden": false,
+        "char_count": 267,
+        "low_text": false
+      },
+      "blocks": [
+        {
+          "block_id": "slide1_text1_p1",
+          "block_type": "heading",
+          "text": "External PII Test — Body",
+          "order": 1,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "shape_id": 2,
+            "shape_name": "Title 1",
+            "placeholder": "TITLE (1)",
+            "paragraph": 1
+          },
+          "bounding_box": {
+            "x": 36.0,
+            "y": 21.62503937007874,
+            "width": 648.0,
+            "height": 90.0
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide1_text2_p1",
+          "block_type": "paragraph",
+          "text": "TC01 Contact: Jordan Example",
+          "order": 2,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 1
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide1_text2_p2",
+          "block_type": "paragraph",
+          "text": "TC02 Email: jordan.example@example.com",
+          "order": 3,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 2
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide1_text2_p3",
+          "block_type": "paragraph",
+          "text": "TC03 Employee ID: EMP-00042",
+          "order": 4,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 3
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide1_text2_p4",
+          "block_type": "paragraph",
+          "text": "TC04 Phone: +1 202-555-0147",
+          "order": 5,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 4
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide1_text2_p5",
+          "block_type": "paragraph",
+          "text": "TC05 Documentation IP: 192.0.2.15",
+          "order": 6,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 5
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide1_text2_p6",
+          "block_type": "paragraph",
+          "text": "TC06 Date: 2026-10-13 (not a phone number)",
+          "order": 7,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 6
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide1_text2_p7",
+          "block_type": "paragraph",
+          "text": "TC16 Negative: The quarterly review is complete.",
+          "order": 8,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 7
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "metadata": {
+        "content_type": "slide",
+        "extraction_method": "native",
+        "width": 720.0,
+        "height": 540.0,
+        "layout": "Title Only",
+        "hidden": false,
+        "char_count": 221,
+        "low_text": false
+      },
+      "blocks": [
+        {
+          "block_id": "slide2_text1_p1",
+          "block_type": "heading",
+          "text": "Table Boundary Cases",
+          "order": 1,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "shape_id": 2,
+            "shape_name": "Title 1",
+            "placeholder": "TITLE (1)",
+            "paragraph": 1
+          },
+          "bounding_box": {
+            "x": 36.0,
+            "y": 21.62503937007874,
+            "width": 648.0,
+            "height": 90.0
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide2_text2_p1",
+          "block_type": "paragraph",
+          "text": "PII is stored inside table cells; pass table header context.",
+          "order": 2,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 1
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide2_table3",
+          "block_type": "table",
+          "text": "",
+          "order": 3,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "shape_id": 4,
+            "shape_name": "Table 3",
+            "rows": 4,
+            "columns": 4
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 144.0,
+            "width": 864.0,
+            "height": 172.8
+          },
+          "children": [
+            {
+              "block_id": "slide2_table3_cell_1_1",
+              "block_type": "table_cell",
+              "text": "Case",
+              "order": 1,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_1_2",
+              "block_type": "table_cell",
+              "text": "Name",
+              "order": 2,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_1_3",
+              "block_type": "table_cell",
+              "text": "Email",
+              "order": 3,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_1_4",
+              "block_type": "table_cell",
+              "text": "Identifier",
+              "order": 4,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_2_1",
+              "block_type": "table_cell",
+              "text": "TC07",
+              "order": 5,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_2_2",
+              "block_type": "table_cell",
+              "text": "Avery Morgan",
+              "order": 6,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_2_3",
+              "block_type": "table_cell",
+              "text": "avery.morgan@example.org",
+              "order": 7,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_2_4",
+              "block_type": "table_cell",
+              "text": "EMP-00041",
+              "order": 8,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_3_1",
+              "block_type": "table_cell",
+              "text": "TC09",
+              "order": 9,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_3_2",
+              "block_type": "table_cell",
+              "text": "—",
+              "order": 10,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_3_3",
+              "block_type": "table_cell",
+              "text": "—",
+              "order": 11,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_3_4",
+              "block_type": "table_cell",
+              "text": "TEST-ID-AB-123456",
+              "order": 12,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_4_1",
+              "block_type": "table_cell",
+              "text": "TC10",
+              "order": 13,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_4_2",
+              "block_type": "table_cell",
+              "text": "Riley Q. Example",
+              "order": 14,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_4_3",
+              "block_type": "table_cell",
+              "text": "riley.q@example.net",
+              "order": 15,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "slide2_table3_cell_4_4",
+              "block_type": "table_cell",
+              "text": "EMP0007",
+              "order": 16,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "metadata": {
+        "content_type": "slide",
+        "extraction_method": "mixed",
+        "width": 720.0,
+        "height": 540.0,
+        "layout": "Title Only",
+        "hidden": false,
+        "char_count": 255,
+        "low_text": false
+      },
+      "blocks": [
+        {
+          "block_id": "slide3_text1_p1",
+          "block_type": "heading",
+          "text": "OCR / Notes Boundary",
+          "order": 1,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "shape_id": 2,
+            "shape_name": "Title 1",
+            "placeholder": "TITLE (1)",
+            "paragraph": 1
+          },
+          "bounding_box": {
+            "x": 36.0,
+            "y": 21.62503937007874,
+            "width": 648.0,
+            "height": 90.0
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide3_text2_p1",
+          "block_type": "paragraph",
+          "text": "The image below contains PII-like text as pixels.",
+          "order": 2,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 1
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide3_text2_p2",
+          "block_type": "paragraph",
+          "text": "Validate speaker notes and hidden content if supported.",
+          "order": 3,
+          "metadata": {
+            "source": "native",
+            "location": "text_box",
+            "shape_id": 3,
+            "shape_name": "TextBox 2",
+            "paragraph": 2
+          },
+          "bounding_box": {
+            "x": 50.4,
+            "y": 93.6,
+            "width": 864.0,
+            "height": 345.6
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide3_image3",
+          "block_type": "image_ocr",
+          "text": "OCR TEST: Taylor Example\ntaylor.example@example.com\nEmployee ID: EMP-00043",
+          "order": 4,
+          "metadata": {
+            "location": "body",
+            "shape_id": 4,
+            "shape_name": "Picture 3",
+            "image_part": "/ppt/media/image1.png",
+            "source": "ocr",
+            "ocr_engine": "Tesseract",
+            "image_width": 1100,
+            "image_height": 250,
+            "ocr_confidence": 92.4,
+            "word_count": 8,
+            "words": [
+              {
+                "text": "OCR",
+                "x": 27,
+                "y": 26,
+                "width": 63,
+                "height": 22,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "TEST:",
+                "x": 100,
+                "y": 26,
+                "width": 78,
+                "height": 22,
+                "confidence": 95,
+                "line_number": 1
+              },
+              {
+                "text": "Taylor",
+                "x": 191,
+                "y": 25,
+                "width": 88,
+                "height": 29,
+                "confidence": 95,
+                "line_number": 1
+              },
+              {
+                "text": "Example",
+                "x": 292,
+                "y": 25,
+                "width": 126,
+                "height": 29,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "taylor.example@example.com",
+                "x": 26,
+                "y": 85,
+                "width": 452,
+                "height": 29,
+                "confidence": 76,
+                "line_number": 2
+              },
+              {
+                "text": "Employee",
+                "x": 28,
+                "y": 145,
+                "width": 144,
+                "height": 29,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "ID:",
+                "x": 186,
+                "y": 146,
+                "width": 36,
+                "height": 22,
+                "confidence": 93,
+                "line_number": 1
+              },
+              {
+                "text": "EMP-00043",
+                "x": 238,
+                "y": 146,
+                "width": 163,
+                "height": 22,
+                "confidence": 92,
+                "line_number": 1
+              }
+            ]
+          },
+          "bounding_box": {
+            "x": 72.0,
+            "y": 216.0,
+            "width": 756.0,
+            "height": 171.81818897637794
+          },
+          "children": []
+        },
+        {
+          "block_id": "slide3_notes_p1",
+          "block_type": "paragraph",
+          "text": "Notes test: Casey Example | casey@example.com | EMP-00044",
+          "order": 5,
+          "metadata": {
+            "source": "native",
+            "location": "notes",
+            "paragraph": 1
+          },
+          "bounding_box": null,
+          "children": []
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "page_count": 3,
+    "properties": {
+      "comments": "generated using python-pptx",
+      "last_modified_by": "Steve Canny",
+      "created": "2013-01-27T09:14:16",
+      "modified": "2013-01-27T09:15:58"
+    },
+    "limitations": []
+  }
+}

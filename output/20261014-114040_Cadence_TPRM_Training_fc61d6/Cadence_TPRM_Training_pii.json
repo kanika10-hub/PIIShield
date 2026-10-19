@@ -1,0 +1,4021 @@
+{
+  "schema_version": "1.2",
+  "document_id": "Cadence_TPRM_Training",
+  "file_name": "Cadence_TPRM_Training.docx",
+  "source_type": "DOCX",
+  "scan_timestamp": "2026-10-14T06:11:23+00:00",
+  "scanner_version": "1.5.0",
+  "status": "completed_with_warnings",
+  "summary": {
+    "blocks_scanned": 1371,
+    "unique_texts_scanned": 1338,
+    "total_findings": 88,
+    "by_type": {
+      "PERSON_NAME": 56,
+      "UNREADABLE_TEXT": 32
+    },
+    "pages_scanned": 1,
+    "tables_scanned": 18,
+    "extraction_warnings": [
+      "4 OCR'd blocks have confidence below 60 (pages 1)",
+      "25 OCR words that look like part of a value (digits or @) were read with confidence below 60 (pages 1): a misread value escapes detection",
+      "42 blocks are text read from images by OCR: misread text can cause missed or wrong findings, and findings in them must be redacted in the image itself (see image.word_boxes)"
+    ],
+    "manual_findings": 32
+  },
+  "tables": [
+    {
+      "page_number": 1,
+      "table_id": "table_1",
+      "rows": 1,
+      "columns": 1,
+      "title_rows": [],
+      "header_rows": [],
+      "column_headers": {}
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_2",
+      "rows": 1,
+      "columns": 3,
+      "title_rows": [
+        1
+      ],
+      "header_rows": [],
+      "column_headers": {}
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_3",
+      "rows": 4,
+      "columns": 1,
+      "title_rows": [],
+      "header_rows": [],
+      "column_headers": {}
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_4",
+      "rows": 6,
+      "columns": 4,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "THIRD-PARTY TYPE",
+        "2": "DESCRIPTION",
+        "3": "USER GROUPS",
+        "4": "APPROVER"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_5",
+      "rows": 11,
+      "columns": 4,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "USER GROUPS",
+        "2": "DESCRIPTION",
+        "3": "PERMISSIONS",
+        "4": "USERS"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_6",
+      "rows": 3,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "WORKFLOWS NAME",
+        "2": "STAGE",
+        "3": "DESCRIPTION",
+        "4": "STAGE RULE",
+        "5": "WORKFLOW RULE"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_7",
+      "rows": 6,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "WORKFLOW NAME",
+        "2": "STAGE (These are not the exact stage names)",
+        "3": "DESCRIPTION",
+        "4": "STAGE RULE",
+        "5": "WORKFLOW RULE"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_8",
+      "rows": 6,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "WORKFLOW NAME",
+        "2": "STAGE (These are not the exact stage names)",
+        "3": "DESCRIPTION",
+        "4": "STAGE RULE",
+        "5": "WORKFLOW RULE"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_9",
+      "rows": 9,
+      "columns": 4,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "ATTRIBUTE",
+        "2": "DESCRIPTION",
+        "3": "VALUE",
+        "4": "DIRECTION"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_10",
+      "rows": 46,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "SR. NO.",
+        "2": "RULE NAME",
+        "3": "PLACE",
+        "4": "DESCRIPTION",
+        "5": "RULE"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_11",
+      "rows": 3,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "QUESTIONNAIRE NO.",
+        "2": "QUESTIONNAIRE NAME",
+        "3": "PLACE",
+        "4": "DESCRIPTION",
+        "5": "APPROVERS"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_12",
+      "rows": 15,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "LOGIC NO.",
+        "2": "PLACE",
+        "3": "CONDITION",
+        "4": "ACTION",
+        "5": "QUESTION SHOWN"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_13",
+      "rows": 8,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "SLA NO.",
+        "2": "SLA NAME",
+        "3": "DESCRIPTION",
+        "4": "TIMELINE (DAYS)",
+        "5": "REMINDER"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_14",
+      "rows": 91,
+      "columns": 5,
+      "title_rows": [],
+      "header_rows": [
+        1
+      ],
+      "column_headers": {
+        "1": "RULE NO.",
+        "2": "PLACE",
+        "3": "RULE NAME",
+        "4": "CONDITION",
+        "5": "ACTION"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_15",
+      "rows": 9,
+      "columns": 2,
+      "title_rows": [
+        1
+      ],
+      "header_rows": [
+        2
+      ],
+      "column_headers": {
+        "1": "Client Name",
+        "2": "Cadence"
+      }
+    },
+    {
+      "page_number": 1,
+      "table_id": "table_16",
+      "rows": 2,
+      "columns": 1,
+      "title_rows": [],
+      "header_rows": [],
+      "column_headers": {}
+    },
+    {
+      "page_number": 1,
+      "table_id": "section_1_footer_table_1",
+      "rows": 1,
+      "columns": 3,
+      "title_rows": [],
+      "header_rows": [],
+      "column_headers": {}
+    },
+    {
+      "page_number": 1,
+      "table_id": "section_2_footer_table_1",
+      "rows": 1,
+      "columns": 3,
+      "title_rows": [],
+      "header_rows": [],
+      "column_headers": {}
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "F-0001",
+      "type": "PERSON_NAME",
+      "text": "Artificial Intelligence",
+      "start": 44,
+      "end": 67,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Artificial Intelligence",
+      "context": "",
+      "page_number": 1,
+      "block_id": "paragraph_99",
+      "block_type": "list_item",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0002",
+      "type": "PERSON_NAME",
+      "text": "Daniela Figueroa",
+      "start": 0,
+      "end": 16,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_2_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 2,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0003",
+      "type": "PERSON_NAME",
+      "text": "Bridgett Gatewood",
+      "start": 17,
+      "end": 34,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_2_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 2,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0004",
+      "type": "PERSON_NAME",
+      "text": "KC Burney",
+      "start": 35,
+      "end": 44,
+      "confidence": 0.8,
+      "detector": "name_rule",
+      "rule_id": "PERSON_LABELLED",
+      "detection_method": "context_rule",
+      "matched_pattern": "name_runs",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_2_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 2,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0005",
+      "type": "PERSON_NAME",
+      "text": "Jyoti Karwal",
+      "start": 45,
+      "end": 57,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_2_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 2,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0006",
+      "type": "PERSON_NAME",
+      "text": "Tamika Oliver",
+      "start": 0,
+      "end": 13,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_3_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 3,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0007",
+      "type": "PERSON_NAME",
+      "text": "Shimane Smith",
+      "start": 14,
+      "end": 27,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_3_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 3,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0008",
+      "type": "PERSON_NAME",
+      "text": "Chris Schmitz",
+      "start": 28,
+      "end": 41,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_3_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 3,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0009",
+      "type": "PERSON_NAME",
+      "text": "Chris Ott",
+      "start": 42,
+      "end": 51,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_3_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 3,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0010",
+      "type": "PERSON_NAME",
+      "text": "Rob Tilney",
+      "start": 52,
+      "end": 62,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Vendor Risk Management Group",
+      "page_number": 1,
+      "block_id": "table_5_row_3_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 3,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0011",
+      "type": "PERSON_NAME",
+      "text": "Shimane Smith",
+      "start": 0,
+      "end": 13,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Legal Group",
+      "page_number": 1,
+      "block_id": "table_5_row_4_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 4,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0012",
+      "type": "PERSON_NAME",
+      "text": "Daniela Figueroa",
+      "start": 14,
+      "end": 30,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Legal Group",
+      "page_number": 1,
+      "block_id": "table_5_row_4_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 4,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0013",
+      "type": "PERSON_NAME",
+      "text": "Chris Schmitz",
+      "start": 0,
+      "end": 13,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Procurement Group",
+      "page_number": 1,
+      "block_id": "table_5_row_5_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 5,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0014",
+      "type": "PERSON_NAME",
+      "text": "Daniela Figueroa",
+      "start": 0,
+      "end": 16,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Finance Group",
+      "page_number": 1,
+      "block_id": "table_5_row_6_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 6,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0015",
+      "type": "PERSON_NAME",
+      "text": "Rob Tilney",
+      "start": 0,
+      "end": 10,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | IT Group",
+      "page_number": 1,
+      "block_id": "table_5_row_7_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 7,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0016",
+      "type": "PERSON_NAME",
+      "text": "Jyoti Karwal",
+      "start": 11,
+      "end": 23,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | IT Group",
+      "page_number": 1,
+      "block_id": "table_5_row_7_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 7,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0017",
+      "type": "PERSON_NAME",
+      "text": "Jonathan Szeto",
+      "start": 24,
+      "end": 38,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | IT Group",
+      "page_number": 1,
+      "block_id": "table_5_row_7_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 7,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0018",
+      "type": "PERSON_NAME",
+      "text": "Marc Otani",
+      "start": 39,
+      "end": 49,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | IT Group",
+      "page_number": 1,
+      "block_id": "table_5_row_7_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 7,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0019",
+      "type": "PERSON_NAME",
+      "text": "Tamika Oliver",
+      "start": 0,
+      "end": 13,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Compliance Group",
+      "page_number": 1,
+      "block_id": "table_5_row_8_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 8,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0020",
+      "type": "PERSON_NAME",
+      "text": "Dayo Seton",
+      "start": 0,
+      "end": 10,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Privacy Group",
+      "page_number": 1,
+      "block_id": "table_5_row_9_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 9,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0021",
+      "type": "PERSON_NAME",
+      "text": "Chris Ott",
+      "start": 0,
+      "end": 9,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Security Group",
+      "page_number": 1,
+      "block_id": "table_5_row_10_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 10,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0022",
+      "type": "PERSON_NAME",
+      "text": "Melisa Cardozo",
+      "start": 10,
+      "end": 24,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Security Group",
+      "page_number": 1,
+      "block_id": "table_5_row_10_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 10,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0023",
+      "type": "PERSON_NAME",
+      "text": "DK Koran",
+      "start": 25,
+      "end": 33,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Security Group",
+      "page_number": 1,
+      "block_id": "table_5_row_10_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 10,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0024",
+      "type": "PERSON_NAME",
+      "text": "Erik Hansen",
+      "start": 34,
+      "end": 45,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Security Group",
+      "page_number": 1,
+      "block_id": "table_5_row_10_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 10,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0025",
+      "type": "PERSON_NAME",
+      "text": "Daniela Figueroa",
+      "start": 0,
+      "end": 16,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "USERS",
+      "context": "USERS | Data Quality Group",
+      "page_number": 1,
+      "block_id": "table_5_row_11_cell_4",
+      "block_type": "table_cell",
+      "table_id": "table_5",
+      "row": 11,
+      "column": 4,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0026",
+      "type": "PERSON_NAME",
+      "text": "Dayo Seton",
+      "start": 506,
+      "end": 516,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "Users",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_6",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_6",
+        "image_part": "/word/media/image10.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 96,
+        "word_boxes": [
+          {
+            "x": 1434,
+            "y": 624,
+            "width": 43,
+            "height": 19
+          },
+          {
+            "x": 1483,
+            "y": 624,
+            "width": 51,
+            "height": 14
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0027",
+      "type": "PERSON_NAME",
+      "text": "Burnev Daniela Figueroa",
+      "start": 203,
+      "end": 226,
+      "confidence": 0.85,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_8",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_8",
+        "image_part": "/word/media/image12.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 365,
+            "y": 501,
+            "width": 57,
+            "height": 12
+          },
+          {
+            "x": 967,
+            "y": 498,
+            "width": 61,
+            "height": 14
+          },
+          {
+            "x": 1035,
+            "y": 498,
+            "width": 71,
+            "height": 14
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0028",
+      "type": "PERSON_NAME",
+      "text": "KC Burney",
+      "start": 283,
+      "end": 292,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "KC Burney",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_8",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_8",
+        "image_part": "/word/media/image12.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 96,
+        "word_boxes": [
+          {
+            "x": 967,
+            "y": 564,
+            "width": 22,
+            "height": 13
+          },
+          {
+            "x": 994,
+            "y": 564,
+            "width": 58,
+            "height": 17
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0029",
+      "type": "PERSON_NAME",
+      "text": "Euam Gar",
+      "start": 412,
+      "end": 420,
+      "confidence": 0.85,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_11",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_11",
+        "image_part": "/word/media/image15.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 1357,
+            "y": 385,
+            "width": 105,
+            "height": 25
+          },
+          {
+            "x": 1494,
+            "y": 385,
+            "width": 52,
+            "height": 25
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0030",
+      "type": "PERSON_NAME",
+      "text": "Artificial Intelligence",
+      "start": 90,
+      "end": 113,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Artificial Intelligence",
+      "context": "",
+      "page_number": 1,
+      "block_id": "paragraph_232",
+      "block_type": "paragraph",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0031",
+      "type": "PERSON_NAME",
+      "text": "Geeta Eavalto",
+      "start": 451,
+      "end": 464,
+      "confidence": 0.85,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_20",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_20",
+        "image_part": "/word/media/image24.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 33,
+            "y": 348,
+            "width": 57,
+            "height": 10
+          },
+          {
+            "x": 250,
+            "y": 339,
+            "width": 44,
+            "height": 35
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0032",
+      "type": "PERSON_NAME",
+      "text": "W Howlong",
+      "start": 816,
+      "end": 825,
+      "confidence": 0.85,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_22",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_22",
+        "image_part": "/word/media/image26.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 17,
+        "word_boxes": [
+          {
+            "x": 354,
+            "y": 832,
+            "width": 19,
+            "height": 14
+          },
+          {
+            "x": 385,
+            "y": 832,
+            "width": 58,
+            "height": 13
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0033",
+      "type": "PERSON_NAME",
+      "text": "Y Howlong",
+      "start": 791,
+      "end": 800,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "W Howlong",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_24",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_24",
+        "image_part": "/word/media/image28.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 348,
+            "y": 833,
+            "width": 19,
+            "height": 14
+          },
+          {
+            "x": 379,
+            "y": 833,
+            "width": 58,
+            "height": 13
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0034",
+      "type": "PERSON_NAME",
+      "text": "W Howlong",
+      "start": 1031,
+      "end": 1040,
+      "confidence": 0.85,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_25",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_25",
+        "image_part": "/word/media/image29.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 17,
+        "word_boxes": [
+          {
+            "x": 349,
+            "y": 837,
+            "width": 19,
+            "height": 14
+          },
+          {
+            "x": 380,
+            "y": 837,
+            "width": 58,
+            "height": 13
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0035",
+      "type": "PERSON_NAME",
+      "text": "Howlong",
+      "start": 965,
+      "end": 972,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "W Howlong",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_26",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_26",
+        "image_part": "/word/media/image30.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 53,
+        "word_boxes": [
+          {
+            "x": 306,
+            "y": 676,
+            "width": 54,
+            "height": 28
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0036",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 421,
+      "end": 438,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_31",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_31",
+        "image_part": "/word/media/image35.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 73,
+        "word_boxes": [
+          {
+            "x": 847,
+            "y": 412,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 917,
+            "y": 412,
+            "width": 58,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0037",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 450,
+      "end": 467,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_31",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_31",
+        "image_part": "/word/media/image35.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 73,
+        "word_boxes": [
+          {
+            "x": 1297,
+            "y": 412,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 1367,
+            "y": 412,
+            "width": 58,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0038",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 447,
+      "end": 464,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 95,
+        "word_boxes": [
+          {
+            "x": 870,
+            "y": 417,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 941,
+            "y": 417,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0039",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 476,
+      "end": 493,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 95,
+        "word_boxes": [
+          {
+            "x": 1320,
+            "y": 417,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 1391,
+            "y": 417,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0040",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 535,
+      "end": 552,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 870,
+            "y": 462,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 941,
+            "y": 462,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0041",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 564,
+      "end": 581,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 1320,
+            "y": 462,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 1391,
+            "y": 462,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0042",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 625,
+      "end": 642,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 870,
+            "y": 507,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 941,
+            "y": 507,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0043",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 654,
+      "end": 671,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 1320,
+            "y": 507,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 1391,
+            "y": 507,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0044",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 731,
+      "end": 748,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 870,
+            "y": 552,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 941,
+            "y": 552,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0045",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 760,
+      "end": 777,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 1320,
+            "y": 552,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 1391,
+            "y": 552,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0046",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 822,
+      "end": 839,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 870,
+            "y": 597,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 941,
+            "y": 597,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0047",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 851,
+      "end": 868,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 1320,
+            "y": 597,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 1391,
+            "y": 597,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0048",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 921,
+      "end": 938,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 870,
+            "y": 642,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 941,
+            "y": 642,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0049",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 950,
+      "end": 967,
+      "confidence": 0.75,
+      "detector": "surname",
+      "rule_id": "PERSON_SURNAME",
+      "detection_method": "context_rule",
+      "matched_pattern": "surname_mentions",
+      "context_trigger": "Siddharth Gaikwad",
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 92,
+        "word_boxes": [
+          {
+            "x": 1320,
+            "y": 642,
+            "width": 66,
+            "height": 11
+          },
+          {
+            "x": 1391,
+            "y": 642,
+            "width": 57,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0050",
+      "type": "PERSON_NAME",
+      "text": "Artificial Intelligence",
+      "start": 336,
+      "end": 359,
+      "confidence": 0.85,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": null,
+      "context": "QUESTION SHOWN | CL.5",
+      "page_number": 1,
+      "block_id": "table_12_row_6_cell_5",
+      "block_type": "table_cell",
+      "table_id": "table_12",
+      "row": 6,
+      "column": 5,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0051",
+      "type": "PERSON_NAME",
+      "text": "Daniela Figueroa",
+      "start": 0,
+      "end": 16,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "Contact",
+      "context": "Third-Party Risk Assessment | Cadence | Client Contact",
+      "page_number": 1,
+      "block_id": "table_15_row_3_cell_2",
+      "block_type": "table_cell",
+      "table_id": "table_15",
+      "row": 3,
+      "column": 2,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0052",
+      "type": "PERSON_NAME",
+      "text": "Siddharth Gaikwad",
+      "start": 0,
+      "end": 17,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "Author",
+      "context": "Third-Party Risk Assessment | Cadence | Author(s)",
+      "page_number": 1,
+      "block_id": "table_15_row_5_cell_2",
+      "block_type": "table_cell",
+      "table_id": "table_15",
+      "row": 5,
+      "column": 2,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0053",
+      "type": "PERSON_NAME",
+      "text": "Srinivas Teppa",
+      "start": 19,
+      "end": 33,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "Author",
+      "context": "Third-Party Risk Assessment | Cadence | Author(s)",
+      "page_number": 1,
+      "block_id": "table_15_row_5_cell_2",
+      "block_type": "table_cell",
+      "table_id": "table_15",
+      "row": 5,
+      "column": 2,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0054",
+      "type": "PERSON_NAME",
+      "text": "Nikhil Karkera",
+      "start": 0,
+      "end": 14,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "Reviewer",
+      "context": "Third-Party Risk Assessment | Cadence | Peer Reviewer",
+      "page_number": 1,
+      "block_id": "table_15_row_6_cell_2",
+      "block_type": "table_cell",
+      "table_id": "table_15",
+      "row": 6,
+      "column": 2,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0055",
+      "type": "PERSON_NAME",
+      "text": "Madhav Mehta",
+      "start": 5,
+      "end": 17,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "author",
+      "context": "author",
+      "page_number": null,
+      "block_id": "property_author",
+      "block_type": "property",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "F-0056",
+      "type": "PERSON_NAME",
+      "text": "Divisha Kilari",
+      "start": 5,
+      "end": 19,
+      "confidence": 0.9,
+      "detector": "nlp",
+      "rule_id": "PERSON_NER",
+      "detection_method": "ner",
+      "matched_pattern": "spacy:PERSON",
+      "context_trigger": "modified by",
+      "context": "last modified by",
+      "page_number": null,
+      "block_id": "property_last_modified_by",
+      "block_type": "property",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": null,
+      "review_status": "unreviewed",
+      "action": "REDACT"
+    },
+    {
+      "finding_id": "M-0001",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 14,
+      "end": 15,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_8",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_8",
+        "image_part": "/word/media/image12.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 14,
+        "word_boxes": [
+          {
+            "x": 1479,
+            "y": 0,
+            "width": 22,
+            "height": 51
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0002",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 14,
+      "end": 15,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_16",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_16",
+        "image_part": "/word/media/image20.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 58,
+        "word_boxes": [
+          {
+            "x": 1471,
+            "y": 17,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0003",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 16,
+      "end": 17,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_16",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_16",
+        "image_part": "/word/media/image20.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 42,
+        "word_boxes": [
+          {
+            "x": 1527,
+            "y": 17,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0004",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 159,
+      "end": 160,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_16",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_16",
+        "image_part": "/word/media/image20.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 88,
+        "word_boxes": [
+          {
+            "x": 560,
+            "y": 457,
+            "width": 33,
+            "height": 32
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0005",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 413,
+      "end": 414,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_17",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_17",
+        "image_part": "/word/media/image21.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 1428,
+            "y": 15,
+            "width": 17,
+            "height": 22
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0006",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 415,
+      "end": 416,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_17",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_17",
+        "image_part": "/word/media/image21.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 65,
+        "word_boxes": [
+          {
+            "x": 1481,
+            "y": 15,
+            "width": 19,
+            "height": 22
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0007",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 417,
+      "end": 418,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_17",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_17",
+        "image_part": "/word/media/image21.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 59,
+        "word_boxes": [
+          {
+            "x": 1534,
+            "y": 15,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0008",
+      "type": "UNREADABLE_TEXT",
+      "text": "@®",
+      "start": 13,
+      "end": 15,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_18",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_18",
+        "image_part": "/word/media/image22.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 21,
+        "word_boxes": [
+          {
+            "x": 1478,
+            "y": 12,
+            "width": 22,
+            "height": 23
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0009",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 16,
+      "end": 17,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_18",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_18",
+        "image_part": "/word/media/image22.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 47,
+        "word_boxes": [
+          {
+            "x": 1534,
+            "y": 12,
+            "width": 22,
+            "height": 23
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0010",
+      "type": "UNREADABLE_TEXT",
+      "text": "411",
+      "start": 473,
+      "end": 476,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_20",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_20",
+        "image_part": "/word/media/image24.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 57,
+        "word_boxes": [
+          {
+            "x": 946,
+            "y": 353,
+            "width": 30,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0011",
+      "type": "UNREADABLE_TEXT",
+      "text": "4.12",
+      "start": 784,
+      "end": 788,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_20",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_20",
+        "image_part": "/word/media/image24.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 51,
+        "word_boxes": [
+          {
+            "x": 946,
+            "y": 538,
+            "width": 30,
+            "height": 11
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0012",
+      "type": "UNREADABLE_TEXT",
+      "text": "4.12",
+      "start": 865,
+      "end": 869,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_20",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_20",
+        "image_part": "/word/media/image24.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 74,
+        "word_boxes": [
+          {
+            "x": 519,
+            "y": 561,
+            "width": 24,
+            "height": 10
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0013",
+      "type": "UNREADABLE_TEXT",
+      "text": "414%",
+      "start": 1173,
+      "end": 1177,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_20",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_20",
+        "image_part": "/word/media/image24.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 29,
+        "word_boxes": [
+          {
+            "x": 946,
+            "y": 664,
+            "width": 72,
+            "height": 16
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0014",
+      "type": "UNREADABLE_TEXT",
+      "text": "®@",
+      "start": 17,
+      "end": 19,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_22",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_22",
+        "image_part": "/word/media/image26.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 16,
+        "word_boxes": [
+          {
+            "x": 1821,
+            "y": 0,
+            "width": 28,
+            "height": 46
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0015",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 17,
+      "end": 18,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_25",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_25",
+        "image_part": "/word/media/image29.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 44,
+        "word_boxes": [
+          {
+            "x": 1815,
+            "y": 1,
+            "width": 30,
+            "height": 51
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0016",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 26,
+      "end": 27,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_26",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_26",
+        "image_part": "/word/media/image30.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 79,
+        "word_boxes": [
+          {
+            "x": 1494,
+            "y": 14,
+            "width": 19,
+            "height": 19
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0017",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 28,
+      "end": 29,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_26",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_26",
+        "image_part": "/word/media/image30.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 84,
+        "word_boxes": [
+          {
+            "x": 1540,
+            "y": 14,
+            "width": 18,
+            "height": 19
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0018",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 109,
+      "end": 110,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_26",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_26",
+        "image_part": "/word/media/image30.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 58,
+        "word_boxes": [
+          {
+            "x": 371,
+            "y": 115,
+            "width": 9,
+            "height": 9
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0019",
+      "type": "UNREADABLE_TEXT",
+      "text": "QO & NerdWalletIn. Vv & @ @\n| Add controls x ©\nTemps 9 Oe [ Pisaaan | [-]\n@© Create a custom control\nngagements\n* Control ID Standard / Framework\n‘QRC_CL_Nonus\n* Name category F\n4\n1 Contracti) BE NenYS control Data Security x\ny\naa T fullles\n12) | T Praca} Description\n13% leyour f\n“Tm\nImplementation guidance\n% Jsyour\noS Kea Boi US & 1,0 Fy\n1s T Pease)\nAtibute manager 17 BB Please}\nCancel [ Saveandaddnew | EE\n18 v Howlo\nCancel",
+      "start": 0,
+      "end": 428,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_27",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_27",
+        "image_part": "/word/media/image31.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 1213,
+            "y": 8,
+            "width": 15,
+            "height": 19
+          },
+          {
+            "x": 1248,
+            "y": 9,
+            "width": 19,
+            "height": 16
+          },
+          {
+            "x": 1284,
+            "y": 12,
+            "width": 104,
+            "height": 11
+          },
+          {
+            "x": 1416,
+            "y": 2,
+            "width": 18,
+            "height": 29
+          },
+          {
+            "x": 1440,
+            "y": 8,
+            "width": 19,
+            "height": 19
+          },
+          {
+            "x": 1486,
+            "y": 8,
+            "width": 19,
+            "height": 19
+          },
+          {
+            "x": 1532,
+            "y": 8,
+            "width": 18,
+            "height": 19
+          },
+          {
+            "x": 334,
+            "y": 40,
+            "width": 17,
+            "height": 1
+          },
+          {
+            "x": 371,
+            "y": 19,
+            "width": 20,
+            "height": 32
+          },
+          {
+            "x": 404,
+            "y": 19,
+            "width": 66,
+            "height": 32
+          },
+          {
+            "x": 1170,
+            "y": 28,
+            "width": 17,
+            "height": 17
+          },
+          {
+            "x": 1213,
+            "y": 40,
+            "width": 17,
+            "height": 1
+          },
+          {
+            "x": 225,
+            "y": 58,
+            "width": 63,
+            "height": 15
+          },
+          {
+            "x": 296,
+            "y": 58,
+            "width": 5,
+            "height": 11
+          },
+          {
+            "x": 309,
+            "y": 58,
+            "width": 32,
+            "height": 11
+          },
+          {
+            "x": 1393,
+            "y": 46,
+            "width": 9,
+            "height": 52
+          },
+          {
+            "x": 1397,
+            "y": 58,
+            "width": 110,
+            "height": 30
+          },
+          {
+            "x": 1501,
+            "y": 46,
+            "width": 5,
+            "height": 52
+          },
+          {
+            "x": 1517,
+            "y": 58,
+            "width": 29,
+            "height": 31
+          },
+          {
+            "x": 372,
+            "y": 96,
+            "width": 11,
+            "height": 14
+          },
+          {
+            "x": 393,
+            "y": 98,
+            "width": 37,
+            "height": 9
+          },
+          {
+            "x": 434,
+            "y": 100,
+            "width": 6,
+            "height": 7
+          },
+          {
+            "x": 445,
+            "y": 99,
+            "width": 42,
+            "height": 8
+          },
+          {
+            "x": 492,
+            "y": 98,
+            "width": 41,
+            "height": 9
+          },
+          {
+            "x": 46,
+            "y": 113,
+            "width": 61,
+            "height": 10
+          },
+          {
+            "x": 399,
+            "y": 153,
+            "width": 4,
+            "height": 2
+          },
+          {
+            "x": 407,
+            "y": 152,
+            "width": 42,
+            "height": 9
+          },
+          {
+            "x": 454,
+            "y": 152,
+            "width": 13,
+            "height": 9
+          },
+          {
+            "x": 811,
+            "y": 152,
+            "width": 51,
+            "height": 9
+          },
+          {
+            "x": 867,
+            "y": 152,
+            "width": 4,
+            "height": 10
+          },
+          {
+            "x": 876,
+            "y": 152,
+            "width": 64,
+            "height": 9
+          },
+          {
+            "x": 407,
+            "y": 177,
+            "width": 92,
+            "height": 11
+          },
+          {
+            "x": 400,
+            "y": 235,
+            "width": 2,
+            "height": 2
+          },
+          {
+            "x": 408,
+            "y": 235,
+            "width": 34,
+            "height": 8
+          },
+          {
+            "x": 811,
+            "y": 217,
+            "width": 51,
+            "height": 34
+          },
+          {
+            "x": 1549,
+            "y": 237,
+            "width": 11,
+            "height": 8
+          },
+          {
+            "x": 1386,
+            "y": 252,
+            "width": 10,
+            "height": 9
+          },
+          {
+            "x": 246,
+            "y": 265,
+            "width": 8,
+            "height": 11
+          },
+          {
+            "x": 284,
+            "y": 263,
+            "width": 67,
+            "height": 12
+          },
+          {
+            "x": 407,
+            "y": 253,
+            "width": 26,
+            "height": 31
+          },
+          {
+            "x": 440,
+            "y": 253,
+            "width": 40,
+            "height": 31
+          },
+          {
+            "x": 487,
+            "y": 253,
+            "width": 36,
+            "height": 31
+          },
+          {
+            "x": 819,
+            "y": 259,
+            "width": 25,
+            "height": 9
+          },
+          {
+            "x": 848,
+            "y": 259,
+            "width": 43,
+            "height": 12
+          },
+          {
+            "x": 1112,
+            "y": 255,
+            "width": 15,
+            "height": 14
+          },
+          {
+            "x": 713,
+            "y": 307,
+            "width": 8,
+            "height": 8
+          },
+          {
+            "x": 242,
+            "y": 318,
+            "width": 17,
+            "height": 10
+          },
+          {
+            "x": 291,
+            "y": 315,
+            "width": 14,
+            "height": 15
+          },
+          {
+            "x": 315,
+            "y": 317,
+            "width": 36,
+            "height": 11
+          },
+          {
+            "x": 242,
+            "y": 369,
+            "width": 17,
+            "height": 10
+          },
+          {
+            "x": 277,
+            "y": 351,
+            "width": 7,
+            "height": 34
+          },
+          {
+            "x": 291,
+            "y": 366,
+            "width": 14,
+            "height": 15
+          },
+          {
+            "x": 315,
+            "y": 368,
+            "width": 36,
+            "height": 8
+          },
+          {
+            "x": 399,
+            "y": 362,
+            "width": 65,
+            "height": 12
+          },
+          {
+            "x": 242,
+            "y": 418,
+            "width": 63,
+            "height": 15
+          },
+          {
+            "x": 314,
+            "y": 419,
+            "width": 35,
+            "height": 11
+          },
+          {
+            "x": 1213,
+            "y": 428,
+            "width": 9,
+            "height": 1
+          },
+          {
+            "x": 242,
+            "y": 469,
+            "width": 109,
+            "height": 15
+          },
+          {
+            "x": 399,
+            "y": 502,
+            "width": 94,
+            "height": 12
+          },
+          {
+            "x": 496,
+            "y": 502,
+            "width": 52,
+            "height": 12
+          },
+          {
+            "x": 290,
+            "y": 520,
+            "width": 9,
+            "height": 7
+          },
+          {
+            "x": 310,
+            "y": 520,
+            "width": 39,
+            "height": 10
+          },
+          {
+            "x": 242,
+            "y": 523,
+            "width": 17,
+            "height": 10
+          },
+          {
+            "x": 291,
+            "y": 521,
+            "width": 53,
+            "height": 14
+          },
+          {
+            "x": 423,
+            "y": 520,
+            "width": 38,
+            "height": 31
+          },
+          {
+            "x": 489,
+            "y": 531,
+            "width": 43,
+            "height": 12
+          },
+          {
+            "x": 551,
+            "y": 532,
+            "width": 10,
+            "height": 9
+          },
+          {
+            "x": 584,
+            "y": 531,
+            "width": 48,
+            "height": 10
+          },
+          {
+            "x": 655,
+            "y": 537,
+            "width": 26,
+            "height": 3
+          },
+          {
+            "x": 242,
+            "y": 575,
+            "width": 17,
+            "height": 9
+          },
+          {
+            "x": 291,
+            "y": 571,
+            "width": 14,
+            "height": 16
+          },
+          {
+            "x": 315,
+            "y": 573,
+            "width": 36,
+            "height": 11
+          },
+          {
+            "x": 39,
+            "y": 618,
+            "width": 44,
+            "height": 8
+          },
+          {
+            "x": 88,
+            "y": 621,
+            "width": 43,
+            "height": 5
+          },
+          {
+            "x": 242,
+            "y": 626,
+            "width": 17,
+            "height": 9
+          },
+          {
+            "x": 291,
+            "y": 623,
+            "width": 14,
+            "height": 15
+          },
+          {
+            "x": 315,
+            "y": 624,
+            "width": 36,
+            "height": 11
+          },
+          {
+            "x": 897,
+            "y": 660,
+            "width": 40,
+            "height": 8
+          },
+          {
+            "x": 957,
+            "y": 646,
+            "width": 10,
+            "height": 37
+          },
+          {
+            "x": 978,
+            "y": 660,
+            "width": 110,
+            "height": 8
+          },
+          {
+            "x": 1112,
+            "y": 653,
+            "width": 1,
+            "height": 23
+          },
+          {
+            "x": 1120,
+            "y": 650,
+            "width": 73,
+            "height": 29
+          },
+          {
+            "x": 242,
+            "y": 677,
+            "width": 17,
+            "height": 10
+          },
+          {
+            "x": 290,
+            "y": 676,
+            "width": 16,
+            "height": 11
+          },
+          {
+            "x": 315,
+            "y": 676,
+            "width": 36,
+            "height": 8
+          },
+          {
+            "x": 1397,
+            "y": 700,
+            "width": 41,
+            "height": 9
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0020",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 22,
+      "end": 23,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_28",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_28",
+        "image_part": "/word/media/image32.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 30,
+        "word_boxes": [
+          {
+            "x": 1458,
+            "y": 12,
+            "width": 9,
+            "height": 19
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0021",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 24,
+      "end": 25,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_28",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_28",
+        "image_part": "/word/media/image32.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 78,
+        "word_boxes": [
+          {
+            "x": 1494,
+            "y": 12,
+            "width": 19,
+            "height": 19
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0022",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 180,
+      "end": 181,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_29",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_29",
+        "image_part": "/word/media/image33.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 52,
+        "word_boxes": [
+          {
+            "x": 1824,
+            "y": 7,
+            "width": 26,
+            "height": 39
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0023",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 182,
+      "end": 183,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_29",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_29",
+        "image_part": "/word/media/image33.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 10,
+        "word_boxes": [
+          {
+            "x": 1879,
+            "y": 7,
+            "width": 27,
+            "height": 39
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0024",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 34,
+      "end": 35,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_31",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_31",
+        "image_part": "/word/media/image35.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 52,
+        "word_boxes": [
+          {
+            "x": 1818,
+            "y": 5,
+            "width": 26,
+            "height": 39
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0025",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 36,
+      "end": 37,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_31",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_31",
+        "image_part": "/word/media/image35.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 10,
+        "word_boxes": [
+          {
+            "x": 1873,
+            "y": 5,
+            "width": 27,
+            "height": 39
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0026",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 28,
+      "end": 29,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_32",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_32",
+        "image_part": "/word/media/image36.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 88,
+        "word_boxes": [
+          {
+            "x": 1487,
+            "y": 5,
+            "width": 19,
+            "height": 19
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0027",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 30,
+      "end": 31,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_32",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_32",
+        "image_part": "/word/media/image36.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 41,
+        "word_boxes": [
+          {
+            "x": 1534,
+            "y": 5,
+            "width": 18,
+            "height": 19
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0028",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 64,
+      "end": 65,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 52,
+        "word_boxes": [
+          {
+            "x": 1824,
+            "y": 10,
+            "width": 26,
+            "height": 39
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0029",
+      "type": "UNREADABLE_TEXT",
+      "text": "@",
+      "start": 66,
+      "end": 67,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "image_34",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "image_34",
+        "image_part": "/word/media/image38.png",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 10,
+        "word_boxes": [
+          {
+            "x": 1879,
+            "y": 10,
+            "width": 27,
+            "height": 39
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0030",
+      "type": "UNREADABLE_TEXT",
+      "text": "OPTIV\nDenver Office Kansas City Office\nTH 15th Shs. Su 29 W15th ase\nDever, Co 022 Rs 0621\"\npeers 5.77 5",
+      "start": 0,
+      "end": 103,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "section_1_header_image_1",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "section_1_header_image_1",
+        "image_part": "/word/media/image1.emf",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 76,
+            "y": 50,
+            "width": 121,
+            "height": 54
+          },
+          {
+            "x": 497,
+            "y": 65,
+            "width": 37,
+            "height": 8
+          },
+          {
+            "x": 538,
+            "y": 64,
+            "width": 31,
+            "height": 9
+          },
+          {
+            "x": 659,
+            "y": 65,
+            "width": 35,
+            "height": 8
+          },
+          {
+            "x": 698,
+            "y": 65,
+            "width": 21,
+            "height": 11
+          },
+          {
+            "x": 723,
+            "y": 64,
+            "width": 31,
+            "height": 9
+          },
+          {
+            "x": 498,
+            "y": 79,
+            "width": 13,
+            "height": 7
+          },
+          {
+            "x": 522,
+            "y": 67,
+            "width": 17,
+            "height": 28
+          },
+          {
+            "x": 543,
+            "y": 80,
+            "width": 24,
+            "height": 5
+          },
+          {
+            "x": 575,
+            "y": 79,
+            "width": 18,
+            "height": 7
+          },
+          {
+            "x": 599,
+            "y": 79,
+            "width": 10,
+            "height": 7
+          },
+          {
+            "x": 684,
+            "y": 79,
+            "width": 35,
+            "height": 7
+          },
+          {
+            "x": 724,
+            "y": 79,
+            "width": 19,
+            "height": 7
+          },
+          {
+            "x": 497,
+            "y": 91,
+            "width": 31,
+            "height": 7
+          },
+          {
+            "x": 537,
+            "y": 79,
+            "width": 8,
+            "height": 28
+          },
+          {
+            "x": 551,
+            "y": 91,
+            "width": 26,
+            "height": 7
+          },
+          {
+            "x": 705,
+            "y": 91,
+            "width": 10,
+            "height": 7
+          },
+          {
+            "x": 719,
+            "y": 91,
+            "width": 24,
+            "height": 7
+          },
+          {
+            "x": 497,
+            "y": 103,
+            "width": 58,
+            "height": 7
+          },
+          {
+            "x": 659,
+            "y": 103,
+            "width": 34,
+            "height": 7
+          },
+          {
+            "x": 697,
+            "y": 103,
+            "width": 21,
+            "height": 7
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0031",
+      "type": "UNREADABLE_TEXT",
+      "text": "WS\nE=*",
+      "start": 0,
+      "end": 6,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "section_1_first_page_header_image_3",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "section_1_first_page_header_image_3",
+        "image_part": "/word/media/image5.emf",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 553,
+            "y": 83,
+            "width": 205,
+            "height": 178
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "width": 727,
+            "height": 415
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    },
+    {
+      "finding_id": "M-0032",
+      "type": "UNREADABLE_TEXT",
+      "text": "WS\nE=*",
+      "start": 0,
+      "end": 6,
+      "confidence": 1.0,
+      "detector": "manual",
+      "rule_id": "MANUAL_REVIEW",
+      "detection_method": "manual",
+      "matched_pattern": null,
+      "context_trigger": null,
+      "context": "",
+      "page_number": 1,
+      "block_id": "section_2_first_page_header_image_1",
+      "block_type": "image_ocr",
+      "table_id": null,
+      "row": null,
+      "column": null,
+      "bounding_box": null,
+      "image": {
+        "image_id": "section_2_first_page_header_image_1",
+        "image_part": "/word/media/image5.emf",
+        "ocr_engine": "Tesseract",
+        "ocr_confidence": 0,
+        "word_boxes": [
+          {
+            "x": 553,
+            "y": 83,
+            "width": 205,
+            "height": 178
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "width": 727,
+            "height": 415
+          }
+        ]
+      },
+      "review_status": "confirmed",
+      "action": "REDACT",
+      "review": {
+        "added_by": "john",
+        "added_at": "2026-10-14T06:14:05+00:00"
+      }
+    }
+  ]
+}

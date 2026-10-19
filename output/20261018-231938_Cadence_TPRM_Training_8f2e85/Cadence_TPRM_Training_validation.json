@@ -1,0 +1,100 @@
+{
+  "validator_version": "1.5.0",
+  "validated_at": "2026-10-18T19:07:20+00:00",
+  "document_id": "Cadence_TPRM_Training",
+  "file_name": "Cadence_TPRM_Training.docx",
+  "report_scan_timestamp": "2026-10-18T17:50:18+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "88 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "88 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "185 OCR words over redacted values hold only tags",
+        "4 low-confidence OCR blocks are fully redacted",
+        "20 images held redacted values: the image files themselves still show them (see image.word_boxes in the PII report)"
+      ],
+      "issues": []
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1371 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "26 values and 45 name parts searched in 11002 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1410 blocks compared on 1 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261018-231938_Cadence_TPRM_Training_8f2e85\\Cadence_TPRM_Training.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261018-231938_Cadence_TPRM_Training_8f2e85\\Cadence_TPRM_Training_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261018-231938_Cadence_TPRM_Training_8f2e85\\Cadence_TPRM_Training_sanitized.json",
+    "sanitized_sha256": "1f588423db23fd9b9753a5078b67544b9009ba6cbc5773d03a6e5107eb91abec"
+  }
+}

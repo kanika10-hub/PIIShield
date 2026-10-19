@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PII Exposure Scanner</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/app.css">
+  <!-- Before the page is drawn, so it never shows in the wrong theme first -->
+  <script src="/static/theme.js"></script>
+</head>
+<body>
+  <main class="container">
+
+    <header class="page-header">
+      <div>
+        <h1>Document Privacy Check</h1>
+        <p class="muted">Upload a document to find names, emails, phone numbers, addresses and other personal details before sharing it.</p>
+      </div>
+      <button type="button" class="button theme-button" id="theme-button">Dark mode</button>
+    </header>
+
+    <!-- Input: a document to extract, or a document already extracted -->
+    <section class="panel" aria-labelledby="input-title">
+      <div class="input-header">
+        <h2 class="panel-title" id="input-title">Start here</h2>
+        <p class="muted">PDF, Word, PowerPoint, or extracted JSON</p>
+      </div>
+
+      <div class="input-paths">
+        <label class="dropzone" id="drop-document">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+            <path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"
+                  fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="dropzone-title">Upload document</span>
+          <span class="dropzone-text">This keeps a copy on this computer and checks it for personal information.</span>
+          <span class="dropzone-hint">Choose a PDF, DOCX, or PPTX file</span>
+          <input type="file" id="input-document" class="visually-hidden" accept=".pdf,.pptx,.docx">
+        </label>
+
+        <label class="dropzone" id="drop-extracted">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+            <path d="M8.5 4C6.5 4 6.5 5.5 6.5 7v2.2c0 1.2-.8 2-2 2 1.2 0 2 .8 2 2V15c0 1.5 0 3 2 3M15.5 4c2 0 2 1.5 2 3v2.2c0 1.2.8 2 2 2-1.2 0-2 .8-2 2V15c0 1.5 0 3-2 3"
+                  fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="dropzone-title">Use saved results</span>
+          <span class="dropzone-text">Open a document scan that was already processed.</span>
+          <span class="dropzone-hint">Choose an extracted JSON file</span>
+          <input type="file" id="input-extracted" class="visually-hidden" accept=".json,application/json">
+        </label>
+      </div>
+
+      <p class="input-note muted">Runs locally on this computer <span aria-hidden="true">·</span> up to <span id="max-size">100</span> MB</p>
+
+      <div class="file-row" id="file-row" hidden>
+        <div class="file-info">
+          <span class="file-name" id="file-name"></span>
+          <span class="muted" id="file-meta"></span>
+        </div>
+        <button type="button" class="button primary" id="scan-button">Check document</button>
+      </div>
+
+      <div class="progress" id="progress" hidden><div class="progress-bar" id="progress-bar"></div></div>
+      <p class="status-line" id="status-line" role="status" aria-live="polite"></p>
+      <p class="error-line" id="error-line" role="alert" hidden></p>
+
+      <div class="after-actions" id="after-actions" hidden>
+        <button type="button" class="button" id="new-scan">Scan another document</button>
+        <button type="button" class="button subtle" id="delete-scan">Delete this scan's files</button>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <div class="grid-2">
+      <section class="panel" aria-labelledby="findings-title">
+        <h2 class="panel-title" id="findings-title">Possible personal information found</h2>
+        <div id="findings-summary"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="status-title">
+        <h2 class="panel-title" id="status-title">What happens next</h2>
+        <ol class="steps" id="steps"></ol>
+        <div class="decision" id="decision"></div>
+      </section>
+    </div>
+
+    <!-- Results -->
+    <section class="panel results" id="results" hidden aria-label="Results">
+      <div class="tabs" role="tablist" aria-label="Results" id="tabs">
+        <button type="button" role="tab" id="tab-extracted" aria-controls="view-extracted" aria-selected="true">Original text</button>
+        <button type="button" role="tab" id="tab-findings" aria-controls="view-findings" aria-selected="false" tabindex="-1">Findings</button>
+        <button type="button" role="tab" id="tab-tagged" aria-controls="view-tagged" aria-selected="false" tabindex="-1">Marked text</button>
+        <button type="button" role="tab" id="tab-sanitized" aria-controls="view-sanitized" aria-selected="false" tabindex="-1">Safe copy</button>
+        <button type="button" role="tab" id="tab-validation" aria-controls="view-validation" aria-selected="false" tabindex="-1">Safety check</button>
+      </div>
+      <div class="tab-panel" role="tabpanel" id="view-extracted" aria-labelledby="tab-extracted"></div>
+      <div class="tab-panel" role="tabpanel" id="view-findings" aria-labelledby="tab-findings" hidden></div>
+      <div class="tab-panel" role="tabpanel" id="view-tagged" aria-labelledby="tab-tagged" hidden></div>
+      <div class="tab-panel" role="tabpanel" id="view-sanitized" aria-labelledby="tab-sanitized" hidden></div>
+      <div class="tab-panel" role="tabpanel" id="view-validation" aria-labelledby="tab-validation" hidden></div>
+    </section>
+
+    <footer class="footer muted">
+      Runs on this computer only. Documents and findings are not sent to any external service.
+    </footer>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

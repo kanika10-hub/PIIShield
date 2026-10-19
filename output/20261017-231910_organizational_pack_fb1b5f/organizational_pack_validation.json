@@ -1,0 +1,98 @@
+{
+  "validator_version": "1.5.0",
+  "validated_at": "2026-10-17T17:49:12+00:00",
+  "document_id": "organizational_pack",
+  "file_name": "organizational_pack.pptx",
+  "report_scan_timestamp": "2026-10-17T17:49:12+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "0 OCR words over redacted values hold only tags"
+      ],
+      "issues": []
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "9 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "409 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "61 values and 34 name parts searched in 2966 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "413 blocks compared on 9 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261017-231910_organizational_pack_fb1b5f\\organizational_pack.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261017-231910_organizational_pack_fb1b5f\\organizational_pack_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261017-231910_organizational_pack_fb1b5f\\organizational_pack_sanitized.json",
+    "sanitized_sha256": "23d973c4a29e8608260988f8b9a8224ce80b56a07626c3b4556f44ed262621f2"
+  }
+}

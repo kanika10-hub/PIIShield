@@ -1,0 +1,68 @@
+{
+  "file_validator_version": "1.1.0",
+  "validated_at": "2026-10-18T06:12:37+00:00",
+  "document_id": "organizational_pack",
+  "file_name": "organizational_pack.pptx",
+  "report_scan_timestamp": "2026-10-17T17:49:12+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "redaction": "PASS",
+    "text": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "unread": "PASS"
+  },
+  "checks": [
+    {
+      "name": "redaction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings redacted, 0 images changed, 0 values replaced in other places"
+      ],
+      "issues": []
+    },
+    {
+      "name": "text",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "419 texts compared"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "409 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "61 values and 34 name parts searched in 28409 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "unread",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1 images in the file, 9 shown by blocks"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "redacted": "output\\20261017-231910_organizational_pack_fb1b5f\\organizational_pack_redacted.pptx",
+    "redacted_sha256": "d81ef594202b3fd5cc157dbcd1a24e574729dec66a2a83548ed89ca5383ad587",
+    "deleted": false,
+    "copy_validated_at": "2026-10-17T17:49:12+00:00"
+  }
+}

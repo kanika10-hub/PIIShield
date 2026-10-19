@@ -1,0 +1,33 @@
+{
+  "review_version": "1.0.0",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "validated_at": "2026-10-18T17:05:43+00:00",
+  "sanitized_sha256": "c4d6542f10a96904f35cef49cb3ff538ac90dcde0a5a55c694cb3f63ff92fa0b",
+  "sign_offs": [
+    {
+      "key": "a27d103e58c9bfc6",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-18T17:31:21+00:00"
+    },
+    {
+      "key": "ff869f0428f759e7",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-18T17:31:27+00:00"
+    },
+    {
+      "key": "d7fe28b1cf6cd3d9",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-18T17:31:33+00:00"
+    },
+    {
+      "key": "6bd2ca8933f765d1",
+      "check": "known_values",
+      "reviewer": "hi",
+      "signed_at": "2026-10-18T17:31:39+00:00"
+    }
+  ]
+}

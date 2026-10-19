@@ -1,0 +1,131 @@
+{
+  "validator_version": "1.5.0",
+  "validated_at": "2026-10-18T11:48:13+00:00",
+  "document_id": "Cadence_Group_Risk_Management_Policy__v6.0",
+  "file_name": "Cadence_Group_Risk_Management_Policy__v6.0.pdf",
+  "report_scan_timestamp": "2026-10-18T11:43:03+00:00",
+  "verdict": "NEEDS_REVIEW",
+  "summary": {
+    "provenance": "PASS",
+    "report": "PASS",
+    "replacements": "PASS",
+    "ocr": "PASS",
+    "extraction": "PASS",
+    "rescan": "PASS",
+    "known_values": "NEEDS_REVIEW",
+    "structure": "PASS"
+  },
+  "checks": [
+    {
+      "name": "provenance",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "redactor status: completed"
+      ],
+      "issues": []
+    },
+    {
+      "name": "report",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "4 groups of overlapping findings, each redacted as one span: p13_t1_row_3_cell_3 (F-0289, F-0290), p25_t3_row_2_cell_4 (F-0538, F-0539), p25_t3_row_3_cell_4 (F-0543, F-0544), p25_t3_row_4_cell_4 (F-0547, F-0548)",
+        "988 findings checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "replacements",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "988 findings replaced"
+      ],
+      "issues": []
+    },
+    {
+      "name": "ocr",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "2072 OCR words over redacted values hold only tags",
+        "23 low-confidence OCR blocks are fully redacted"
+      ],
+      "issues": []
+    },
+    {
+      "name": "extraction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "35 pages checked"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "2959 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "NEEDS_REVIEW",
+      "issues_total": 3,
+      "notes": [
+        "254 values and 91 name parts searched in 81605 strings"
+      ],
+      "issues": [
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0101",
+          "occurrences": 2,
+          "locations": [
+            "p6_b7.text",
+            "p6_b7.children[4].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0001",
+          "occurrences": 2,
+          "locations": [
+            "p12_b6.text",
+            "p12_b6.children[40].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        },
+        {
+          "severity": "NEEDS_REVIEW",
+          "finding_id": "F-0160",
+          "occurrences": 2,
+          "locations": [
+            "p22_b24.text",
+            "p22_b24.children[26].text"
+          ],
+          "reason": "part of a name the scan found elsewhere is still in the sanitized copy"
+        }
+      ]
+    },
+    {
+      "name": "structure",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "20639 blocks compared on 35 pages"
+      ],
+      "issues": []
+    }
+  ],
+  "files": {
+    "document": "D:\\optiv\\optivcase2\\backend\\output\\20261018-171115_Cadence_Group_Risk_Management_Policy_v6._3533f2\\Cadence_Group_Risk_Management_Policy__v6.0.json",
+    "report": "D:\\optiv\\optivcase2\\backend\\output\\20261018-171115_Cadence_Group_Risk_Management_Policy_v6._3533f2\\Cadence_Group_Risk_Management_Policy__v6.0_pii.json",
+    "sanitized": "D:\\optiv\\optivcase2\\backend\\output\\20261018-171115_Cadence_Group_Risk_Management_Policy_v6._3533f2\\Cadence_Group_Risk_Management_Policy__v6.0_sanitized.json",
+    "sanitized_sha256": "fd8729b48963ee918a9e227e86233e9df59ce1b494ed0a81f09da58345783b1e"
+  }
+}

@@ -1,0 +1,679 @@
+{
+  "document_id": "hr_onboarding",
+  "file_name": "hr_onboarding.docx",
+  "source_type": "DOCX",
+  "extraction_method": "mixed",
+  "pages": [
+    {
+      "page_number": 1,
+      "metadata": {
+        "content_type": "docx_body",
+        "extraction_method": "mixed",
+        "char_count": 786,
+        "low_text": false
+      },
+      "blocks": [
+        {
+          "block_id": "paragraph_1",
+          "block_type": "heading",
+          "text": "New Starter Record",
+          "order": 1,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "style": "Heading 1",
+            "paragraph_index": 1
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "paragraph_2",
+          "block_type": "paragraph",
+          "text": "This record confirms that [REDACTED: PERSON_NAME] joined the Risk Analytics team in London on 2026-03-02. Her line manager is [REDACTED: PERSON_NAME] ([REDACTED: EMPLOYEE_ID]).",
+          "order": 2,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "style": "Normal",
+            "paragraph_index": 2
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "paragraph_3",
+          "block_type": "paragraph",
+          "text": "She can be reached at [REDACTED: EMAIL] or on [REDACTED: PHONE].",
+          "order": 3,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "style": "Normal",
+            "paragraph_index": 3
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "paragraph_4",
+          "block_type": "paragraph",
+          "text": "For payroll, Social Security Number: [REDACTED: US_SSN] and passport number [REDACTED: PASSPORT_NUMBER] were checked under ticket ISS-2026-0417, cost centre 4500018832.",
+          "order": 4,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "style": "Normal",
+            "paragraph_index": 4
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "paragraph_5",
+          "block_type": "paragraph",
+          "text": "[REDACTED: PERSON_NAME] completes the security induction in week one, as required by policy HR-POL-014.",
+          "order": 5,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "style": "Normal",
+            "paragraph_index": 5
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "paragraph_6",
+          "block_type": "heading",
+          "text": "Team Contacts",
+          "order": 6,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "style": "Heading 2",
+            "paragraph_index": 6
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "table_1",
+          "block_type": "table",
+          "text": "",
+          "order": 7,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "rows": 3,
+            "columns": 4
+          },
+          "bounding_box": null,
+          "children": [
+            {
+              "block_id": "table_1_row_1_cell_1",
+              "block_type": "table_cell",
+              "text": "Name",
+              "order": 1,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_1_cell_2",
+              "block_type": "table_cell",
+              "text": "Email",
+              "order": 2,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_1_cell_3",
+              "block_type": "table_cell",
+              "text": "Phone",
+              "order": 3,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_1_cell_4",
+              "block_type": "table_cell",
+              "text": "Employee ID",
+              "order": 4,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_2_cell_1",
+              "block_type": "table_cell",
+              "text": "[REDACTED: PERSON_NAME]",
+              "order": 5,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_2_cell_2",
+              "block_type": "table_cell",
+              "text": "[REDACTED: EMAIL]",
+              "order": 6,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_2_cell_3",
+              "block_type": "table_cell",
+              "text": "[REDACTED: PHONE]",
+              "order": 7,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_2_cell_4",
+              "block_type": "table_cell",
+              "text": "[REDACTED: EMPLOYEE_ID]",
+              "order": 8,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_3_cell_1",
+              "block_type": "table_cell",
+              "text": "[REDACTED: PERSON_NAME]",
+              "order": 9,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_3_cell_2",
+              "block_type": "table_cell",
+              "text": "[REDACTED: EMAIL]",
+              "order": 10,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_3_cell_3",
+              "block_type": "table_cell",
+              "text": "[REDACTED: PHONE]",
+              "order": 11,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            },
+            {
+              "block_id": "table_1_row_3_cell_4",
+              "block_type": "table_cell",
+              "text": "[REDACTED: EMPLOYEE_ID]",
+              "order": 12,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": null,
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "paragraph_7",
+          "block_type": "paragraph",
+          "text": "Sign-off sheet:",
+          "order": 8,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "section": 1,
+            "style": "Normal",
+            "paragraph_index": 7
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "image_1",
+          "block_type": "image_ocr",
+          "text": "Approved by: [REDACTED: PERSON_NAME]\nMobile [REDACTED: PHONE]",
+          "order": 9,
+          "metadata": {
+            "location": "body",
+            "section": 1,
+            "image_part": "/word/media/image1.png",
+            "source": "ocr",
+            "ocr_engine": "Tesseract",
+            "image_width": 1000,
+            "image_height": 160,
+            "ocr_confidence": 94.4,
+            "word_count": 8,
+            "words": [
+              {
+                "text": "Approved",
+                "x": 20,
+                "y": 27,
+                "width": 151,
+                "height": 33,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "by:",
+                "x": 186,
+                "y": 27,
+                "width": 43,
+                "height": 33,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "[REDACTED: PERSON_NAME]",
+                "x": 245,
+                "y": 27,
+                "width": 97,
+                "height": 26,
+                "confidence": 93,
+                "line_number": 1
+              },
+              {
+                "text": "[REDACTED: PERSON_NAME]",
+                "x": 356,
+                "y": 27,
+                "width": 70,
+                "height": 26,
+                "confidence": 91,
+                "line_number": 1
+              },
+              {
+                "text": "Mobile",
+                "x": 23,
+                "y": 87,
+                "width": 102,
+                "height": 26,
+                "confidence": 95,
+                "line_number": 2
+              },
+              {
+                "text": "[REDACTED: PHONE]",
+                "x": 138,
+                "y": 87,
+                "width": 57,
+                "height": 26,
+                "confidence": 94,
+                "line_number": 2
+              },
+              {
+                "text": "[REDACTED: PHONE]",
+                "x": 209,
+                "y": 87,
+                "width": 76,
+                "height": 26,
+                "confidence": 94,
+                "line_number": 2
+              },
+              {
+                "text": "[REDACTED: PHONE]",
+                "x": 298,
+                "y": 87,
+                "width": 117,
+                "height": 26,
+                "confidence": 96,
+                "line_number": 2
+              }
+            ]
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "section_1_header_paragraph_1",
+          "block_type": "paragraph",
+          "text": "Confidential - prepared by [REDACTED: PERSON_NAME]",
+          "order": 10,
+          "metadata": {
+            "source": "native",
+            "location": "header",
+            "part": "header",
+            "visible": true,
+            "section": 1,
+            "style": "Header",
+            "paragraph_index": 1
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "section_1_footer_paragraph_1",
+          "block_type": "paragraph",
+          "text": "Questions: [REDACTED: EMAIL]",
+          "order": 11,
+          "metadata": {
+            "source": "native",
+            "location": "footer",
+            "part": "footer",
+            "visible": true,
+            "section": 1,
+            "style": "Footer",
+            "paragraph_index": 1
+          },
+          "bounding_box": null,
+          "children": []
+        },
+        {
+          "block_id": "comment_0",
+          "block_type": "paragraph",
+          "text": "Start date confirmed with payroll.",
+          "order": 12,
+          "metadata": {
+            "source": "native",
+            "location": "comment",
+            "comment_id": 0,
+            "author": "[REDACTED: PERSON_NAME]",
+            "initials": "IS",
+            "anchor_block_id": "paragraph_2"
+          },
+          "bounding_box": null,
+          "children": []
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "page_count": 1,
+    "section_count": 1,
+    "properties": {
+      "title": "New Starter Record",
+      "subject": "Onboarding",
+      "author": "[REDACTED: PERSON_NAME]",
+      "keywords": "onboarding; payroll",
+      "comments": "Synthetic evaluation document",
+      "category": "HR",
+      "last_modified_by": "[REDACTED: PERSON_NAME]",
+      "created": "2013-12-23T23:15:00+00:00",
+      "modified": "2013-12-23T23:15:00+00:00"
+    },
+    "limitations": [],
+    "redaction": {
+      "variant": "sanitized",
+      "redactor_version": "1.0.0",
+      "redaction_timestamp": "2026-10-14T07:06:55+00:00",
+      "report_scan_timestamp": "2026-10-14T07:06:55+00:00",
+      "report_status": "completed_with_warnings",
+      "status": "completed",
+      "summary": {
+        "findings": 23,
+        "redacted": 23,
+        "skipped": 0,
+        "failed": 0,
+        "spans_replaced": 23,
+        "by_type": {
+          "PERSON_NAME": 10,
+          "EMPLOYEE_ID": 3,
+          "EMAIL": 4,
+          "PHONE": 4,
+          "US_SSN": 1,
+          "PASSPORT_NUMBER": 1
+        }
+      },
+      "errors": [],
+      "warnings": [],
+      "audit": [
+        {
+          "finding_id": "F-0001",
+          "block_id": "paragraph_2",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0002",
+          "block_id": "paragraph_2",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0003",
+          "block_id": "paragraph_2",
+          "type": "EMPLOYEE_ID",
+          "status": "redacted",
+          "replacement": "[REDACTED: EMPLOYEE_ID]"
+        },
+        {
+          "finding_id": "F-0004",
+          "block_id": "paragraph_3",
+          "type": "EMAIL",
+          "status": "redacted",
+          "replacement": "[REDACTED: EMAIL]"
+        },
+        {
+          "finding_id": "F-0005",
+          "block_id": "paragraph_3",
+          "type": "PHONE",
+          "status": "redacted",
+          "replacement": "[REDACTED: PHONE]"
+        },
+        {
+          "finding_id": "F-0006",
+          "block_id": "paragraph_4",
+          "type": "US_SSN",
+          "status": "redacted",
+          "replacement": "[REDACTED: US_SSN]"
+        },
+        {
+          "finding_id": "F-0007",
+          "block_id": "paragraph_4",
+          "type": "PASSPORT_NUMBER",
+          "status": "redacted",
+          "replacement": "[REDACTED: PASSPORT_NUMBER]"
+        },
+        {
+          "finding_id": "F-0008",
+          "block_id": "paragraph_5",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0009",
+          "block_id": "table_1_row_2_cell_1",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0010",
+          "block_id": "table_1_row_2_cell_2",
+          "type": "EMAIL",
+          "status": "redacted",
+          "replacement": "[REDACTED: EMAIL]"
+        },
+        {
+          "finding_id": "F-0011",
+          "block_id": "table_1_row_2_cell_3",
+          "type": "PHONE",
+          "status": "redacted",
+          "replacement": "[REDACTED: PHONE]"
+        },
+        {
+          "finding_id": "F-0012",
+          "block_id": "table_1_row_2_cell_4",
+          "type": "EMPLOYEE_ID",
+          "status": "redacted",
+          "replacement": "[REDACTED: EMPLOYEE_ID]"
+        },
+        {
+          "finding_id": "F-0013",
+          "block_id": "table_1_row_3_cell_1",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0014",
+          "block_id": "table_1_row_3_cell_2",
+          "type": "EMAIL",
+          "status": "redacted",
+          "replacement": "[REDACTED: EMAIL]"
+        },
+        {
+          "finding_id": "F-0015",
+          "block_id": "table_1_row_3_cell_3",
+          "type": "PHONE",
+          "status": "redacted",
+          "replacement": "[REDACTED: PHONE]"
+        },
+        {
+          "finding_id": "F-0016",
+          "block_id": "table_1_row_3_cell_4",
+          "type": "EMPLOYEE_ID",
+          "status": "redacted",
+          "replacement": "[REDACTED: EMPLOYEE_ID]"
+        },
+        {
+          "finding_id": "F-0017",
+          "block_id": "image_1",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0018",
+          "block_id": "image_1",
+          "type": "PHONE",
+          "status": "redacted",
+          "replacement": "[REDACTED: PHONE]"
+        },
+        {
+          "finding_id": "F-0019",
+          "block_id": "section_1_header_paragraph_1",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0020",
+          "block_id": "section_1_footer_paragraph_1",
+          "type": "EMAIL",
+          "status": "redacted",
+          "replacement": "[REDACTED: EMAIL]"
+        },
+        {
+          "finding_id": "F-0021",
+          "block_id": "comment_0_author",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0022",
+          "block_id": "property_author",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        },
+        {
+          "finding_id": "F-0023",
+          "block_id": "property_last_modified_by",
+          "type": "PERSON_NAME",
+          "status": "redacted",
+          "replacement": "[REDACTED: PERSON_NAME]"
+        }
+      ]
+    }
+  }
+}

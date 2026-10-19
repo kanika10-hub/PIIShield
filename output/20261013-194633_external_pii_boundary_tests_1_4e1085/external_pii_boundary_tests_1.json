@@ -1,0 +1,2417 @@
+{
+  "document_id": "external_pii_boundary_tests_1",
+  "file_name": "external_pii_boundary_tests_1.pdf",
+  "source_type": "PDF",
+  "extraction_method": "mixed",
+  "pages": [
+    {
+      "page_number": 1,
+      "metadata": {
+        "content_type": "pdf_page",
+        "extraction_method": "mixed",
+        "width": 612.0,
+        "height": 792.0,
+        "native_char_count": 659,
+        "char_count": 803,
+        "low_text": false
+      },
+      "blocks": [
+        {
+          "block_id": "p1_b1",
+          "block_type": "heading",
+          "text": "External PII Detection & Redaction Test",
+          "order": 1,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 6
+          },
+          "bounding_box": {
+            "x": 137.45700073242188,
+            "y": 76.73999786376953,
+            "width": 337.08587646484375,
+            "height": 24.78600311279297
+          },
+          "children": [
+            {
+              "block_id": "p1_b1_w1",
+              "block_type": "word",
+              "text": "External",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 137.45700073242188,
+                "y": 76.73999786376953,
+                "width": 71.02801513671875,
+                "height": 24.78600311279297
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b1_w2",
+              "block_type": "word",
+              "text": "PII",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 213.489013671875,
+                "y": 76.73999786376953,
+                "width": 22.013992309570312,
+                "height": 24.78600311279297
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b1_w3",
+              "block_type": "word",
+              "text": "Detection",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 240.5070037841797,
+                "y": 76.73999786376953,
+                "width": 82.00798034667969,
+                "height": 24.78600311279297
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b1_w4",
+              "block_type": "word",
+              "text": "&",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 327.51898193359375,
+                "y": 76.73999786376953,
+                "width": 12.996002197265625,
+                "height": 24.78600311279297
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b1_w5",
+              "block_type": "word",
+              "text": "Redaction",
+              "order": 5,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 345.51898193359375,
+                "y": 76.73999786376953,
+                "width": 87.01193237304688,
+                "height": 24.78600311279297
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b1_w6",
+              "block_type": "word",
+              "text": "Test",
+              "order": 6,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 437.534912109375,
+                "y": 76.73999786376953,
+                "width": 37.007965087890625,
+                "height": 24.78600311279297
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b2",
+          "block_type": "paragraph",
+          "text": "Synthetic QA data only. Test extraction, detection, redaction, and validation.",
+          "order": 2,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 10
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 105.25,
+            "width": 335.7299499511719,
+            "height": 13.739997863769531
+          },
+          "children": [
+            {
+              "block_id": "p1_b2_w1",
+              "block_type": "word",
+              "text": "Synthetic",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 105.25,
+                "width": 41.1300048828125,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w2",
+              "block_type": "word",
+              "text": "QA",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 121.91000366210938,
+                "y": 105.25,
+                "width": 14.449996948242188,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w3",
+              "block_type": "word",
+              "text": "data",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 139.13999938964844,
+                "y": 105.25,
+                "width": 19.460006713867188,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w4",
+              "block_type": "word",
+              "text": "only.",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 161.3800048828125,
+                "y": 105.25,
+                "width": 21.1199951171875,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w5",
+              "block_type": "word",
+              "text": "Test",
+              "order": 5,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 185.27999877929688,
+                "y": 105.25,
+                "width": 19.449981689453125,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w6",
+              "block_type": "word",
+              "text": "extraction,",
+              "order": 6,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 207.50999450683594,
+                "y": 105.25,
+                "width": 46.12998962402344,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w7",
+              "block_type": "word",
+              "text": "detection,",
+              "order": 7,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 256.41998291015625,
+                "y": 105.25,
+                "width": 43.3599853515625,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w8",
+              "block_type": "word",
+              "text": "redaction,",
+              "order": 8,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 302.5599670410156,
+                "y": 105.25,
+                "width": 43.910003662109375,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w9",
+              "block_type": "word",
+              "text": "and",
+              "order": 9,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 349.2499694824219,
+                "y": 105.25,
+                "width": 16.67999267578125,
+                "height": 13.739997863769531
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b2_w10",
+              "block_type": "word",
+              "text": "validation.",
+              "order": 10,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 368.7099609375,
+                "y": 105.25,
+                "width": 45.019989013671875,
+                "height": 13.739997863769531
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b3",
+          "block_type": "heading",
+          "text": "Body cases",
+          "order": 3,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 2
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 141.02000427246094,
+            "width": 77.81201171875,
+            "height": 19.277999877929688
+          },
+          "children": [
+            {
+              "block_id": "p1_b3_w1",
+              "block_type": "word",
+              "text": "Body",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 141.02000427246094,
+                "width": 35.00000762939453,
+                "height": 19.277999877929688
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b3_w2",
+              "block_type": "word",
+              "text": "cases",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 116.89199829101562,
+                "y": 141.02000427246094,
+                "width": 38.920013427734375,
+                "height": 19.277999877929688
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b4",
+          "block_type": "paragraph",
+          "text": "TC01 Name: Jordan Example",
+          "order": 4,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 4
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 165.25,
+            "width": 131.70999145507812,
+            "height": 13.740005493164062
+          },
+          "children": [
+            {
+              "block_id": "p1_b4_w1",
+              "block_type": "word",
+              "text": "TC01",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 165.25,
+                "width": 24.449996948242188,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b4_w2",
+              "block_type": "word",
+              "text": "Name:",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 165.25,
+                "width": 29.45000457763672,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b4_w3",
+              "block_type": "word",
+              "text": "Jordan",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 137.4600067138672,
+                "y": 165.25,
+                "width": 30.569992065429688,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b4_w4",
+              "block_type": "word",
+              "text": "Example",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 170.80999755859375,
+                "y": 165.25,
+                "width": 38.899993896484375,
+                "height": 13.740005493164062
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b5",
+          "block_type": "paragraph",
+          "text": "TC02 Email: jordan.example@example.com",
+          "order": 5,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 3
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 188.25,
+            "width": 195.75997924804688,
+            "height": 13.740005493164062
+          },
+          "children": [
+            {
+              "block_id": "p1_b5_w1",
+              "block_type": "word",
+              "text": "TC02",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 188.25,
+                "width": 24.449996948242188,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b5_w2",
+              "block_type": "word",
+              "text": "Email:",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 188.25,
+                "width": 27.780006408691406,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b5_w3",
+              "block_type": "word",
+              "text": "jordan.example@example.com",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 135.79000854492188,
+                "y": 188.25,
+                "width": 137.969970703125,
+                "height": 13.740005493164062
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b6",
+          "block_type": "paragraph",
+          "text": "TC03 Employee ID: EMP-00042",
+          "order": 6,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 4
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 211.25,
+            "width": 142.82998657226562,
+            "height": 13.740005493164062
+          },
+          "children": [
+            {
+              "block_id": "p1_b6_w1",
+              "block_type": "word",
+              "text": "TC03",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 211.25,
+                "width": 24.449996948242188,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b6_w2",
+              "block_type": "word",
+              "text": "Employee",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 211.25,
+                "width": 44.459999084472656,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b6_w3",
+              "block_type": "word",
+              "text": "ID:",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 152.47000122070312,
+                "y": 211.25,
+                "width": 12.779998779296875,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b6_w4",
+              "block_type": "word",
+              "text": "EMP-00042",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 168.02999877929688,
+                "y": 211.25,
+                "width": 52.79998779296875,
+                "height": 13.740005493164062
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b7",
+          "block_type": "paragraph",
+          "text": "TC04 Phone: +1 202-555-0147",
+          "order": 7,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 4
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 234.25,
+            "width": 138.13998413085938,
+            "height": 13.740005493164062
+          },
+          "children": [
+            {
+              "block_id": "p1_b7_w1",
+              "block_type": "word",
+              "text": "TC04",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 234.25,
+                "width": 24.449996948242188,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b7_w2",
+              "block_type": "word",
+              "text": "Phone:",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 234.25,
+                "width": 31.69001007080078,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b7_w3",
+              "block_type": "word",
+              "text": "+1",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 139.70001220703125,
+                "y": 234.25,
+                "width": 11.399993896484375,
+                "height": 13.740005493164062
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b7_w4",
+              "block_type": "word",
+              "text": "202-555-0147",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 153.8800048828125,
+                "y": 234.25,
+                "width": 62.259979248046875,
+                "height": 13.740005493164062
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b8",
+          "block_type": "paragraph",
+          "text": "TC05 Documentation IP: 192.0.2.15",
+          "order": 8,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 4
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 257.25,
+            "width": 159.52996826171875,
+            "height": 13.739990234375
+          },
+          "children": [
+            {
+              "block_id": "p1_b8_w1",
+              "block_type": "word",
+              "text": "TC05",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 257.25,
+                "width": 24.449996948242188,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b8_w2",
+              "block_type": "word",
+              "text": "Documentation",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 257.25,
+                "width": 67.24999237060547,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b8_w3",
+              "block_type": "word",
+              "text": "IP:",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 175.25999450683594,
+                "y": 257.25,
+                "width": 12.229995727539062,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b8_w4",
+              "block_type": "word",
+              "text": "192.0.2.15",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 190.26998901367188,
+                "y": 257.25,
+                "width": 47.259979248046875,
+                "height": 13.739990234375
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b9",
+          "block_type": "paragraph",
+          "text": "TC06 Date boundary: 2026-10-13 (must not be PHONE)",
+          "order": 9,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 8
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 280.25,
+            "width": 249.54995727539062,
+            "height": 13.739990234375
+          },
+          "children": [
+            {
+              "block_id": "p1_b9_w1",
+              "block_type": "word",
+              "text": "TC06",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 280.25,
+                "width": 24.449996948242188,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b9_w2",
+              "block_type": "word",
+              "text": "Date",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 280.25,
+                "width": 21.1199951171875,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b9_w3",
+              "block_type": "word",
+              "text": "boundary:",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 129.1300048828125,
+                "y": 280.25,
+                "width": 44.470001220703125,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b9_w4",
+              "block_type": "word",
+              "text": "2026-10-13",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 176.3800048828125,
+                "y": 280.25,
+                "width": 51.139984130859375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b9_w5",
+              "block_type": "word",
+              "text": "(must",
+              "order": 5,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 230.29998779296875,
+                "y": 280.25,
+                "width": 25.0,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b9_w6",
+              "block_type": "word",
+              "text": "not",
+              "order": 6,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 258.0799865722656,
+                "y": 280.25,
+                "width": 13.899993896484375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b9_w7",
+              "block_type": "word",
+              "text": "be",
+              "order": 7,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 274.7599792480469,
+                "y": 280.25,
+                "width": 11.1199951171875,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b9_w8",
+              "block_type": "word",
+              "text": "PHONE)",
+              "order": 8,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 288.65997314453125,
+                "y": 280.25,
+                "width": 38.889984130859375,
+                "height": 13.739990234375
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b10",
+          "block_type": "paragraph",
+          "text": "TC15 Uppercase email: OCR-TEST@example.com",
+          "order": 10,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 4
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 303.25,
+            "width": 228.52999877929688,
+            "height": 13.739990234375
+          },
+          "children": [
+            {
+              "block_id": "p1_b10_w1",
+              "block_type": "word",
+              "text": "TC15",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 303.25,
+                "width": 24.449996948242188,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b10_w2",
+              "block_type": "word",
+              "text": "Uppercase",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 303.25,
+                "width": 48.349998474121094,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b10_w3",
+              "block_type": "word",
+              "text": "email:",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 156.36000061035156,
+                "y": 303.25,
+                "width": 26.669998168945312,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b10_w4",
+              "block_type": "word",
+              "text": "OCR-TEST@example.com",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 185.80999755859375,
+                "y": 303.25,
+                "width": 120.72000122070312,
+                "height": 13.739990234375
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b11",
+          "block_type": "paragraph",
+          "text": "TC16 Negative control: The quarterly review is complete.",
+          "order": 11,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 8
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 326.25,
+            "width": 251.74996948242188,
+            "height": 13.739990234375
+          },
+          "children": [
+            {
+              "block_id": "p1_b11_w1",
+              "block_type": "word",
+              "text": "TC16",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 326.25,
+                "width": 24.449996948242188,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b11_w2",
+              "block_type": "word",
+              "text": "Negative",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 326.25,
+                "width": 39.459999084472656,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b11_w3",
+              "block_type": "word",
+              "text": "control:",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 147.47000122070312,
+                "y": 326.25,
+                "width": 32.78999328613281,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b11_w4",
+              "block_type": "word",
+              "text": "The",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 183.0399932861328,
+                "y": 326.25,
+                "width": 17.229995727539062,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b11_w5",
+              "block_type": "word",
+              "text": "quarterly",
+              "order": 5,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 203.04998779296875,
+                "y": 326.25,
+                "width": 38.899993896484375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b11_w6",
+              "block_type": "word",
+              "text": "review",
+              "order": 6,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 244.72998046875,
+                "y": 326.25,
+                "width": 28.889984130859375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b11_w7",
+              "block_type": "word",
+              "text": "is",
+              "order": 7,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 276.39996337890625,
+                "y": 326.25,
+                "width": 7.22003173828125,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b11_w8",
+              "block_type": "word",
+              "text": "complete.",
+              "order": 8,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 286.39996337890625,
+                "y": 326.25,
+                "width": 43.350006103515625,
+                "height": 13.739990234375
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b12",
+          "block_type": "paragraph",
+          "text": "TC17 Negative control: Version 2.0 was released on 2026-10-13.",
+          "order": 12,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 9
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 349.25,
+            "width": 287.909912109375,
+            "height": 13.739990234375
+          },
+          "children": [
+            {
+              "block_id": "p1_b12_w1",
+              "block_type": "word",
+              "text": "TC17",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 349.25,
+                "width": 24.449996948242188,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w2",
+              "block_type": "word",
+              "text": "Negative",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 105.2300033569336,
+                "y": 349.25,
+                "width": 39.459999084472656,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w3",
+              "block_type": "word",
+              "text": "control:",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 147.47000122070312,
+                "y": 349.25,
+                "width": 32.78999328613281,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w4",
+              "block_type": "word",
+              "text": "Version",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 183.0399932861328,
+                "y": 349.25,
+                "width": 33.899993896484375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w5",
+              "block_type": "word",
+              "text": "2.0",
+              "order": 5,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 219.71998596191406,
+                "y": 349.25,
+                "width": 13.899993896484375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w6",
+              "block_type": "word",
+              "text": "was",
+              "order": 6,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 236.3999786376953,
+                "y": 349.25,
+                "width": 17.779998779296875,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w7",
+              "block_type": "word",
+              "text": "released",
+              "order": 7,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 256.9599609375,
+                "y": 349.25,
+                "width": 38.350006103515625,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w8",
+              "block_type": "word",
+              "text": "on",
+              "order": 8,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 298.0899658203125,
+                "y": 349.25,
+                "width": 11.1199951171875,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b12_w9",
+              "block_type": "word",
+              "text": "2026-10-13.",
+              "order": 9,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 311.9899597167969,
+                "y": 349.25,
+                "width": 53.919952392578125,
+                "height": 13.739990234375
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b13",
+          "block_type": "heading",
+          "text": "Table cases",
+          "order": 13,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 2
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 378.0199890136719,
+            "width": 79.3800048828125,
+            "height": 19.27801513671875
+          },
+          "children": [
+            {
+              "block_id": "p1_b13_w1",
+              "block_type": "word",
+              "text": "Table",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 378.0199890136719,
+                "width": 36.56800842285156,
+                "height": 19.27801513671875
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b13_w2",
+              "block_type": "word",
+              "text": "cases",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 118.46000671386719,
+                "y": 378.0199890136719,
+                "width": 38.91999816894531,
+                "height": 19.27801513671875
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_t1",
+          "block_type": "table",
+          "text": "",
+          "order": 14,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "rows": 4,
+            "columns": 4
+          },
+          "bounding_box": {
+            "x": 82.80000305175781,
+            "y": 403.0,
+            "width": 446.40000915527344,
+            "height": 72.0
+          },
+          "children": [
+            {
+              "block_id": "p1_t1_r1_c1",
+              "block_type": "table_cell",
+              "text": "Case",
+              "order": 1,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 82.80000305175781,
+                "y": 403.0,
+                "width": 50.40000915527344,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r1_c1_w1",
+                  "block_type": "word",
+                  "text": "Case",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 88.80000305175781,
+                    "y": 405.25,
+                    "width": 23.339996337890625,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r1_c2",
+              "block_type": "table_cell",
+              "text": "Name",
+              "order": 2,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 133.20001220703125,
+                "y": 403.0,
+                "width": 107.99998474121094,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r1_c2_w1",
+                  "block_type": "word",
+                  "text": "Name",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 139.20001220703125,
+                    "y": 405.25,
+                    "width": 26.66998291015625,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r1_c3",
+              "block_type": "table_cell",
+              "text": "Email",
+              "order": 3,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 241.1999969482422,
+                "y": 403.0,
+                "width": 158.3999786376953,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r1_c3_w1",
+                  "block_type": "word",
+                  "text": "Email",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 247.1999969482422,
+                    "y": 405.25,
+                    "width": 24.999984741210938,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r1_c4",
+              "block_type": "table_cell",
+              "text": "Identifier",
+              "order": 4,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 1,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 399.5999755859375,
+                "y": 403.0,
+                "width": 129.60003662109375,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r1_c4_w1",
+                  "block_type": "word",
+                  "text": "Identifier",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 405.5999755859375,
+                    "y": 405.25,
+                    "width": 38.350006103515625,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r2_c1",
+              "block_type": "table_cell",
+              "text": "TC07",
+              "order": 5,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 82.80000305175781,
+                "y": 421.0,
+                "width": 50.40000915527344,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r2_c1_w1",
+                  "block_type": "word",
+                  "text": "TC07",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 88.80000305175781,
+                    "y": 423.25,
+                    "width": 24.449996948242188,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r2_c2",
+              "block_type": "table_cell",
+              "text": "Avery Morgan",
+              "order": 6,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 133.20001220703125,
+                "y": 421.0,
+                "width": 107.99998474121094,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r2_c2_w1",
+                  "block_type": "word",
+                  "text": "Avery",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 139.20001220703125,
+                    "y": 423.25,
+                    "width": 25.55999755859375,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                },
+                {
+                  "block_id": "p1_t1_r2_c2_w2",
+                  "block_type": "word",
+                  "text": "Morgan",
+                  "order": 2,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 167.54000854492188,
+                    "y": 423.25,
+                    "width": 33.899993896484375,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r2_c3",
+              "block_type": "table_cell",
+              "text": "avery.morgan@example.org",
+              "order": 7,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 241.1999969482422,
+                "y": 421.0,
+                "width": 158.3999786376953,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r2_c3_w1",
+                  "block_type": "word",
+                  "text": "avery.morgan@example.org",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 247.1999969482422,
+                    "y": 423.25,
+                    "width": 126.29994201660156,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r2_c4",
+              "block_type": "table_cell",
+              "text": "EMP-00041",
+              "order": 8,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 2,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 399.5999755859375,
+                "y": 421.0,
+                "width": 129.60003662109375,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r2_c4_w1",
+                  "block_type": "word",
+                  "text": "EMP-00041",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 405.5999755859375,
+                    "y": 423.25,
+                    "width": 52.79998779296875,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r3_c1",
+              "block_type": "table_cell",
+              "text": "TC09",
+              "order": 9,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 82.80000305175781,
+                "y": 439.0,
+                "width": 50.40000915527344,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r3_c1_w1",
+                  "block_type": "word",
+                  "text": "TC09",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 88.80000305175781,
+                    "y": 441.25,
+                    "width": 24.449996948242188,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r3_c2",
+              "block_type": "table_cell",
+              "text": "—",
+              "order": 10,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 133.20001220703125,
+                "y": 439.0,
+                "width": 107.99998474121094,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r3_c2_w1",
+                  "block_type": "word",
+                  "text": "—",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 139.20001220703125,
+                    "y": 441.25,
+                    "width": 10.0,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r3_c3",
+              "block_type": "table_cell",
+              "text": "—",
+              "order": 11,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 241.1999969482422,
+                "y": 439.0,
+                "width": 158.3999786376953,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r3_c3_w1",
+                  "block_type": "word",
+                  "text": "—",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 247.1999969482422,
+                    "y": 441.25,
+                    "width": 10.000015258789062,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r3_c4",
+              "block_type": "table_cell",
+              "text": "TEST-ID-AB-123456",
+              "order": 12,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 3,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 399.5999755859375,
+                "y": 439.0,
+                "width": 129.60003662109375,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r3_c4_w1",
+                  "block_type": "word",
+                  "text": "TEST-ID-AB-123456",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 405.5999755859375,
+                    "y": 441.25,
+                    "width": 92.25,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r4_c1",
+              "block_type": "table_cell",
+              "text": "TC10",
+              "order": 13,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 1,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 82.80000305175781,
+                "y": 457.0,
+                "width": 50.40000915527344,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r4_c1_w1",
+                  "block_type": "word",
+                  "text": "TC10",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 88.80000305175781,
+                    "y": 459.25,
+                    "width": 24.449996948242188,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r4_c2",
+              "block_type": "table_cell",
+              "text": "Riley Q. Example",
+              "order": 14,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 2,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 133.20001220703125,
+                "y": 457.0,
+                "width": 107.99998474121094,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r4_c2_w1",
+                  "block_type": "word",
+                  "text": "Riley",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 139.20001220703125,
+                    "y": 459.25,
+                    "width": 22.220001220703125,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                },
+                {
+                  "block_id": "p1_t1_r4_c2_w2",
+                  "block_type": "word",
+                  "text": "Q.",
+                  "order": 2,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 164.20001220703125,
+                    "y": 459.25,
+                    "width": 10.55999755859375,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                },
+                {
+                  "block_id": "p1_t1_r4_c2_w3",
+                  "block_type": "word",
+                  "text": "Example",
+                  "order": 3,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 177.54000854492188,
+                    "y": 459.25,
+                    "width": 38.89997863769531,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r4_c3",
+              "block_type": "table_cell",
+              "text": "riley.q@example.net",
+              "order": 15,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 3,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 241.1999969482422,
+                "y": 457.0,
+                "width": 158.3999786376953,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r4_c3_w1",
+                  "block_type": "word",
+                  "text": "riley.q@example.net",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 247.1999969482422,
+                    "y": 459.25,
+                    "width": 91.28999328613281,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "block_id": "p1_t1_r4_c4",
+              "block_type": "table_cell",
+              "text": "EMP0007",
+              "order": 16,
+              "metadata": {
+                "source": "native",
+                "location": "body",
+                "row": 4,
+                "column": 4,
+                "row_span": 1,
+                "column_span": 1
+              },
+              "bounding_box": {
+                "x": 399.5999755859375,
+                "y": 457.0,
+                "width": 129.60003662109375,
+                "height": 18.0
+              },
+              "children": [
+                {
+                  "block_id": "p1_t1_r4_c4_w1",
+                  "block_type": "word",
+                  "text": "EMP0007",
+                  "order": 1,
+                  "metadata": {
+                    "line": 1
+                  },
+                  "bounding_box": {
+                    "x": 405.5999755859375,
+                    "y": 459.25,
+                    "width": 43.9100341796875,
+                    "height": 13.739990234375
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b14",
+          "block_type": "heading",
+          "text": "OCR image-only case",
+          "order": 15,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 3
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 496.0199890136719,
+            "width": 143.9340057373047,
+            "height": 19.277984619140625
+          },
+          "children": [
+            {
+              "block_id": "p1_b14_w1",
+              "block_type": "word",
+              "text": "OCR",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 496.0199890136719,
+                "width": 31.108001708984375,
+                "height": 19.277984619140625
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b14_w2",
+              "block_type": "word",
+              "text": "image-only",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 113.0,
+                "y": 496.0199890136719,
+                "width": 73.906005859375,
+                "height": 19.277984619140625
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b14_w3",
+              "block_type": "word",
+              "text": "case",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 190.79800415039062,
+                "y": 496.0199890136719,
+                "width": 31.136001586914062,
+                "height": 19.277984619140625
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_b15",
+          "block_type": "paragraph",
+          "text": "The following PII-like text exists as pixels; OCR coverage is required.",
+          "order": 16,
+          "metadata": {
+            "source": "native",
+            "location": "body",
+            "line_count": 1,
+            "word_count": 11
+          },
+          "bounding_box": {
+            "x": 78.0,
+            "y": 520.25,
+            "width": 305.09991455078125,
+            "height": 13.739990234375
+          },
+          "children": [
+            {
+              "block_id": "p1_b15_w1",
+              "block_type": "word",
+              "text": "The",
+              "order": 1,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 78.0,
+                "y": 520.25,
+                "width": 17.229995727539062,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w2",
+              "block_type": "word",
+              "text": "following",
+              "order": 2,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 98.01000213623047,
+                "y": 520.25,
+                "width": 38.900001525878906,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w3",
+              "block_type": "word",
+              "text": "PII-like",
+              "order": 3,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 139.69000244140625,
+                "y": 520.25,
+                "width": 30.55999755859375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w4",
+              "block_type": "word",
+              "text": "text",
+              "order": 4,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 173.02999877929688,
+                "y": 520.25,
+                "width": 16.1199951171875,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w5",
+              "block_type": "word",
+              "text": "exists",
+              "order": 5,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 191.92999267578125,
+                "y": 520.25,
+                "width": 25.55999755859375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w6",
+              "block_type": "word",
+              "text": "as",
+              "order": 6,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 220.26998901367188,
+                "y": 520.25,
+                "width": 10.55999755859375,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w7",
+              "block_type": "word",
+              "text": "pixels;",
+              "order": 7,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 233.6099853515625,
+                "y": 520.25,
+                "width": 28.339996337890625,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w8",
+              "block_type": "word",
+              "text": "OCR",
+              "order": 8,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 264.72998046875,
+                "y": 520.25,
+                "width": 22.220001220703125,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w9",
+              "block_type": "word",
+              "text": "coverage",
+              "order": 9,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 289.72998046875,
+                "y": 520.25,
+                "width": 41.1300048828125,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w10",
+              "block_type": "word",
+              "text": "is",
+              "order": 10,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 333.63995361328125,
+                "y": 520.25,
+                "width": 7.220001220703125,
+                "height": 13.739990234375
+              },
+              "children": []
+            },
+            {
+              "block_id": "p1_b15_w11",
+              "block_type": "word",
+              "text": "required.",
+              "order": 11,
+              "metadata": {
+                "line": 1
+              },
+              "bounding_box": {
+                "x": 343.63995361328125,
+                "y": 520.25,
+                "width": 39.4599609375,
+                "height": 13.739990234375
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "block_id": "p1_i1",
+          "block_type": "image_ocr",
+          "text": "OCR TEST: Taylor Example\ntaylor.example@example.com\nEmployee ID: EMP-00043",
+          "order": 17,
+          "metadata": {
+            "location": "body",
+            "image_xref": 4,
+            "source": "ocr",
+            "ocr_engine": "Tesseract",
+            "image_width": 1100,
+            "image_height": 250,
+            "ocr_confidence": 92.4,
+            "word_count": 8,
+            "words": [
+              {
+                "text": "OCR",
+                "x": 27,
+                "y": 26,
+                "width": 63,
+                "height": 22,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "TEST:",
+                "x": 100,
+                "y": 26,
+                "width": 78,
+                "height": 22,
+                "confidence": 95,
+                "line_number": 1
+              },
+              {
+                "text": "Taylor",
+                "x": 191,
+                "y": 25,
+                "width": 88,
+                "height": 29,
+                "confidence": 95,
+                "line_number": 1
+              },
+              {
+                "text": "Example",
+                "x": 292,
+                "y": 25,
+                "width": 126,
+                "height": 29,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "taylor.example@example.com",
+                "x": 26,
+                "y": 85,
+                "width": 452,
+                "height": 29,
+                "confidence": 76,
+                "line_number": 2
+              },
+              {
+                "text": "Employee",
+                "x": 28,
+                "y": 145,
+                "width": 144,
+                "height": 29,
+                "confidence": 96,
+                "line_number": 1
+              },
+              {
+                "text": "ID:",
+                "x": 186,
+                "y": 146,
+                "width": 36,
+                "height": 22,
+                "confidence": 93,
+                "line_number": 1
+              },
+              {
+                "text": "EMP-00043",
+                "x": 238,
+                "y": 146,
+                "width": 163,
+                "height": 22,
+                "confidence": 92,
+                "line_number": 1
+              }
+            ]
+          },
+          "bounding_box": {
+            "x": 82.80000305175781,
+            "y": 533.0,
+            "width": 446.40000915527344,
+            "height": 101.52001953125
+          },
+          "children": []
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "page_count": 1,
+    "ocr_engine": "Tesseract",
+    "properties": {},
+    "limitations": [],
+    "table_reconstruction": {
+      "method": "header band + row rules + header-labelled columns",
+      "tables": 1
+    }
+  }
+}

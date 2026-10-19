@@ -1,0 +1,71 @@
+{
+  "file_validator_version": "1.3.0",
+  "validated_at": "2026-10-18T17:33:33+00:00",
+  "document_id": "Cadence_Financial_Group_Organizational_Pack",
+  "file_name": "Cadence_Financial_Group_Organizational_Pack.pptx",
+  "report_scan_timestamp": "2026-10-18T17:33:31+00:00",
+  "verdict": "PASS",
+  "summary": {
+    "redaction": "PASS",
+    "text": "PASS",
+    "rescan": "PASS",
+    "known_values": "PASS",
+    "unread": "PASS"
+  },
+  "checks": [
+    {
+      "name": "redaction",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "124 findings redacted, 0 images changed, 0 values replaced in other places"
+      ],
+      "issues": []
+    },
+    {
+      "name": "text",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "419 texts compared"
+      ],
+      "issues": []
+    },
+    {
+      "name": "rescan",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "409 blocks rescanned"
+      ],
+      "issues": []
+    },
+    {
+      "name": "known_values",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "61 values and 34 name parts searched in 28409 strings"
+      ],
+      "issues": []
+    },
+    {
+      "name": "unread",
+      "status": "PASS",
+      "issues_total": 0,
+      "notes": [
+        "1 images in the file, 9 shown by blocks"
+      ],
+      "issues": []
+    }
+  ],
+  "redaction_pass": 1,
+  "leftovers": [],
+  "leftovers_complete": false,
+  "files": {
+    "redacted": "D:\\optiv\\optivcase2\\backend\\output\\20261018-230330_Cadence_Financial_Group_Organizational_P_ce1c49\\Cadence_Financial_Group_Organizational_Pack_redacted.pptx",
+    "redacted_sha256": "67484a5fd27303634c928d3e837e0aa39229e42f0f10f08daf885be1a5a89b04",
+    "deleted": false,
+    "copy_validated_at": "2026-10-18T17:33:32+00:00"
+  }
+}

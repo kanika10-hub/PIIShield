@@ -1,0 +1,239 @@
+{
+  "file_redactor_version": "1.4.0",
+  "redacted_at": "2026-10-19T05:38:41+00:00",
+  "document_id": "risk_policy",
+  "file_name": "risk_policy.pdf",
+  "report_scan_timestamp": "2026-10-13T18:04:58+00:00",
+  "status": "completed",
+  "redaction_pass": 3,
+  "leftovers": [
+    {
+      "page_number": 5,
+      "box": [
+        390.25,
+        589.25,
+        411.5,
+        596.5
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 6,
+      "box": [
+        231.75,
+        196.25,
+        258.5,
+        201.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 6,
+      "box": [
+        218.25,
+        199.75,
+        258.75,
+        205.25
+      ],
+      "type": "EMAIL",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 6,
+      "box": [
+        354.75,
+        196.25,
+        373.25,
+        201.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 6,
+      "box": [
+        330.75,
+        199.75,
+        371.5,
+        205.25
+      ],
+      "type": "EMAIL",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 6,
+      "box": [
+        375.0,
+        200.25,
+        392.75,
+        204.5
+      ],
+      "type": "EMPLOYEE_ID",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 12,
+      "box": [
+        274.5,
+        166.5,
+        416.5,
+        175.75
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 15,
+      "box": [
+        309.0,
+        228.5,
+        377.5,
+        237.5
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        387.5,
+        569.25,
+        403.0,
+        573.25
+      ],
+      "type": "PASSPORT_NUMBER",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 22,
+      "box": [
+        122.25,
+        555.75,
+        143.5,
+        563.25
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 22,
+      "box": [
+        148.5,
+        638.75,
+        169.75,
+        646.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 22,
+      "box": [
+        312.0,
+        648.25,
+        335.5,
+        655.5
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 23,
+      "box": [
+        291.75,
+        151.75,
+        413.75,
+        163.25
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 6,
+      "box": [
+        358.5,
+        196.25,
+        373.25,
+        201.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        342.0,
+        523.5,
+        362.5,
+        527.75
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        348.5,
+        553.75,
+        360.25,
+        558.25
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 18,
+      "box": [
+        345.25,
+        569.25,
+        362.25,
+        573.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 31,
+      "box": [
+        351.5,
+        312.5,
+        370.0,
+        319.0
+      ],
+      "type": "PERSON_NAME",
+      "found_in_pass": 1
+    },
+    {
+      "page_number": 6,
+      "box": [
+        262.25,
+        200.25,
+        279.75,
+        204.5
+      ],
+      "type": "EMPLOYEE_ID",
+      "found_in_pass": 2
+    }
+  ],
+  "summary": {
+    "findings": 896,
+    "redacted": 896,
+    "skipped": 0,
+    "failed": 0,
+    "spans_replaced": 892,
+    "images_redacted": 0,
+    "values_swept": 0,
+    "annotations_removed": 0,
+    "attachments_removed": 0,
+    "leftovers_redacted": 19
+  },
+  "errors": [],
+  "files": {
+    "source": "uploads\\20261013-232035_risk_policy_1460d5\\risk_policy.pdf",
+    "source_sha256": "3f4b5db17d2e2694630fe4244754a270d4c0dde68ef009ee0495e43a2bf606f3",
+    "redacted": "output\\20261013-232035_risk_policy_1460d5\\risk_policy_redacted.pdf",
+    "redacted_sha256": "9b54f95bab3cfd4269ad01a8cb4a23b09e4ee40454dcdbc09800a837c787ca76"
+  }
+}
