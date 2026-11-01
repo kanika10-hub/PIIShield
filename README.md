@@ -182,8 +182,8 @@ Developed and tested on **Windows 11 with PowerShell** and **Python 3.14**.
 ### 1. Get the code and install the Python packages
 
 ```powershell
-git clone https://github.com/kanika10-hub/PIIShield_v2.git
-cd PIIShield_v2
+git clone https://github.com/kanika10-hub/PIIShield.git
+cd PIIShield
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
