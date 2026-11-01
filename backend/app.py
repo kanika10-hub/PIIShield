@@ -20,6 +20,9 @@ API, all JSON:
     GET    /api/jobs/<id>/validation        verdict, checks, warnings, redaction
     GET    /api/jobs/<id>/download/<file>   extracted, findings, sanitized,
                                             validation, audit-json or audit-md
+    GET    /api/jobs/<id>/download/redacted the redacted PDF, PPTX or DOCX file,
+                                            only if approved_file() releases it
+                                            (403 with the reason otherwise)
     DELETE /api/jobs/<id>                   delete the job's files
 
     Review of a finished job's validation issues (src/pii/review.py), each
@@ -43,11 +46,12 @@ from pathlib import Path
 
 from flask import Flask, Response, abort, jsonify, request, send_file
 
+from src.original_format.validator import approved_file
 from src.pii.document_scanner import findings_path
 from src.pii.exposure_report import exposure_path, markdown
 from src.pii.redactor import output_paths
 from src.pii.review import ReviewError
-from src.pii.validator import review_path, validation_path
+from src.pii.validator import NotApproved, review_path, validation_path
 from src.web.jobs import InputRejected, JobBusy, Jobs
 from src.web.views import document_view, findings_view, validation_view
 
@@ -318,6 +322,18 @@ def download(job_id, name):
             text, mimetype="text/markdown",
             headers={"Content-Disposition": f'attachment; filename="{stem}_audit.md"'}
         )
+
+    # The redacted file leaves only through its release gate
+    if name == "redacted":
+        try:
+            path = approved_file(job.json_path)
+        except NotApproved as reason:
+            return api_error(
+                f"The redacted file may not be shared: {str(reason).replace(str(job.json_path.parent), 'output')}",
+                403
+            )
+
+        return send_file(path, as_attachment=True, download_name=path.name)
 
     choices = {
         # Upload it again as an extracted JSON file to rescan without re-extracting

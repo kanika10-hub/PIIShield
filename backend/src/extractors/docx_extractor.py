@@ -48,6 +48,8 @@ CHART_TEXT = etree.XPath(
 # A SmartArt diagram's text: each node's paragraphs in the data part
 DIAGRAM_PARAGRAPHS = etree.XPath(".//a:p", namespaces=NAMESPACES)
 PARAGRAPH_TEXT = etree.XPath(".//a:t/text()", namespaces=NAMESPACES)
+# The drawing of a diagram, which Word shows, is linked from the story
+DIAGRAM_DRAWING_IDS = etree.XPath(".//*[local-name()='dataModelExt']/@relId")
 
 # An embedded object (a spreadsheet, another document): never opened
 OLE_OBJECTS = etree.XPath(".//w:object[not(ancestor::mc:Fallback)]", namespaces=NAMESPACES)
@@ -403,7 +405,19 @@ class StoryReader:
             )
 
             block_id = f"{self.prefix}{kind}_{self.next_number(kind)}"
-            self.sources.add(block_id, PartsSource([part]))
+
+            # Every part that holds the text: a chart's own parts (its
+            # embedded workbook), and the drawing Word shows for a diagram
+            if kind == "chart":
+                held = [rel.target_part for rel in part.rels.values() if not rel.is_external]
+            else:
+                held = [
+                    self.story.part.related_parts[drawing_id]
+                    for drawing_id in DIAGRAM_DRAWING_IDS(xml)
+                    if drawing_id in self.story.part.related_parts
+                ]
+
+            self.sources.add(block_id, PartsSource([part, *held]))
 
             self.blocks.append(DocumentBlock(
                 block_id=block_id,

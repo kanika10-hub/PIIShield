@@ -16,7 +16,7 @@ BLOCK_TYPES = {
     "heading", "paragraph", "list_item", "table", "table_cell", "image_ocr",
     "image", "chart", "diagram", "embedded_object", "word"
 }
-LOCATIONS = {"body", "header", "footer", "text_box", "notes", "footnote", "endnote", "comment"}
+LOCATIONS = {"body", "header", "footer", "text_box", "notes", "footnote", "endnote", "comment", "template"}
 METHODS = {"native", "ocr", "mixed"}
 CONTENT_TYPES = {"PDF": "pdf_page", "PPTX": "slide", "DOCX": "docx_body"}
 IMAGE_KEYS = {"ocr_engine", "image_width", "image_height", "ocr_confidence", "word_count", "words"}

@@ -17,12 +17,21 @@ extracted, e.g. by an earlier run), which skips extraction:
     redact      <name>_tagged.json, <name>_sanitized.json
     validate    <name>_validation.json
     audit       <name>_exposure.json                 exposure_file
+    file_redact <name>_redacted.<ext>, <name>_file_redaction.json
+                                                     redact_original, from the stored upload
+    file_check  <name>_file_validation.json          validate_original; for a PDF whose scans
+                                                     still show PII, file_redact and file_check
+                                                     again with those places (another_pass)
     then        approved_copy: may the sanitized copy go to an LLM?
+                approved_file: may the redacted file be shared?
 
 If extraction, the format check or the scan fails, the PII report is
 written with status "failed" and nothing is tagged or redacted. If
 redaction or validation fails, the files they wrote are deleted. A step
-that fails stops the job, and the steps after it are "skipped".
+that fails stops the job, and the steps after it are "skipped". The
+redacted file's steps are the exception, as in main.py: if they fail,
+their files are deleted and the job completes without the file. They
+are skipped for an extracted JSON upload, which has no original file.
 
 A finished job can then be reviewed, one validation issue at a time
 (src/pii/review.py):
@@ -32,7 +41,8 @@ A finished job can then be reviewed, one validation issue at a time
                 <name>_review.json (its sign-offs were for the old copy),
                 redact and validate again, give the new validation the
                 sign-offs of the issues it still holds unchanged
-                (review.kept_review), then audit
+                (review.kept_review), then audit, and write and check
+                the redacted file again
     hide all    the same at once for every OCR issue that can be hidden
                 and was not signed off
     sign off all
@@ -55,9 +65,11 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 
 from main import (
-    OUTPUT_DIR, SUPPORTED_TYPES, UPLOAD_DIR, delete, extract_document, format_summary,
+    OUTPUT_DIR, SUPPORTED_TYPES, UPLOAD_DIR, delete, extract_document, file_outputs, format_summary,
     input_problem, load_extracted, pipeline_outputs
 )
+from src.original_format.redactor import WRITERS, redact_original
+from src.original_format.validator import another_pass, approved_file, file_validation_path, validate_original
 from src.models.schema import format_problems
 from src.pii.detectors import LocalNLPDetector
 from src.pii.document_scanner import failed_report, findings_path, save_findings, scan_file
@@ -82,6 +94,8 @@ STEPS = [
     ("redact", "Tagging and sanitization"),
     ("validate", "Validation"),
     ("audit", "Audit report"),
+    ("file_redact", "Redacted file"),
+    ("file_check", "Redacted file check"),
 ]
 
 ORIGINAL_PATH = "uploaded through the web interface"
@@ -112,7 +126,7 @@ class JobBusy(Exception):
 
 
 # The steps a reviewer's answer runs again
-AFTER_HIDING = ["redact", "validate", "audit"]
+AFTER_HIDING = ["redact", "validate", "audit", "file_redact", "file_check"]
 AFTER_SIGN_OFF = ["audit"]
 
 
@@ -239,9 +253,10 @@ def error_text(error):
 
 def approval(json_path):
     """
-    What the release gate says of the job's sanitized copy (approved_copy,
-    the same gate any code sending text to an LLM must use), and how far
-    the review of its issues has got.
+    What the release gates say of the job's sanitized copy (approved_copy,
+    the same gate any code sending text to an LLM must use) and of its
+    redacted file (approved_file), and how far the review of the copy's
+    issues has got.
     """
 
     json_path = Path(json_path)
@@ -251,6 +266,8 @@ def approval(json_path):
         result = {"approved": True, "reason": None}
     except NotApproved as reason:
         result = {"approved": False, "reason": str(reason).replace(str(json_path.parent), "output")}
+
+    result.update(file_approval(json_path))
 
     try:
         validation = json.loads(validation_path(json_path).read_text(encoding="utf-8"))
@@ -270,6 +287,27 @@ def approval(json_path):
             "needing_review": review["total"],
         },
     }
+
+
+def file_approval(json_path):
+    """
+    What approved_file says of the job's redacted file, and its check's
+    verdict (None if it was not checked).
+    """
+
+    try:
+        verdict = json.loads(file_validation_path(json_path).read_text(encoding="utf-8")).get("verdict")
+    except (OSError, ValueError):
+        verdict = None
+
+    try:
+        name = approved_file(json_path).name
+        return {"file_verdict": verdict, "file_approved": True, "file_name": name, "file_reason": None}
+    except NotApproved as reason:
+        return {
+            "file_verdict": verdict, "file_approved": False, "file_name": None,
+            "file_reason": str(reason).replace(str(json_path.parent), "output"),
+        }
 
 
 def safe_name(file_name):
@@ -471,6 +509,9 @@ class Jobs:
         outputs = pipeline_outputs(json_path)
         report_path = outputs[0]
 
+        # The redacted file was checked beside the copy about to be replaced
+        delete(file_outputs(json_path))
+
         try:
             with job.step("redact") as detail:
                 result, _, _ = redact_file(json_path, report_path)
@@ -497,6 +538,61 @@ class Jobs:
             save_review(json_path, kept)
 
         self.audit(job)
+        self.redacted_file(job, nlp)
+
+    def redacted_file(self, job, nlp):
+        """
+        Steps 6-7 of main.py: the redacted file in its own format, then
+        its check. If they fail, their files are deleted and the job
+        completes: the sanitized copy and its reports stand.
+        """
+
+        json_path = job.json_path
+        suffix = job.stored_path.suffix.lower()
+
+        if job.extracted or suffix not in WRITERS:
+            reason = (
+                "Not available: the upload is an extracted JSON file, not the document" if job.extracted
+                else f"Not available yet for {suffix.lstrip('.').upper()} files"
+            )
+            job.skip("file_redact", reason)
+            job.skip("file_check", reason)
+
+        else:
+            written = False
+
+            try:
+                with job.step("file_redact") as detail:
+                    record, _, _ = redact_original(json_path, job.stored_path)
+                    placed = record["summary"]
+                    detail["text"] = (
+                        f"{placed['redacted']} of {placed['findings']} findings placed in the "
+                        f"{suffix.lstrip('.').upper()} file ({record['status']})"
+                    )
+
+                written = True
+
+                with job.step("file_check") as detail:
+                    file_validation, _ = validate_original(json_path, nlp)
+
+                    # A scan read again can show what its first reading missed: those places too
+                    while leftovers := another_pass(file_validation):
+                        redact_original(json_path, job.stored_path, leftovers=leftovers)
+                        file_validation, _ = validate_original(json_path, nlp)
+
+                    passes = file_validation["redaction_pass"]
+                    detail["text"] = (
+                        file_validation["verdict"].replace("_", " ") + (f" (after {passes} passes)" if passes > 1 else "")
+                    )
+
+            except Exception:
+                # An unchecked or part-made file must not be mistaken for a checked one
+                delete(file_outputs(json_path))
+
+                if not written:
+                    job.skip("file_check", "Not run: the redacted file could not be written")
+
+        job.update(result={**job.result, **approval(json_path)})
 
     def audit(self, job):
         """

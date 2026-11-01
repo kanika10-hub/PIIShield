@@ -15,44 +15,59 @@
 
   // The client-side upload, then the server's steps (src/web/jobs.py)
   const STEPS = [
-    ["upload", "Upload"],
-    ["extract", "Text extraction"],
-    ["check", "Extraction check"],
-    ["scan", "PII detection"],
-    ["redact", "Tagging and sanitization"],
-    ["validate", "Validation"],
-    ["audit", "Audit report"],
+    ["upload", "Upload the file"],
+    ["extract", "Read the document"],
+    ["check", "Check it was read fully"],
+    ["scan", "Find personal details"],
+    ["redact", "Hide them in the text"],
+    ["validate", "Check the cleaned text"],
+    ["audit", "Write the report"],
+    ["file_redact", "Make the cleaned file"],
+    ["file_check", "Check the cleaned file"],
   ];
+
+  const STEP_LABELS = new Map(STEPS);
 
   const STEP_ICONS = { pending: "", running: "", done: "✓", failed: "✕", skipped: "–" };
   const STEP_TEXT = { pending: "waiting", running: "in progress", done: "done", failed: "failed", skipped: "skipped" };
 
   // Every type the detectors report, in the order the summary lists them
   const TYPE_LABELS = {
-    PERSON_NAME: ["Names", "Name"],
+    PERSON_NAME: ["People's names", "Person's name"],
     EMAIL: ["Email addresses", "Email address"],
     PHONE: ["Phone numbers", "Phone number"],
     EMPLOYEE_ID: ["Employee IDs", "Employee ID"],
     US_SSN: ["US Social Security numbers", "US Social Security number"],
     INDIAN_PAN: ["Indian PAN numbers", "Indian PAN number"],
     PASSPORT_NUMBER: ["Passport numbers", "Passport number"],
-    NATIONAL_ID: ["National ID numbers", "National ID number"],
+    NATIONAL_ID: ["National IDs", "National ID"],
     DATE_OF_BIRTH: ["Dates of birth", "Date of birth"],
     POSTAL_ADDRESS: ["Home addresses", "Home address"],
     PAYMENT_CARD: ["Payment card numbers", "Payment card number"],
     BANK_ACCOUNT: ["Bank account numbers", "Bank account number"],
     IP_ADDRESS: ["IP addresses", "IP address"],
-    UNREADABLE_TEXT: ["Unreadable OCR text", "Unreadable OCR text"],
+    UNREADABLE_TEXT: ["Hard-to-read text", "Hard-to-read text"],
   };
 
   const VERDICTS = {
-    PASS: { label: "PASS", cls: "pass", text: "No PII is known to remain in the sanitized copy." },
+    PASS: { label: "Safe", cls: "pass", text: "No personal details were found left in the cleaned text." },
     NEEDS_REVIEW: {
-      label: "NEEDS REVIEW", cls: "review",
-      text: "Nothing is known to remain, but something could not be confirmed. A person must review the issues below first.",
+      label: "Check needed", cls: "review",
+      text: "No personal details are known to be left, but a few places could not be checked automatically. A person needs to look at them (under Review, below) before anything is shared.",
     },
-    FAIL: { label: "FAIL", cls: "fail", text: "PII remains in the sanitized copy, or the copy does not match its document." },
+    FAIL: { label: "Not safe", cls: "fail", text: "Personal details are still in the cleaned text, or it does not match the original document. Do not share it." },
   };
+
+  // An issue's or a check's status, in plain words
+  const STATUS_LABELS = { PASS: "Passed", NEEDS_REVIEW: "Check needed", FAIL: "Failed" };
+
+  // What the uploaded file is called in plain words, by its extension
+  const FILE_KINDS = { pdf: "PDF", docx: "Word file", pptx: "PowerPoint file" };
+
+  // A finding's confidence is a rule's ranking (0.75 to 0.99), not a
+  // probability: shown as a band, the number only in technical details
+  const HIGH_CONFIDENCE = 0.9;
+  const MEDIUM_CONFIDENCE = 0.8;
 
   // The verdict once the review is counted: PASS when a reviewer answered
   // every issue and the release gate let the copy go (jobs.approval)
@@ -67,27 +82,42 @@
 
   // What each validator check (src/pii/validator.py) confirms
   const CHECKS = {
-    provenance: "The report and sanitized copy belong to this document",
-    report: "Every finding's offsets point at its value",
-    replacements: "Every finding was replaced",
-    ocr: "OCR text is reliable, and hidden where redacted",
-    extraction: "The extractor read the whole document",
-    rescan: "A rescan of the sanitized copy finds no PII",
-    known_values: "No found value is left anywhere in the copy",
-    structure: "The structure is unchanged apart from the tags",
+    provenance: "The report and cleaned text belong to this document",
+    report: "Each item found matches the original text",
+    replacements: "Every item found was hidden",
+    ocr: "Text read from pictures and scans is clear, and hidden where it should be",
+    extraction: "The whole document was read",
+    rescan: "A second search of the cleaned text finds no personal details",
+    known_values: "Nothing that was found is left anywhere in the cleaned text",
+    structure: "Nothing changed except the hidden details",
   };
+
+  // An issue in plain words, by its check and its reason
+  // (src/pii/validator.py); the reason itself shows in technical details.
+  // The reason is not reworded there: a sign-off is keyed on its text.
+  const PLAIN_ISSUES = [
+    ["known_values", /^part of a name/, "A word that may be part of someone's name is still in the text."],
+    ["known_values", /./, "Something found elsewhere in the document is still in the text."],
+    ["ocr", /could not be OCR'd/, "A picture could not be read, so any personal details in it were not checked."],
+    ["ocr", /./, "Text in a picture or scan was hard to read, so a name or number in it may have been missed."],
+    ["extraction", /little or no text/, "Little or no text could be read from this page, so personal details on it may have been missed."],
+    ["extraction", /embedded object/, "A file inside the document (for example a spreadsheet) was not opened, so it was not checked."],
+    ["extraction", /./, "Part of the document could not be read, so it was not checked."],
+    ["rescan", /person names were not rescanned/, "People's names could not be checked a second time."],
+    ["provenance", /^redactor:/, "Something could not be hidden automatically."],
+  ];
 
   const LOCATIONS = {
     header: "Header", footer: "Footer", text_box: "Text box", notes: "Speaker notes",
-    footnote: "Footnote", endnote: "Endnote", comment: "Comment",
+    footnote: "Footnote", endnote: "Endnote", comment: "Comment", template: "Slide template",
   };
 
   const CAPTIONS = {
-    image_ocr: "Image text (OCR)",
-    image: "Image",
+    image_ocr: "Text read from a picture",
+    image: "Picture",
     chart: "Chart",
     diagram: "Diagram",
-    embedded_object: "Embedded object (not opened)",
+    embedded_object: "File inside the document (not opened)",
   };
 
   const LOW_OCR_CONFIDENCE = 60;
@@ -105,9 +135,9 @@
   const DOCUMENT_TABS = { extracted: "original", tagged: "tagged", sanitized: "sanitized" };
 
   const INTROS = {
-    extracted: "The text as extracted from the file, in reading order. Detected PII is highlighted: select a highlight to open its finding.",
-    tagged: "Each detected value is labelled with its type. This copy still contains the PII: it is for review only.",
-    sanitized: "Each detected value is replaced by a placeholder. This is the only copy that may go to an AI model, and only once it passes validation.",
+    extracted: "This is the document's text, in reading order. Personal details that were found are highlighted: click one to see more.",
+    tagged: "Each detected item is marked with its type. This version still contains the personal data and is for review only.",
+    sanitized: "Personal details are replaced with labels such as [REDACTED: EMAIL]. This is the text that may be sent to an AI tool, but only once it passes the safety check.",
   };
 
   // ------------------------------------------------------------
@@ -118,8 +148,8 @@
 
   // The two ways in: a document to extract, or a document already extracted
   const PATHS = {
-    document: { zone: $("drop-document"), input: $("input-document"), label: "Document file" },
-    extracted: { zone: $("drop-extracted"), input: $("input-extracted"), label: "Extracted JSON" },
+    document: { zone: $("drop-document"), input: $("input-document"), label: "Document" },
+    extracted: { zone: $("drop-extracted"), input: $("input-extracted"), label: "Saved scan (JSON)" },
   };
 
   const ui = {
@@ -137,6 +167,7 @@
     summary: $("findings-summary"),
     steps: $("steps"),
     decision: $("decision"),
+    next: $("next-step"),
     results: $("results"),
   };
 
@@ -158,6 +189,8 @@
     blockTexts: new Map(),
     findingRows: new Map(),
     activeTab: "extracted",
+    // Whether the results of the job's latest run are loaded
+    loaded: false,
     // The tab to show again after a review answer, and the reviewer's name
     returnTab: null,
     reviewer: "",
@@ -229,6 +262,56 @@
     return typeof value === "number" ? value.toFixed(2) : "";
   }
 
+  // High, Medium or Low, with the number in technical details
+  function confidenceText(value) {
+    if (typeof value !== "number") return "";
+
+    const band = value >= HIGH_CONFIDENCE ? "High" : value >= MEDIUM_CONFIDENCE ? "Medium" : "Low";
+
+    return [band, tech(` (${formatConfidence(value)})`)];
+  }
+
+  // Text that only the technical details show
+  function tech(text) {
+    return el("span", { class: "tech-only", text });
+  }
+
+  // What the uploaded document is, in plain words: "PDF", "Word file"
+  function fileKind(job) {
+    const result = job.result || {};
+    const name = result.file_name || (job.input_kind === "extracted_json" ? job.source_file : job.file_name) || "";
+    const extension = (name.match(/\.([^.]+)$/) || ["", ""])[1].toLowerCase();
+
+    return FILE_KINDS[extension] || "file";
+  }
+
+  // An issue in plain words, or its own reason if there is none
+  function plainIssue(checkName, issue) {
+    const reason = issue.reason || "";
+    const match = PLAIN_ISSUES.find(([check, pattern]) => check === checkName && pattern.test(reason));
+
+    return match ? match[2] : humanize(reason);
+  }
+
+  // Where an issue or a hidden block is: its page (a button that shows it
+  // in the original text when it is shown there), block ID in technical details
+  function placeLink(blockId, pageNumber) {
+    if (!blockId && !pageNumber) return null;
+
+    const page = pageNumber ? `page ${pageNumber}` : "see where";
+    const block = blockId ? tech(`${pageNumber ? " · " : ""}block ${blockId}`) : null;
+
+    if (!inDocument(blockId, pageNumber)) return [pageNumber ? page : null, block];
+
+    return [
+      el("button", {
+        type: "button", class: "link-button", text: page, title: "Show it in the original text",
+        onclick: () => showBlock(blockId, pageNumber),
+      }),
+      block,
+    ];
+  }
+
   function humanize(text) {
     const words = String(text || "").replace(/_/g, " ");
     return words.charAt(0).toUpperCase() + words.slice(1);
@@ -244,15 +327,19 @@
   }
 
   function statusLabel(status) {
-    return String(status || "").replace(/_/g, " ");
+    return STATUS_LABELS[status] || String(status || "").replace(/_/g, " ");
   }
 
   function badge(text, cls) {
     return el("span", { class: `badge ${cls || ""}`, text });
   }
 
-  function section(title, content) {
-    return [el("h3", { class: "section-title", text: title }), content];
+  // options.tech: shown only with technical details; options.id: the title's ID
+  function section(title, content, options) {
+    const { tech: techOnly, id } = options || {};
+    const parts = [el("h3", { class: "section-title", id, text: title }), content];
+
+    return techOnly ? el("div", { class: "tech-only" }, parts) : parts;
   }
 
   // ------------------------------------------------------------
@@ -296,15 +383,15 @@
   function fileProblem(file, kind, extension) {
     if (!state.fileTypes[kind].includes(extension)) {
       if (kind === "document" && state.fileTypes.extracted.includes(extension)) {
-        return `${file.name} is a JSON file: choose it under Extracted JSON.`;
+        return `${file.name} is a saved scan (JSON), not a document. To check it, turn on Show technical details and choose it under Use saved results.`;
       }
 
       if (kind === "extracted" && state.fileTypes.document.includes(extension)) {
-        return `${file.name} is a document: choose it under Document file.`;
+        return `${file.name} is a document: choose it under Upload document.`;
       }
 
       return kind === "document"
-        ? `${file.name} is not a PDF, PPTX or DOCX file.`
+        ? `${file.name} is not a PDF, Word or PowerPoint file.`
         : `${file.name} is not a JSON file.`;
     }
 
@@ -342,8 +429,8 @@
     ui.fileRow.hidden = false;
     ui.scan.disabled = false;
     ui.status.textContent = kind === "extracted"
-      ? "Ready to scan. Extraction will be skipped: the file is checked against the common JSON format instead."
-      : "Ready to scan.";
+      ? "Ready to check. The document is not read again: the saved scan is used instead."
+      : "Ready to check.";
   }
 
   function markChosen(kind) {
@@ -450,12 +537,12 @@
     ui.after.hidden = false;
 
     if (job.state === "failed") {
-      showError(`The scan stopped: ${job.error}`);
-      ui.status.textContent = "The scan did not complete. What it produced is shown below.";
+      showError(`The check stopped: ${job.error}`);
+      ui.status.textContent = "The check did not finish. What it found so far is shown below.";
     } else if (job.input_kind === "extracted_json") {
-      ui.status.textContent = `Scan complete: ${job.file_name} (extracted from ${job.source_file})`;
+      ui.status.textContent = `Check complete: ${job.file_name} (saved scan of ${job.source_file})`;
     } else {
-      ui.status.textContent = `Scan complete: ${job.file_name}`;
+      ui.status.textContent = `Check complete: ${job.file_name}`;
     }
 
     await loadResults(job);
@@ -479,7 +566,7 @@
     }
 
     ui.scan.disabled = busy || !state.file;
-    ui.scan.textContent = busy ? "Scanning…" : "Scan Document";
+    ui.scan.textContent = busy ? "Checking…" : "Check document";
     ui.after.hidden = busy || !state.job || !["completed", "failed"].includes(state.job.state);
   }
 
@@ -521,6 +608,7 @@
     state.pageNodes = {};
     state.blockTexts = new Map();
     state.findingRows = new Map();
+    state.loaded = false;
     state.returnTab = null;
     ui.results.hidden = true;
     ui.after.hidden = true;
@@ -528,6 +616,7 @@
     renderSteps(null);
     renderSummary(null);
     renderDecision(null);
+    renderNext(null);
   }
 
   function reset() {
@@ -546,12 +635,12 @@
   async function deleteScan() {
     if (!state.job) return;
 
-    if (!window.confirm("Delete this scan's uploaded file and all of its outputs from this computer?")) return;
+    if (!window.confirm("Delete the uploaded file and everything made from it from this computer?")) return;
 
     try {
       await api(`/api/jobs/${encodeURIComponent(state.job.job_id)}`, { method: "DELETE" });
       reset();
-      ui.status.textContent = "The scan's files were deleted from this computer.";
+      ui.status.textContent = "The files were deleted from this computer.";
     } catch (error) {
       showError(error.message);
     }
@@ -565,12 +654,13 @@
     renderSteps(job);
     renderSummary(job);
     renderDecision(job);
+    renderNext(job);
 
     if (job.state === "queued") {
-      ui.status.textContent = "Waiting for the previous scan to finish…";
+      ui.status.textContent = "Waiting for the previous document to finish…";
     } else if (job.state === "running") {
       const step = job.steps.find((item) => item.status === "running");
-      ui.status.textContent = step ? `${step.label}…` : "Processing…";
+      ui.status.textContent = step ? `${STEP_LABELS.get(step.name) || step.label}…` : "Working…";
     }
   }
 
@@ -585,7 +675,8 @@
         el("span", null, [
           el("span", { class: "step-label", text: label }),
           el("span", { class: "visually-hidden", text: ` (${STEP_TEXT[step.status]})` }),
-          step.detail ? el("span", { class: "step-detail", text: step.detail }) : null,
+          // The server's details name formats and counts: technical details only
+          step.detail ? el("span", { class: name === "upload" ? "step-detail" : "step-detail tech-only", text: step.detail }) : null,
         ]),
       ]);
     }));
@@ -594,7 +685,7 @@
   function zeroFindingsNote() {
     return el("p", {
       class: "note warn",
-      text: "No PII was detected. This is not proof that the document contains none: OCR errors, unread images and unusual layouts can hide PII. Check the extraction warnings and the validation results.",
+      text: "No personal details were found. That does not guarantee there are none: text in pictures or scans can be misread, and unusual layouts can hide details. Look through the Original text tab before sharing.",
     });
   }
 
@@ -602,9 +693,9 @@
     const result = job ? job.result : null;
 
     if (!result || result.findings_total === undefined) {
-      let text = "Findings appear here after a document is scanned.";
-      if (job && job.state === "failed") text = "No findings: the scan stopped before PII detection finished.";
-      else if (job) text = "Waiting for PII detection to finish…";
+      let text = "The personal details found are counted here after a document is checked.";
+      if (job && job.state === "failed") text = "Nothing to show: the check stopped before it finished looking for personal details.";
+      else if (job) text = "Looking for personal details…";
       fill(ui.summary, el("p", { class: "muted", text }));
       return;
     }
@@ -617,9 +708,9 @@
     fill(ui.summary, [
       el("div", { class: "total" }, [
         el("span", { class: "total-number", text: total }),
-        el("span", { class: "muted", text: total === 1 ? "finding" : "findings" }),
+        el("span", { class: "muted", text: total === 1 ? "item found" : "items found" }),
       ]),
-      el("ul", { class: "breakdown", "aria-label": "Findings by type" }, types.map((type) => {
+      el("ul", { class: "breakdown", "aria-label": "Items found, by type" }, types.map((type) => {
         const count = counts[type] || 0;
         const bar = el("span");
         bar.style.width = `${(count / largest) * 100}%`;
@@ -631,7 +722,7 @@
         ]);
       })),
       result.names_detected === false
-        ? el("p", { class: "note warn", text: "Person names were not detected: the spaCy language model is not available." })
+        ? el("p", { class: "note warn", text: "People's names were not checked: the part of the checker that recognises names is not installed." })
         : null,
       total === 0 ? zeroFindingsNote() : null,
     ]);
@@ -651,8 +742,8 @@
       const verdict = finalVerdict(job);
       const info = VERDICTS[verdict];
       rows.push(el("div", { class: "decision-row" }, [
-        el("span", { text: passedAfterReview(job) ? "Validation (after review)" : "Validation" }),
-        badge(info ? info.label : verdict, info ? info.cls : ""),
+        el("span", { text: passedAfterReview(job) ? "Safety check (after review)" : "Safety check" }),
+        badge(info ? info.label : statusLabel(verdict), info ? info.cls : ""),
       ]));
     }
 
@@ -660,12 +751,149 @@
     if (job.state === "completed" || job.state === "failed") {
       const approved = job.state === "completed" && result.approved === true;
       rows.push(el("div", { class: "decision-row" }, [
-        el("span", { text: "AI processing" }),
-        approved ? badge("APPROVED", "pass") : badge("BLOCKED", "fail"),
+        el("span", { text: "Cleaned text can be sent to an AI tool" }),
+        approved ? badge("Yes", "pass") : badge("No", "fail"),
       ]));
+
+      // Only once its steps ran (jobs.file_approval)
+      if (result.file_verdict !== undefined) {
+        const fileApproved = job.state === "completed" && result.file_approved === true;
+        rows.push(el("div", { class: "decision-row" }, [
+          el("span", { text: `Cleaned ${fileKind(job)}` }),
+          fileApproved ? badge("Ready", "pass") : result.file_verdict ? badge("Not ready", "fail") : badge("Not made", "fail"),
+        ]));
+      }
     }
 
     fill(ui.decision, rows);
+  }
+
+  // ------------------------------------------------------------
+  // What to do next: one sentence and one action
+  // ------------------------------------------------------------
+
+  function renderNext(job) {
+    if (!job) {
+      ui.next.hidden = true;
+      ui.next.replaceChildren();
+      return;
+    }
+
+    const finished = job.state === "completed" || job.state === "failed";
+    const next = finished && state.loaded ? nextStep(job) : {
+      cls: "working",
+      icon: "",
+      title: job.state === "queued" ? "Waiting for the previous document to finish…" : "Checking your document…",
+      text: ["This takes a few minutes, longer for scanned PDFs. Keep this page open."],
+    };
+
+    ui.next.className = `panel next-step ${next.cls}`;
+    fill(ui.next, [
+      el("span", { class: "next-icon", "aria-hidden": "true", text: next.icon }),
+      el("div", { class: "next-text" }, [
+        el("h2", { text: next.title }),
+        next.text.map((line) => el("p", null, line)),
+      ]),
+      next.actions ? el("div", { class: "next-actions" }, next.actions) : null,
+    ]);
+    ui.next.hidden = false;
+  }
+
+  // The job's outcome in plain words. "Ready" only when the release gate
+  // let the cleaned file go (jobs.file_approval): the same flag that shows
+  // the download button
+  function nextStep(job) {
+    const result = job.result || {};
+    const kind = fileKind(job);
+    const review = result.review || {};
+    const open = (review.needing_review || 0) - (review.signed_off || 0);
+    const fileApproved = job.state === "completed" && result.file_approved === true;
+    const fileProblem = result.file_verdict
+      ? `The cleaned ${kind} did not pass its own safety check, so it cannot be downloaded.`
+      : `The cleaned ${kind} could not be made.`;
+    const why = (reason) => (reason ? tech(` (${reason})`) : null);
+
+    if (job.state === "failed") {
+      return {
+        cls: "fail", icon: "✕",
+        title: "The check could not finish",
+        text: ["Nothing from this check is safe to share. Try again with Check another document, or turn on Show technical details to see what went wrong."],
+      };
+    }
+
+    if (fileApproved) {
+      const findings = result.findings_total;
+
+      return {
+        cls: "pass", icon: "✓",
+        title: `Your cleaned ${kind} is ready`,
+        text: [
+          findings === 0
+            ? "No personal details were found, so nothing was blacked out. That does not guarantee there are none: look through the Original text before sharing."
+            : `${findings} personal detail${findings === 1 ? " was" : "s were"} blacked out`
+              + (review.after_review ? ", and a reviewer checked the places that needed it." : ". The cleaned file passed its own safety check."),
+          "Share the cleaned file, not the one you uploaded: that one still contains the personal details.",
+        ],
+        actions: [
+          el("a", {
+            class: "button primary", href: `/api/jobs/${encodeURIComponent(job.job_id)}/download/redacted`,
+            download: "", text: `Download cleaned ${kind}`,
+          }),
+          resultsButton("See what was found", "findings"),
+        ],
+      };
+    }
+
+    if (result.verdict === "FAIL") {
+      return {
+        cls: "fail", icon: "✕",
+        title: "Personal details may still be in this document",
+        text: ["The automatic check found personal details it could not hide. Do not share this document or anything made from it. Turn on Show technical details to see where."],
+      };
+    }
+
+    if (result.verdict === "NEEDS_REVIEW" && open > 0) {
+      return {
+        cls: "review", icon: "!",
+        title: `${open} ${open === 1 ? "place needs" : "places need"} a person to check`,
+        text: [
+          "The automatic check could not be sure about some places. Look at each one, then choose Hide it, or Checked, it's fine.",
+          result.file_verdict === "PASS"
+            ? `When none are left, the cleaned ${kind} will be ready to download.`
+            : [fileProblem, why(result.file_reason)],
+        ],
+        actions: [resultsButton("Start review", "validation", "review-title", true)],
+      };
+    }
+
+    if (job.state === "completed" && result.approved === true) {
+      return {
+        cls: "fail", icon: "✕",
+        title: `The cleaned ${kind} is not available`,
+        text: [
+          [fileProblem, why(result.file_reason)],
+          "Do not share the file you uploaded: it still contains the personal details.",
+        ],
+        actions: [resultsButton("See what was found", "findings")],
+      };
+    }
+
+    return {
+      cls: "fail", icon: "✕",
+      title: "This document is not ready to share",
+      text: [["The safety check did not clear it. Turn on Show technical details to see why.", why(result.reason)]],
+    };
+  }
+
+  // Opens a results tab and scrolls to it (or to one part of it)
+  function resultsButton(label, tab, targetId, primary) {
+    return el("button", {
+      type: "button", class: primary ? "button primary" : "button", text: label,
+      onclick: () => {
+        selectTab(tab);
+        ((targetId && $(targetId)) || ui.results).scrollIntoView({ block: "start" });
+      },
+    });
   }
 
   // ------------------------------------------------------------
@@ -694,20 +922,25 @@
     // After a review answer, back to the tab it was given on
     selectTab(state.returnTab || "extracted");
     state.returnTab = null;
+    state.loaded = true;
+    renderNext(state.job);
   }
 
   function bindTabs() {
-    TABS.forEach((name, index) => {
+    for (const name of TABS) {
       const tab = $(`tab-${name}`);
 
       tab.addEventListener("click", () => selectTab(name));
 
       tab.addEventListener("keydown", (event) => {
+        // Only the tabs this view shows (Marked text is a technical detail)
+        const shown = TABS.filter((other) => $(`tab-${other}`).offsetParent !== null);
+        const index = shown.indexOf(name);
         const moves = {
-          ArrowRight: TABS[(index + 1) % TABS.length],
-          ArrowLeft: TABS[(index - 1 + TABS.length) % TABS.length],
-          Home: TABS[0],
-          End: TABS[TABS.length - 1],
+          ArrowRight: shown[(index + 1) % shown.length],
+          ArrowLeft: shown[(index - 1 + shown.length) % shown.length],
+          Home: shown[0],
+          End: shown[shown.length - 1],
         };
 
         if (moves[event.key]) {
@@ -716,6 +949,11 @@
           $(`tab-${moves[event.key]}`).focus();
         }
       });
+    }
+
+    // A tab the simple view hides is not left open (theme.js)
+    document.addEventListener("detailschange", (event) => {
+      if (!event.detail.on && state.activeTab === "tagged" && !ui.results.hidden) selectTab("extracted");
     });
   }
 
@@ -747,11 +985,25 @@
     return el("p", { class: "note warn", text: (data && data.unavailable) || fallback });
   }
 
+  // The redacted file in the upload's own format has a check of its own (jobs.file_approval)
   function originalFileNote() {
-    return el("p", {
-      class: "note",
-      text: "Sanitizing the extracted text does not redact the original PDF, PPTX or DOCX file. The original file, and the images inside it, still show the PII.",
-    });
+    const result = state.job.result || {};
+    const kind = fileKind(state.job);
+
+    if (state.job.state === "completed" && result.file_approved === true) {
+      return el("p", {
+        class: "note",
+        text: `The cleaned ${kind}, with personal details blacked out, passed its own safety check. Download it from the Downloads section of the Safety check tab. The file you uploaded still contains the personal details.`,
+      });
+    }
+
+    return el("p", { class: result.file_verdict ? "note warn" : "note" }, result.file_verdict
+      ? [
+        `The cleaned ${kind} is not ready to download`,
+        result.file_reason ? tech(`: ${result.file_reason}`) : null,
+        ". The file you uploaded still contains the personal details.",
+      ]
+      : `No cleaned ${kind} was made. The file you uploaded still contains the personal details, including any inside pictures.`);
   }
 
   function approvalNote() {
@@ -761,15 +1013,15 @@
       return el("p", {
         class: "note",
         text: job.result.verdict === "NEEDS_REVIEW"
-          ? "Approved for AI processing: this copy passed validation after a reviewer checked every issue it raised."
-          : "Approved for AI processing: this copy passed validation.",
+          ? "This cleaned text can be sent to an AI tool: a reviewer checked every place that needed it."
+          : "This cleaned text can be sent to an AI tool: it passed the safety check.",
       });
     }
 
-    const verdict = job.result.verdict ? statusLabel(job.result.verdict) : "not validated";
+    const info = VERDICTS[job.result.verdict];
     return el("p", {
       class: "note danger",
-      text: `Blocked for AI processing (validation: ${verdict}). Do not send this copy to an AI model.`,
+      text: `Do not send this cleaned text to an AI tool yet (safety check: ${info ? info.label : "not done"}).`,
     });
   }
 
@@ -817,7 +1069,7 @@
     if (tab === "sanitized") append(container, [approvalNote(), originalFileNote()]);
 
     if (!view || view.unavailable) {
-      append(container, unavailableNote(view, "This text is not available for this scan."));
+      append(container, unavailableNote(view, "This text is not available for this document."));
       return;
     }
 
@@ -834,13 +1086,13 @@
 
       for (const block of page.blocks) blocks.append(renderBlock(block, tab, marks, nodes));
 
-      if (!page.blocks.length) blocks.append(el("p", { class: "muted", text: "No text was extracted from this page." }));
+      if (!page.blocks.length) blocks.append(el("p", { class: "muted", text: "No text could be read from this page." }));
 
       const section = el("section", { class: "doc-page" }, [
         el("h3", { class: "doc-page-label" }, [
           page.label,
           page.hidden ? badge("Hidden slide") : null,
-          page.low_text ? badge("Little or no text extracted", "review") : null,
+          page.low_text ? badge("Little or no text could be read", "review") : null,
         ]),
         blocks,
       ]);
@@ -876,11 +1128,13 @@
     if (LOCATIONS[block.location]) parts.push(LOCATIONS[block.location]);
     if (CAPTIONS[block.block_type]) parts.push(CAPTIONS[block.block_type]);
 
-    if (typeof block.ocr_confidence === "number" && block.ocr_confidence < LOW_OCR_CONFIDENCE) {
-      parts.push(`low OCR confidence (${Math.round(block.ocr_confidence)})`);
-    }
+    const lowOcr = typeof block.ocr_confidence === "number" && block.ocr_confidence < LOW_OCR_CONFIDENCE;
 
-    return parts.join(" · ");
+    if (lowOcr) parts.push("hard to read");
+
+    if (!parts.length) return null;
+
+    return [parts.join(" · "), lowOcr ? tech(` (OCR confidence ${Math.round(block.ocr_confidence)})`) : null];
   }
 
   function renderBlock(block, tab, marks, nodes) {
@@ -891,7 +1145,7 @@
 
     if (caption) {
       node.classList.add("framed");
-      node.append(el("span", { class: "block-caption", text: caption }));
+      node.append(el("span", { class: "block-caption" }, caption));
     }
 
     if (block.author) {
@@ -943,7 +1197,7 @@
 
     const caption = blockCaption(block);
     const wrap = el("div", { class: "doc-table-wrap" }, [
-      caption ? el("span", { class: "block-caption", text: caption }) : null,
+      caption ? el("span", { class: "block-caption" }, caption) : null,
       el("table", { class: "doc-table" }, body),
     ]);
 
@@ -1030,12 +1284,12 @@
     const data = state.data.findings;
 
     if (!data || data.unavailable) {
-      append(container, unavailableNote(data, "The PII report is not available for this scan."));
+      append(container, unavailableNote(data, "The list of personal details found is not available."));
       return;
     }
 
     if (data.status === "failed") {
-      append(container, el("p", { class: "note danger", text: `The PII scan failed: ${data.error}` }));
+      append(container, el("p", { class: "note danger", text: `The search for personal details failed: ${data.error}` }));
       return;
     }
 
@@ -1050,11 +1304,11 @@
     for (const item of findings) counts[item.type] = (counts[item.type] || 0) + 1;
 
     const search = el("input", {
-      class: "input", type: "search", placeholder: "Search value, location or finding ID",
-      "aria-label": "Search findings",
+      class: "input", type: "search", placeholder: "Search the text found or where it is",
+      "aria-label": "Search the items found",
     });
 
-    const typeFilter = el("select", { class: "input", "aria-label": "Filter by PII type" }, [
+    const typeFilter = el("select", { class: "input", "aria-label": "Show one type only" }, [
       el("option", { value: "", text: "All types" }),
       Object.keys(counts).sort().map((type) => el("option", { value: type, text: `${typeLabel(type)} (${counts[type]})` })),
     ]);
@@ -1077,10 +1331,10 @@
       }, [
         el("td", { class: "nowrap", text: typeLabel(item.type, true) }),
         el("td", { class: "value", text: item.value }),
-        el("td", { class: "num", text: formatConfidence(item.confidence) }),
+        el("td", { class: "nowrap" }, confidenceText(item.confidence)),
         el("td", { class: "nowrap", text: item.page_label }),
         el("td", { text: item.location }),
-        el("td", { class: "nowrap", text: humanize(item.review_status) }),
+        el("td", { class: "nowrap tech-only", text: humanize(item.review_status) }),
       ]);
 
       row.searchText = [item.value, item.location, item.finding_id, item.type, item.block_id].join(" ").toLowerCase();
@@ -1118,12 +1372,13 @@
     append(container, [
       el("div", { class: "toolbar" }, [search, typeFilter, count]),
       el("div", { class: "table-wrap" }, el("table", { class: "data-table" }, [
-        el("thead", null, el("tr", null, ["Type", "Value", "Confidence", "Page / slide", "Location", "Review status"]
-          .map((heading) => el("th", { scope: "col", text: heading })))),
+        el("thead", null, el("tr", null, [
+          ["Type"], ["Text found"], ["How sure"], ["Page / slide"], ["Where"], ["Review status", "tech-only"],
+        ].map(([heading, cls]) => el("th", { scope: "col", class: cls, text: heading })))),
         body,
       ])),
       el("div", { class: "inspector", id: "inspector" },
-        el("p", { class: "muted", text: "Select a finding to see its surrounding text and source location." })),
+        el("p", { class: "muted", text: "Click a row to see the text around it and where it is in the document." })),
     ]);
 
     apply();
@@ -1137,28 +1392,32 @@
 
     for (const [rowId, row] of state.findingRows) row.classList.toggle("selected", rowId === id);
 
+    // [term, value, shown only with technical details]
     const details = [
-      ["Value", el("span", { class: "value", text: item.value })],
+      ["Text found", el("span", { class: "value", text: item.value })],
       ["Type", typeLabel(item.type, true)],
-      ["Confidence", `${formatConfidence(item.confidence)} (a rule's ranking, not a probability)`],
-      ["Location", item.location],
-      ["Detector", `${item.detector || ""}${item.rule_id ? ` · ${item.rule_id}` : ""}`],
-      ["Found because of", item.context_trigger],
-      ["Action", item.action],
-      ["Validation", item.validation],
-      ["Validation issues", item.validation_issues && item.validation_issues.length ? item.validation_issues.join("; ") : null],
-      ["Review status", humanize(item.review_status)],
-      ["Image OCR confidence", typeof item.ocr_confidence === "number" ? Math.round(item.ocr_confidence) : null],
-      ["Block", `${item.block_id} · characters ${item.start}–${item.end}`],
+      ["How sure", confidenceText(item.confidence)],
+      ["Where", item.location],
+      ["Detector", `${item.detector || ""}${item.rule_id ? ` · ${item.rule_id}` : ""}`, true],
+      ["Found because of", item.context_trigger, true],
+      ["Action", item.action, true],
+      ["Validation", item.validation, true],
+      ["Validation issues", item.validation_issues && item.validation_issues.length ? item.validation_issues.join("; ") : null, true],
+      ["Review status", humanize(item.review_status), true],
+      ["Image OCR confidence", typeof item.ocr_confidence === "number" ? Math.round(item.ocr_confidence) : null, true],
+      ["Block", `${item.block_id} · characters ${item.start}–${item.end}`, true],
     ].filter(([, value]) => value !== null && value !== undefined && value !== "");
 
     fill(inspector, [
-      el("h3", { text: `${typeLabel(item.type, true)} · ${item.finding_id}` }),
-      el("dl", { class: "details" }, details.map(([term, value]) => [el("dt", { text: term }), el("dd", null, value)])),
-      el("p", { class: "block-caption", text: "Surrounding text" }),
+      el("h3", null, [typeLabel(item.type, true), tech(` · ${item.finding_id}`)]),
+      el("dl", { class: "details" }, details.map(([term, value, techOnly]) => [
+        el("dt", { class: techOnly ? "tech-only" : null, text: term }),
+        el("dd", { class: techOnly ? "tech-only" : null }, value),
+      ])),
+      el("p", { class: "block-caption", text: "Text around it" }),
       contextBox(item),
       el("div", { class: "downloads" }, el("button", {
-        type: "button", class: "button", text: "Show in extracted text", onclick: () => showInDocument(item),
+        type: "button", class: "button", text: "Show it in the original text", onclick: () => showInDocument(item),
       })),
     ]);
     // The inspector is filled on demand; keep it in view
@@ -1247,72 +1506,67 @@
 
     if (!info) {
       return el("div", { class: "verdict-box fail" }, [
-        badge("NOT VALIDATED", "fail"),
+        badge("Not checked", "fail"),
         el("div", { class: "verdict-text" }, [
-          el("strong", { text: "Blocked for AI processing" }),
-          "Validation did not run, so nothing confirms the sanitized copy is free of PII.",
+          el("strong", { text: "Do not send it to an AI tool" }),
+          "The safety check did not run, so nothing confirms the cleaned text is free of personal details.",
         ]),
       ]);
     }
 
     return el("div", { class: `verdict-box ${info.cls}` }, [
-      badge(info.label, info.cls),
+      badge(reviewed ? `${info.label} (after review)` : info.label, info.cls),
       el("div", { class: "verdict-text" }, [
-        el("strong", { text: approved ? "Approved for AI processing" : "Blocked for AI processing" }),
-        reviewed ? "Validation raised issues that needed review, and a reviewer checked every one (below)." : info.text,
-        !approved && job.result.reason && verdict === "PASS" ? ` (${job.result.reason})` : null,
+        el("strong", { text: approved ? "The cleaned text can be sent to an AI tool" : "Do not send it to an AI tool yet" }),
+        reviewed ? "A few places needed a person to check them, and a reviewer checked every one (below)." : info.text,
+        !approved && job.result.reason && verdict === "PASS" ? tech(` (${job.result.reason})`) : null,
       ]),
     ]);
   }
 
-  // readOnly: no answers of its own (an OCR issue, answered with the others)
-  function issueItem(issue, readOnly) {
+  // One issue of one check: its status, what it means and where it is.
+  // readOnly: no answers of its own (in the list of checks, or an OCR
+  // issue answered with the others); the Review section answers it.
+  function issueItem(issue, checkName, readOnly) {
     const where = [];
 
     if (issue.finding_id) {
       where.push(el("button", {
-        type: "button", class: "link-button", text: issue.finding_id,
+        type: "button", class: "link-button", title: "Show the item found",
         onclick: () => openFinding(issue.finding_id),
-      }));
+      }, [el("span", { class: "simple-only", text: "see the item found" }), tech(issue.finding_id)]));
     }
 
-    const place = [
-      issue.block_id ? `block ${issue.block_id}` : null,
-      issue.page_number ? `page ${issue.page_number}` : null,
-    ].filter(Boolean).join(" · ");
-
-    // The block (or page) opens in the extracted text, where the reviewer can read it
-    if (place) {
-      where.push(" ", inDocument(issue.block_id, issue.page_number)
-        ? el("button", {
-          type: "button", class: "link-button", text: place, title: "Show in extracted text",
-          onclick: () => showBlock(issue.block_id, issue.page_number),
-        })
-        : place);
-    }
+    // The block (or page) opens in the original text, where the reviewer can read it
+    const place = placeLink(issue.block_id, issue.page_number);
+    if (place) where.push(where.length ? ", " : null, place);
 
     const item = el("li");
     const signed = issue.signed_off;
+    const label = signed ? "Checked" : statusLabel(issue.severity);
+    const cls = signed ? "pass" : statusClass(issue.severity);
 
     // An issue that needs review: its badge opens the reviewer's choices
-    const status = readOnly
-      ? badge(signed ? "CHECKED" : statusLabel(issue.severity), signed ? "pass" : statusClass(issue.severity))
-      : issue.severity === "NEEDS_REVIEW" && issue.key
+    const status = !readOnly && issue.severity === "NEEDS_REVIEW" && issue.key
       ? el("button", {
         type: "button",
-        class: `badge badge-button ${signed ? "pass" : "review"}`,
-        text: signed ? "CHECKED" : statusLabel(issue.severity),
-        title: signed ? "Checked by a reviewer: select to see who, or to undo" : "Select to review this issue",
+        class: `badge badge-button ${cls}`,
+        text: label,
+        title: signed ? "Checked by a reviewer: click to see who, or to undo" : "Click to choose what to do about it",
         "aria-expanded": "false",
         onclick: () => toggleReview(item, issue, status),
       })
-      : badge(statusLabel(issue.severity), statusClass(issue.severity));
+      : badge(label, cls);
+
+    const plain = plainIssue(checkName, issue);
+    const own = humanize(issue.reason);
 
     return append(item, [
       status,
       " ",
-      issue.reason,
-      issue.occurrences ? ` (${issue.occurrences}×)` : null,
+      plain,
+      plain !== own ? el("span", { class: "tech-only muted", text: ` (${issue.reason})` }) : null,
+      issue.occurrences > 1 ? ` Found ${issue.occurrences} times.` : null,
       where.length ? el("span", { class: "muted" }, [" — ", where]) : null,
     ]);
   }
@@ -1368,12 +1622,16 @@
 
     return el("div", { class: "review-box" }, [
       // Who checked the issue: recorded with the answer, not a value to hide
-      el("label", { class: "review-name" }, ["Reviewer", name]),
+      el("label", { class: "review-name" }, ["Your name", name]),
       issue.can_hide ? el("button", { type: "button", class: "button", text: "Hide it", onclick: () => send("hide") }) : null,
       el("button", { type: "button", class: "button", text: "Checked, it's fine", onclick: () => send("sign-offs") }),
-      issue.can_hide
-        ? el("p", { class: "muted review-hint", text: "Hide it redacts this text and runs the checks again. \"Checked\" answers on issues it does not change are kept." })
-        : null,
+      el("p", {
+        class: "muted review-hint",
+        text: (issue.can_hide
+          ? "Hide it blacks out this text and runs the checks again; your other answers are kept. "
+          : "")
+          + "Checked, it's fine leaves the text as it is. Your name is recorded with your answer.",
+      }),
       message,
     ]);
   }
@@ -1396,6 +1654,7 @@
 
       state.job = job;
       state.returnTab = state.activeTab;
+      state.loaded = false;
       clearError();
       setBusy(true);
       renderJob(job);
@@ -1410,21 +1669,33 @@
     return Number.isNaN(date.getTime()) ? String(value || "") : date.toLocaleString();
   }
 
-  // How far the review has got, "Hide all OCR issues", and the blocks a
-  // reviewer hid text in (views.review_view)
-  function reviewPanel(review, ocrIssues) {
+  // How far the review has got, each place to check with its answers,
+  // "Hide all" for the OCR places, and the blocks a reviewer hid text in
+  // (views.review_view)
+  function reviewPanel(review, toCheck, ocrIssues, cut) {
     const hidden = review.hidden || [];
 
     const progress = el("p", {
       class: review.open ? "note warn" : "note",
-      text: `${hidden.length} block${hidden.length === 1 ? "" : "s"} hidden · ${review.checked} checked · ${review.open} left to review. `
-        + (review.open ? "Validation turns PASS when none are left." : "Nothing is left to review."),
+      text: `${review.open} left to check · ${review.checked} checked · ${hidden.length} place${hidden.length === 1 ? "" : "s"} hidden. `
+        + (review.open
+          ? "Click Check needed beside each place to answer it. When none are left, the safety check passes."
+          : "Nothing is left to check."),
     });
 
     return [
       progress,
+      cut.length
+        ? el("p", {
+          class: "note danger",
+          text: "There are too many places to list them all here, so this document cannot be cleared by review. Ask your technical contact to look at it.",
+        })
+        : null,
+      toCheck.length ? el("ul", { class: "plain-list" }, toCheck.map(([checkName, issue]) => issueItem(issue, checkName))) : null,
       ocrIssues.length ? ocrGroup(ocrIssues) : null,
-      hidden.length ? el("ul", { class: "plain-list" }, hidden.map(hiddenItem)) : null,
+      hidden.length
+        ? [el("p", { class: "muted", text: "Places hidden by a reviewer:" }), el("ul", { class: "plain-list" }, hidden.map(hiddenItem))]
+        : null,
     ];
   }
 
@@ -1481,19 +1752,19 @@
       ]);
     } else if (job.state === "completed") {
       answers = el("div", { class: "review-box" }, [
-        el("label", { class: "review-name" }, ["Reviewer", name]),
+        el("label", { class: "review-name" }, ["Your name", name]),
         el("button", {
           type: "button", class: "button", text: "Hide all",
-          onclick: answer("hide-all", `Hide the text of all ${plural(open.length, "place")}? It is redacted from the sanitized copy, so the AI will not see it.`),
+          onclick: answer("hide-all", `Black out the text in all ${plural(open.length, "place")}? It is hidden like the other personal details, so an AI tool will not see it.`),
         }),
         el("button", {
           type: "button", class: "button", text: "Checked, all fine",
-          onclick: answer("sign-off-all", `Approve all ${plural(open.length, "place")} as they are? Their text goes to the AI unread, including any PII the OCR misread.`),
+          onclick: answer("sign-off-all", `Leave all ${plural(open.length, "place")} as they are? Their text will be shared as it is, including any personal details that were misread.`),
         }),
         el("p", {
           class: "muted review-hint",
           text: (open.length < issues.length ? `${issues.length - open.length} already checked: the buttons answer the other ${open.length}. ` : "")
-            + "Hide all removes their text from the sanitized copy. Checked, all fine sends it to the AI as it is.",
+            + "Hide all blacks out the text in these places. Checked, all fine leaves it as it is.",
         }),
         message,
       ]);
@@ -1501,14 +1772,15 @@
 
     return el("div", { class: "ocr-group" }, [
       el("p", { class: "ocr-group-line" }, [
-        open.length ? badge("NEEDS REVIEW", "review") : badge("CHECKED", "pass"),
+        open.length ? badge("Check needed", "review") : badge("Checked", "pass"),
         " ",
-        `${plural(issues.length, "place")} where OCR text was read with low confidence${where}`,
+        `${plural(issues.length, "place")} in pictures or scans where the text was hard to read${where}. `,
+        "A name or number there may have been misread, and so missed.",
       ]),
       answers,
       el("details", null, [
         el("summary", { text: `Show the ${plural(issues.length, "place")}` }),
-        el("ul", null, issues.map((issue) => issueItem(issue, true))),
+        el("ul", null, issues.map((issue) => issueItem(issue, issue.check_name, true))),
       ]),
     ]);
   }
@@ -1516,20 +1788,14 @@
   // One block a reviewer hid text in: block ID, types, who and when; never the text
   function hiddenItem(entry) {
     const types = entry.types.map((type) => (TYPE_LABELS[type] ? TYPE_LABELS[type][1] : humanize(type))).join(", ");
-    const place = [`block ${entry.block_id}`, entry.page_number ? `page ${entry.page_number}` : null].filter(Boolean).join(" · ");
 
     return el("li", null, [
-      badge("HIDDEN", "pass"),
+      badge("Hidden", "pass"),
       " ",
       types,
       el("span", { class: "muted" }, [
         " — ",
-        inDocument(entry.block_id, entry.page_number)
-          ? el("button", {
-            type: "button", class: "link-button", text: place, title: "Show in extracted text",
-            onclick: () => showBlock(entry.block_id, entry.page_number),
-          })
-          : place,
+        placeLink(entry.block_id, entry.page_number),
         entry.added_by ? ` · by ${entry.added_by} · ${formatTime(entry.added_at)}` : null,
       ]),
     ]);
@@ -1556,8 +1822,11 @@
           grouped.length
             ? el("p", { class: "muted", text: `${grouped.length} place${grouped.length === 1 ? "" : "s"} where OCR text was read with low confidence: answered all together under Review, above.` })
             : null,
+          issues.some((issue) => issue.severity === "NEEDS_REVIEW")
+            ? el("p", { class: "muted", text: "Issues that need checking are answered under Review, above." })
+            : null,
           issues.length
-            ? el("ul", null, issues.map((issue) => issueItem(issue)))
+            ? el("ul", null, issues.map((issue) => issueItem(issue, check.name, true)))
             : grouped.length ? null : el("p", { class: "muted", text: "No issues." }),
           more > 0 ? el("p", { class: "muted", text: `…and ${more} more in the validation report.` }) : null,
         ]),
@@ -1597,22 +1866,39 @@
 
     const validation = data.validation || {};
 
+    // Served only if its release gate lets it go (approved_file)
+    const fileApproved = job.state === "completed" && job.result.file_approved === true;
+
+    // The JSON files and reports: technical details only
+    const techLink = (name, label) => {
+      const node = link(name, label);
+      node.classList.add("tech-only");
+      return node;
+    };
+
     const links = [
-      available(data.original) ? link("extracted", "Extracted JSON") : null,
-      available(data.findings) ? link("findings", "Findings JSON") : null,
-      available(data.sanitized) ? link("sanitized", approved ? "Sanitized JSON" : "Sanitized JSON (not approved)") : null,
-      validation.validation ? link("validation", "Validation report") : null,
-      validation.exposure ? link("audit-md", "Audit report (Markdown)") : null,
-      validation.exposure ? link("audit-json", "Audit report (JSON)") : null,
+      fileApproved ? link("redacted", `Cleaned ${fileKind(job)}`) : null,
+      available(data.original) ? techLink("extracted", "Extracted JSON") : null,
+      available(data.findings) ? techLink("findings", "Findings JSON") : null,
+      available(data.sanitized) ? techLink("sanitized", approved ? "Sanitized JSON" : "Sanitized JSON (not approved)") : null,
+      validation.validation ? techLink("validation", "Validation report") : null,
+      validation.exposure ? techLink("audit-md", "Audit report (Markdown)") : null,
+      validation.exposure ? techLink("audit-json", "Audit report (JSON)") : null,
     ].filter(Boolean);
 
-    if (!links.length) return el("p", { class: "muted", text: "No files are available for this scan." });
+    if (!links.length) return el("p", { class: "muted", text: "No files are available for this document." });
 
     return [
       el("div", { class: "downloads" }, links),
+      fileApproved
+        ? el("p", { class: "muted simple-only", text: "Share the cleaned file, not the one you uploaded: that one still contains the personal details." })
+        : el("p", { class: "muted simple-only", text: "There is nothing to download yet. The box at the top of the page says why." }),
+      !fileApproved && job.result.file_reason
+        ? el("p", { class: "note warn tech-only", text: `Redacted file not available: ${job.result.file_reason}` })
+        : null,
       el("p", {
-        class: "note",
-        text: "The extracted JSON and the findings JSON hold the PII: handle them as sensitive. Choose the extracted JSON under Extracted JSON to scan the document again without extracting it. The validation and audit reports hold no PII values.",
+        class: "note tech-only",
+        text: "The extracted JSON and the findings JSON hold the PII: handle them as sensitive. Choose the extracted JSON under Use saved results to scan the document again without extracting it. The validation and audit reports hold no PII values.",
       }),
     ];
   }
@@ -1629,34 +1915,42 @@
     const errors = [job.error, data && data.report_error].filter(Boolean);
 
     if (errors.length) {
-      append(container, section("Processing errors",
+      append(container, section("What went wrong",
         el("ul", { class: "plain-list" }, [...new Set(errors)].map((error) => el("li", { text: error })))));
     }
 
     if (!data || data.unavailable) {
-      append(container, [unavailableNote(data, "The validation results are not available."), section("Downloads", downloadsBlock())]);
+      append(container, [unavailableNote(data, "The safety check results are not available."), section("Downloads", downloadsBlock())]);
       return;
     }
 
     const review = data.review || {};
-    const ocrIssues = data.validation
-      ? data.validation.checks.flatMap((check) => (check.issues || []).filter((issue) => issue.unreadable))
-      : [];
+    const checks = data.validation ? data.validation.checks : [];
+    const issuesOf = (keep) => checks.flatMap((check) => (check.issues || [])
+      .filter(keep)
+      .map((issue) => [check.name, issue]));
+
+    // Each place to check, answered one by one; the OCR places all together
+    const toCheck = issuesOf((issue) => !issue.unreadable && issue.severity === "NEEDS_REVIEW");
+    const ocrIssues = issuesOf((issue) => issue.unreadable)
+      .map(([checkName, issue]) => Object.assign({ check_name: checkName }, issue));
+    // Checks that list only some of their issues cannot be signed off (review_approval)
+    const cut = checks.filter((check) => check.status === "NEEDS_REVIEW" && check.issues_total > (check.issues || []).length);
 
     if (data.validation && (review.needing_review || (review.hidden || []).length || ocrIssues.length)) {
-      append(container, section("Review", reviewPanel(review, ocrIssues)));
+      append(container, section("Review", reviewPanel(review, toCheck, ocrIssues, cut), { id: "review-title" }));
     }
 
-    if (data.validation) append(container, section("Validation checks", checkList(data.validation.checks)));
+    if (data.validation) append(container, section("All safety checks", checkList(checks), { tech: true }));
 
     const warnings = data.extraction_warnings || [];
 
     append(container, section("Extraction warnings",
       warnings.length
         ? el("ul", { class: "plain-list" }, warnings.map((warning) => el("li", { text: warning })))
-        : el("p", { class: "muted", text: "None reported." })));
+        : el("p", { class: "muted", text: "None reported." }), { tech: true }));
 
-    if (data.redaction) append(container, section("Redaction", redactionBlock(data.redaction)));
+    if (data.redaction) append(container, section("Redaction", redactionBlock(data.redaction), { tech: true }));
 
     append(container, section("Downloads", downloadsBlock()));
   }

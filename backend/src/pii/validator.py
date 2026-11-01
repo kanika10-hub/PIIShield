@@ -608,11 +608,17 @@ def check_extraction(document):
     return issues, notes
 
 
-def check_rescan(report, sanitized, nlp_detector):
+def check_rescan(report, sanitized, nlp_detector, misreading=None, failed=None):
     """
     Run the scanner over the sanitized copy. Anything it finds is PII
     the redaction left behind, except a value a reviewer already marked
     as a false positive in that block: it was kept on purpose.
+
+    misreading(finding): True for a finding that is only OCR noise (the
+    redacted file's images read again, src/original_format/validator.py).
+    The sanitized copy is not read again, so its check passes none.
+    failed: a list the findings that fail are added to (the redacted
+    file's check places them, to redact them in another pass).
     """
 
     issues = []
@@ -629,11 +635,19 @@ def check_rescan(report, sanitized, nlp_detector):
 
     rescan = scan_document(sanitized, nlp_detector)
     excused = 0
+    misread = 0
 
     for item in rescan["findings"]:
         if (item["block_id"], normalise(item["text"])) in kept:
             excused += 1
             continue
+
+        if misreading is not None and misreading(item):
+            misread += 1
+            continue
+
+        if failed is not None:
+            failed.append(item)
 
         issues.append(issue(
             FAIL, f"{item['type']} found by {item['rule_id']}",
@@ -644,6 +658,12 @@ def check_rescan(report, sanitized, nlp_detector):
 
     if excused:
         notes.append(f"{excused} detections are values reviewed as false positives")
+
+    if misread:
+        notes.append(
+            f"{misread} detections are OCR noise: the redaction marks read again, or low-confidence misreadings "
+            "of pixels that were not changed and were read with confidence before, with no PII"
+        )
 
     return issues, notes
 

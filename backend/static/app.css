@@ -105,7 +105,16 @@ body {
   margin-bottom: 20px;
 }
 
+.header-buttons { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
 .theme-button { flex-shrink: 0; padding: 5px 12px; font-size: 13px; }
+
+/* ---------- simple view or technical details (theme.js) ---------- */
+
+:root:not(.tech) .tech-only { display: none !important; }
+:root.tech .simple-only { display: none !important; }
+
+/* One way in when the saved-scan path is hidden */
+:root:not(.tech) .input-paths { grid-template-columns: minmax(0, 520px); justify-content: center; }
 
 .page-header h1 {
   margin: 0 0 4px;
@@ -302,6 +311,45 @@ body {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* ---------- what to do next ---------- */
+
+.next-step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 16px;
+  border-left-width: 4px;
+}
+
+.next-step.pass { border-color: var(--pass-line); border-left-color: var(--pass); background: var(--pass-soft); }
+.next-step.review { border-color: var(--review-line); border-left-color: var(--review); background: var(--review-soft); }
+.next-step.fail { border-color: var(--fail-line); border-left-color: var(--fail); background: var(--fail-soft); }
+.next-step.working { border-left-color: var(--accent); }
+
+.next-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.next-step.pass .next-icon { border-color: var(--pass); background: var(--pass); color: var(--on-status); }
+.next-step.review .next-icon { border-color: var(--review); background: var(--review); color: var(--on-status); }
+.next-step.fail .next-icon { border-color: var(--fail); background: var(--fail); color: var(--on-status); }
+.next-step.working .next-icon { border-color: var(--accent); border-right-color: transparent; animation: spin 0.9s linear infinite; }
+
+.next-text { flex: 1 1 320px; min-width: 0; }
+.next-text h2 { margin: 0 0 2px; font-size: 16px; font-weight: 600; }
+.next-text p { margin: 0; }
+.next-text p + p { margin-top: 4px; }
+.next-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 
 /* ---------- findings summary ---------- */
 
@@ -660,6 +708,8 @@ mark.pii.selected { background: var(--accent-soft); box-shadow: 0 0 0 1px var(--
 
 @media (max-width: 760px) {
   .container { padding: 20px 16px 32px; }
+  .page-header { flex-wrap: wrap; }
+  .header-buttons { justify-content: flex-start; }
   .grid-2 { grid-template-columns: 1fr; gap: 0; }
   .input-paths { grid-template-columns: 1fr; }
   .file-row { flex-direction: column; align-items: stretch; }

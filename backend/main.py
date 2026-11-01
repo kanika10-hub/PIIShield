@@ -33,10 +33,22 @@ name never overwrite each other's outputs.
                                                                      no PII values)
                                       output/exposure_report.csv    (every document in
                                       output/exposure_report.md      output/, combined)
+6. Write the redacted file in its  -> <job>/<name>_redacted.<ext>   (the PDF, PPTX or
+   own format, from the stored                                       DOCX, each finding
+   upload (src/original_format)                                      replaced by its tag)
+                                      <job>/<name>_file_redaction.json
+7. Check the redacted file         -> <job>/<name>_file_validation.json  (PASS, FAIL or
+                                                                     NEEDS_REVIEW; a FAIL
+                                                                     file is deleted)
+   A PDF whose scans, read again, still show PII the first reading
+   missed is written and checked again with those places blanked too
+   (validator.another_pass), at most MAX_PASSES times in all
 
 Only a sanitized copy whose verdict is PASS may be sent to an LLM, and
 src.pii.validator.approved_copy() is the way to load it for that: it
-refuses any other copy.
+refuses any other copy. The redacted file is released the same way, by
+src.original_format.validator.approved_file(): only a PASS file beside
+an approved copy.
 
 Given an extracted JSON file, the outputs are written next to it.
 
@@ -54,9 +66,13 @@ PII report is still written, with status "failed", and nothing is
 tagged or redacted. If redaction or validation fails, the files they
 had written are deleted. The combined exposure report is rebuilt once
 the old outputs are deleted, so it never lists a document whose outputs
-are gone.
+are gone. If steps 6-7 fail, the files they wrote are deleted and the
+sanitized copy and its reports stand: only the redacted file is missing.
+They are skipped for an extracted JSON file whose stored upload is gone.
 
-Exit code: 0 PASS, 1 FAIL or an error, 2 NEEDS_REVIEW.
+Exit code: 0 PASS, 1 FAIL or an error, 2 NEEDS_REVIEW: the worse of the
+sanitized copy's release and the redacted file's (a redacted file that
+could not be written or checked counts as FAIL).
 """
 
 import json
@@ -68,6 +84,8 @@ from src.extractors.docx_extractor import extract_docx
 from src.extractors.pdf_extractor import extract_pdf
 from src.extractors.pptx_extractor import extract_pptx
 from src.models.schema import format_problems
+from src.original_format.redactor import WRITERS, record_path, redact_original, redacted_path, stored_upload
+from src.original_format.validator import another_pass, approved_file, file_validation_path, validate_original
 from src.pii.detectors import LocalNLPDetector
 from src.pii.document_scanner import failed_report, findings_path, save_findings, scan_file
 from src.pii.exposure_report import (
@@ -76,7 +94,7 @@ from src.pii.exposure_report import (
 from src.pii.redactor import output_paths, redact_file
 from src.pii.validator import (
     EXIT_CODES, FAIL, NEEDS_REVIEW, PASS, NotApproved, approved_copy,
-    print_validation, review_path, validate_file, validation_path
+    print_validation, review_path, validate_file, validation_path, worst
 )
 from src.structure.heading_classifier import classify_headings
 from src.structure.pdf_tables import reconstruct_tables
@@ -236,10 +254,10 @@ def upload(input_path):
     job_id = stored_job_id(input_path, UPLOAD_DIR)
 
     if job_id is None:
-        print(f"[0/5] Uploading {input_path.name} ...")
+        print(f"[0/7] Uploading {input_path.name} ...")
         job_id, stored_path = store_upload(input_path, UPLOAD_DIR)
     else:
-        print(f"[0/5] Upload skipped: {input_path.name} is a stored upload")
+        print(f"[0/7] Upload skipped: {input_path.name} is a stored upload")
         stored_path = input_path
 
     job_dir = OUTPUT_DIR / job_id
@@ -297,19 +315,49 @@ def read_extracted(json_path):
     return document
 
 
+def file_outputs(json_path):
+    """
+    The files steps 6-7 write for an extracted JSON file: the redaction
+    record, the redacted file's check, and the redacted file (named for
+    each type it could have).
+    """
+
+    return [
+        record_path(json_path), file_validation_path(json_path),
+        *(redacted_path(json_path, f"file{suffix}") for suffix in SUPPORTED_TYPES)
+    ]
+
+
 def pipeline_outputs(json_path):
     """
-    The files steps 2-5 write for an extracted JSON file, in step order:
+    The files steps 2-7 write for an extracted JSON file, in step order:
     PII report, tagged copy, sanitized copy, validation report,
-    exposure report.
+    exposure report, then those of the redacted file (file_outputs).
     """
 
     tagged_path, sanitized_path = output_paths(json_path)
 
     return [
         findings_path(json_path), tagged_path, sanitized_path,
-        validation_path(json_path), exposure_path(json_path)
+        validation_path(json_path), exposure_path(json_path), *file_outputs(json_path)
     ]
+
+
+def original_problem(json_path, source_path):
+    """
+    Why the redacted file cannot be written for a document (steps 6-7),
+    or None: its type has no writer, or its stored upload is gone.
+    """
+
+    original = stored_upload(json_path, {"file_name": source_path.name}, UPLOAD_DIR)
+
+    if original.suffix.lower() not in WRITERS:
+        return original, f"{original.suffix.upper().lstrip('.')} files cannot be redacted in their own format yet"
+
+    if not original.is_file():
+        return original, f"the uploaded file is no longer there ({original})"
+
+    return original, None
 
 
 def delete(paths):
@@ -347,10 +395,10 @@ def main():
 
     try:
         if already_extracted:
-            print(f"[1/5] Extraction skipped: using {json_path}")
+            print(f"[1/7] Extraction skipped: using {json_path}")
             print("      Format:      OK (checked on loading)")
         else:
-            print(f"[1/5] Extracting {source_path.name} ...")
+            print(f"[1/7] Extracting {source_path.name} ...")
             document = extract_document(source_path)
             document.save_json(json_path)
             print(f"      Common JSON: {json_path}")
@@ -366,7 +414,7 @@ def main():
 
             print(f"      Format:      OK ({len(document.pages)} pages)")
 
-        print("[2/5] Scanning for PII ...")
+        print("[2/7] Scanning for PII ...")
         nlp = LocalNLPDetector()
 
         if nlp.error:
@@ -392,7 +440,7 @@ def main():
         print(f"      Warning: {warning}")
 
     try:
-        print("[3/5] Tagging and redacting ...")
+        print("[3/7] Tagging and redacting ...")
         result, tagged_path, sanitized_path = redact_file(json_path, report_path)
         redaction = result["redaction"]
         print(f"      Tagged:      {tagged_path}  (still holds PII: for review only)")
@@ -402,7 +450,7 @@ def main():
             f"of {redaction['summary']['findings']} findings redacted"
         )
 
-        print("[4/5] Validating the sanitized copy ...")
+        print("[4/7] Validating the sanitized copy ...")
         validation, validation_report_path = validate_file(json_path, report_path, nlp)
         print(f"      Validation:  {validation_report_path}")
 
@@ -413,7 +461,7 @@ def main():
         raise
 
     try:
-        print("[5/5] Reporting the PII exposure ...")
+        print("[5/7] Reporting the PII exposure ...")
         exposure, exposure_report_path = exposure_file(json_path, report_path)
         csv_path, md_path, documents = write_combined(combined_folder(json_path))
         print(f"      Exposure:    {exposure_report_path}  (no PII values: shareable)")
@@ -427,6 +475,44 @@ def main():
         print("\nFailed. No exposure report was kept.")
         raise
 
+    # Steps 6-7. If they fail, the sanitized copy and its reports stand
+    original, problem = original_problem(json_path, source_path)
+    file_verdict = None
+
+    if problem:
+        print(f"[6/7] Redacted file skipped: {problem}")
+    else:
+        try:
+            print(f"[6/7] Writing the redacted {original.suffix.upper().lstrip('.')} file ...")
+            record, redacted, record_file = redact_original(json_path, original)
+            placed = record["summary"]
+            print(f"      Redacted:    {redacted}  (not checked yet)")
+            print(
+                f"      Placed:      {placed['redacted']} of {placed['findings']} findings ({record['status']}), "
+                f"{placed['images_redacted']} images changed"
+            )
+
+            print("[7/7] Checking the redacted file ...")
+            file_validation, file_report_path = validate_original(json_path, nlp)
+            file_verdict = file_validation["verdict"]
+            print(f"      Check:       {file_report_path}  ({file_verdict})")
+
+            # A scan read again can show what its first reading missed: those places too
+            while leftovers := another_pass(file_validation):
+                print(f"[6/7] Writing the redacted file again, with {len(leftovers)} places its check found ...")
+                record, redacted, record_file = redact_original(json_path, original, leftovers=leftovers)
+                print("[7/7] Checking the redacted file again ...")
+                file_validation, file_report_path = validate_original(json_path, nlp)
+                file_verdict = file_validation["verdict"]
+                print(f"      Check:       {file_report_path}  ({file_verdict}, pass {file_validation['redaction_pass']})")
+
+        except Exception as error:
+            # An unchecked or part-made file must not be mistaken for a checked one
+            delete(file_outputs(json_path))
+            file_verdict = FAIL
+            print(f"      Failed: {type(error).__name__}: {error}")
+            print("      No redacted file was kept. The sanitized copy and its reports stand.")
+
     print_validation(validation)
 
     verdict = validation["verdict"]
@@ -434,8 +520,15 @@ def main():
     # The same gate any code sending text to an LLM must use
     try:
         approved_copy(json_path)
+        outcomes = [PASS]
+
+        print(
+            f"\nApproved: {sanitized_path} passed validation and may be sent to an LLM.\n"
+            "Load it with src.pii.validator.approved_copy(), which refuses any other copy."
+        )
 
     except NotApproved as reason:
+        outcomes = [verdict if verdict != PASS else FAIL]
         print(f"\nBlocked: do not send {sanitized_path} to an LLM ({reason}).")
 
         if verdict == FAIL:
@@ -445,14 +538,22 @@ def main():
 
         print(f"See {validation_report_path}")
 
-        sys.exit(EXIT_CODES[verdict] if verdict != PASS else 1)
+    # The same gate any code sharing the redacted file must use
+    if file_verdict is not None:
+        try:
+            print(
+                f"\nApproved: {approved_file(json_path)} passed its check and may be shared.\n"
+                "Release it with src.original_format.validator.approved_file(), which refuses any other file."
+            )
+            outcomes.append(PASS)
 
-    print(
-        f"\nApproved: {sanitized_path} passed validation and may be sent to an LLM.\n"
-        "Load it with src.pii.validator.approved_copy(), which refuses any other copy."
-    )
+        except NotApproved as reason:
+            # A PASS file waits for its sanitized copy's approval; refused beside
+            # an approved copy, it changed since its check
+            outcomes.append(file_verdict if file_verdict != PASS else outcomes[0] if outcomes[0] != PASS else FAIL)
+            print(f"\nBlocked: do not share the redacted file ({reason}).")
 
-    sys.exit(EXIT_CODES[PASS])
+    sys.exit(EXIT_CODES[worst(outcomes)])
 
 
 if __name__ == "__main__":

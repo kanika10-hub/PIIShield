@@ -3,11 +3,12 @@ from pathlib import Path
 from lxml import etree
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE, PP_PLACEHOLDER
+from pptx.opc.constants import RELATIONSHIP_TYPE as RT
 from pptx.util import Emu
 
 from src.extractors.common import combined_method, office_properties, page_text_metadata, text_method
 from src.extractors.text_sources import (
-    ImageSource, PartsSource, Sources, TextSource, pptx_paragraph_pieces
+    ImageSource, PartsSource, Sources, TextSource, pptx_comment_pieces, pptx_paragraph_pieces
 )
 from src.models.document import (
     ExtractedDocument,
@@ -29,6 +30,16 @@ PARAGRAPH_TEXT = etree.XPath(".//a:t/text()", namespaces=DRAWING_NS)
 # named by relId in the data part and related from the slide
 DIAGRAM_DRAWING_IDS = etree.XPath(".//*[local-name()='dataModelExt']/@relId")
 BLIPS = etree.XPath(".//a:blip", namespaces=DRAWING_NS)
+EMBED = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed"
+
+# Comments: PowerPoint's classic ones (p:cm, authors in p:cmAuthor) and
+# the threaded ones of PowerPoint 365 (p188:cm with p188:reply, authors
+# in p188:author)
+P_NS = "http://schemas.openxmlformats.org/presentationml/2006/main"
+P188_NS = "http://schemas.microsoft.com/office/powerpoint/2018/8/main"
+THREADED_COMMENTS = "http://schemas.microsoft.com/office/2018/10/relationships/comments"
+THREADED_AUTHORS = "http://schemas.microsoft.com/office/2018/10/relationships/authors"
+COMMENT_PARAGRAPHS = etree.XPath("p188:txBody/a:p", namespaces={"p188": P188_NS, **DRAWING_NS})
 
 # Placeholders whose paragraphs are bullets unless they say otherwise
 BULLET_PLACEHOLDERS = (PP_PLACEHOLDER.BODY, PP_PLACEHOLDER.OBJECT)
@@ -429,12 +440,140 @@ def notes_blocks(slide, slide_number, sources=Sources()):
     return blocks
 
 
-def slide_blocks(slide, slide_number, reader, sources=Sources()):
+def template_image_blocks(slide, slide_number, reader, seen, sources=Sources()):
     """
-    The blocks of one slide, in reading order, then its speaker notes.
-    The original-format redactor calls this in locate mode, with a
-    SourceMap.
+    The images the slide shows that no picture block reads: its
+    background and picture fills, and the pictures, fills and background
+    its layout and master put on it (a logo, a backdrop). Each image is
+    read once, on the first slide that shows it. seen: the image parts
+    already read, updated here.
     """
+
+    layout = slide.slide_layout
+    blocks = []
+
+    for kind, owner in (("fill", slide), ("layout", layout), ("master", layout.slide_master)):
+        images = {}                         # partname -> (part, the a:blip elements that show it)
+
+        for blip in BLIPS(owner._element):
+            rel = owner.part.rels.get(blip.get(EMBED))
+
+            if rel is not None and not rel.is_external and rel.reltype == RT.IMAGE:
+                images.setdefault(str(rel.target_part.partname), (rel.target_part, []))[1].append(blip)
+
+        for name, (part, blips) in images.items():
+            if name in seen:
+                continue
+
+            seen.add(name)
+            block_id = f"slide{slide_number}_{kind}_image{len(blocks) + 1}"
+            sources.add(block_id, ImageSource(part, blips))
+
+            blocks.append(reader.block(
+                block_id, name, part.blob,
+                metadata={"location": "body" if kind == "fill" else "template", "image_part": name}
+            ))
+
+    return blocks
+
+
+def comment_authors(slide, sources=Sources()):
+    """
+    (kind, author id) -> the author's element, for the presentation's
+    classic and threaded comment authors.
+    """
+
+    authors = {}
+
+    for rel in slide.part.package.presentation_part.rels.values():
+        if rel.is_external or rel.reltype not in (RT.COMMENT_AUTHORS, THREADED_AUTHORS):
+            continue
+
+        kind = "classic" if rel.reltype == RT.COMMENT_AUTHORS else "threaded"
+
+        for author in sources.xml(rel.target_part).iter(f"{{{P_NS}}}cmAuthor", f"{{{P188_NS}}}author"):
+            authors[(kind, author.get("id"))] = author
+
+    return authors
+
+
+def comment_blocks(slide, slide_number, sources=Sources()):
+    """
+    One block per comment on the slide, replies included. The author's
+    name is kept in metadata, as for Word comments.
+    """
+
+    # By part name: the order a saved copy reads them in too
+    rels = sorted(
+        (
+            rel for rel in slide.part.rels.values()
+            if not rel.is_external and rel.reltype in (RT.COMMENTS, THREADED_COMMENTS)
+        ),
+        key=lambda rel: str(rel.target_part.partname)
+    )
+
+    if not rels:
+        return []
+
+    authors = comment_authors(slide, sources)
+    blocks = []
+
+    for rel in rels:
+        root = sources.xml(rel.target_part)
+
+        if rel.reltype == RT.COMMENTS:
+            entries = [
+                ("classic", comment, TextSource([text], pptx_comment_pieces))
+                for comment in root.iter(f"{{{P_NS}}}cm")
+                for text in comment.iterchildren(f"{{{P_NS}}}text")
+            ]
+        else:
+            entries = [
+                ("threaded", comment, TextSource(COMMENT_PARAGRAPHS(comment), pptx_paragraph_pieces))
+                for comment in root.iter(f"{{{P188_NS}}}cm", f"{{{P188_NS}}}reply")
+            ]
+
+        for kind, comment, source in entries:
+            text = source.text()
+
+            if not text:
+                continue
+
+            block_id = f"slide{slide_number}_comment{len(blocks) + 1}"
+            sources.add(block_id, source)
+
+            metadata = {
+                "source": "native",
+                "location": "comment",
+                "comment_id": comment.get("idx") or comment.get("id"),
+            }
+            author = authors.get((kind, comment.get("authorId")))
+
+            if author is not None:
+                # The author's element holds the name
+                sources.add(f"{block_id}_author", author)
+                metadata["author"] = author.get("name") or ""
+                metadata["initials"] = author.get("initials")
+
+            blocks.append(DocumentBlock(
+                block_id=block_id,
+                block_type="paragraph",
+                text=text,
+                metadata=metadata
+            ))
+
+    return blocks
+
+
+def slide_blocks(slide, slide_number, reader, sources=Sources(), seen=None):
+    """
+    The blocks of one slide, in reading order, then the images its
+    template puts on it, its speaker notes and its comments. seen: the
+    image parts earlier slides read, updated here. The original-format
+    redactor calls this in locate mode, with a SourceMap.
+    """
+
+    seen = set() if seen is None else seen
 
     blocks = shape_blocks(
         slide.shapes, slide_number, find_title_shape(slide), reader, sources=sources
@@ -447,7 +586,10 @@ def slide_blocks(slide, slide_number, reader, sources=Sources()):
         if block.bounding_box else (float("inf"), 0)
     ))
 
+    seen.update(block.metadata["image_part"] for block in blocks if block.metadata.get("image_part"))
+    blocks.extend(template_image_blocks(slide, slide_number, reader, seen, sources))
     blocks.extend(notes_blocks(slide, slide_number, sources))
+    blocks.extend(comment_blocks(slide, slide_number, sources))
 
     for order, block in enumerate(blocks, start=1):
         block.order = order
@@ -461,11 +603,12 @@ def extract_pptx(file_path: str) -> ExtractedDocument:
 
     presentation = Presentation(file_path)
     reader = ImageReader()
+    seen = set()
     pages = []
 
     for slide_number, slide in enumerate(presentation.slides, start=1):
 
-        blocks = slide_blocks(slide, slide_number, reader)
+        blocks = slide_blocks(slide, slide_number, reader, seen=seen)
 
         pages.append(
             DocumentPage(

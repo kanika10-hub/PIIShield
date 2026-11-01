@@ -1,7 +1,8 @@
 """
-Text inside images: the OCR words that hold a value are filled, and the
-redaction tag is written in their place. The pixels themselves change,
-so the value is gone from the image file, not hidden behind a shape.
+Text inside images: the OCR words that hold a value are filled with a
+solid black box, nothing written in it (OCR reads nothing back from it).
+The pixels themselves change, so the value is gone from the image file,
+not hidden behind a shape.
 
     covered_words(text, words, spans)   the OCR words each span touches
     line_boxes(boxes)                   word boxes merged into one per line
@@ -12,19 +13,14 @@ so the value is gone from the image file, not hidden behind a shape.
 import re
 from io import BytesIO
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 
-FILL = (217, 217, 217)      # light grey: a redaction mark on any background
-INK = (0, 0, 0)
+FILL = (0, 0, 0)            # black: a solid redaction box
 
 # OCR word boxes are tight around the letters: anti-aliased edges and
 # accents can sit just outside them
 PAD = 2                     # pixels
-
-# Smallest and largest tag text, as a share of the area's height
-MIN_FONT_PX = 5
-FONT_HEIGHT_SHARE = 0.75
 
 # Formats Pillow writes back as they were read. Others (EMF, WMF) are
 # never OCR'd, so nothing in them is ever placed.
@@ -92,46 +88,10 @@ def span_areas(spans, words_per_span):
     return areas
 
 
-def font_for(tag, width, height):
-    """
-    The largest font the tag fits in a box with, down to MIN_FONT_PX.
-    """
-
-    size = max(MIN_FONT_PX, int(height * FONT_HEIGHT_SHARE))
-
-    while True:
-        font = ImageFont.load_default(size=size)
-
-        if size <= MIN_FONT_PX or font.getlength(tag) <= width:
-            return font
-
-        size -= 1
-
-
-def write_tag(canvas, box, tag):
-    """
-    The tag, left-aligned and centred vertically in box, cut off at its
-    edges: it is drawn on its own tile so it never covers anything else.
-    """
-
-    x0, y0, x1, y1 = (int(value) for value in box)
-    width, height = x1 - x0, y1 - y0
-
-    if width < 2 or height < 2:
-        return
-
-    font = font_for(tag, width, height)
-    tile = Image.new(canvas.mode, (width, height), FILL if canvas.mode == "RGB" else FILL + (255,))
-    draw = ImageDraw.Draw(tile)
-    top, bottom = font.getbbox(tag)[1], font.getbbox(tag)[3]
-    draw.text((1, (height - (bottom - top)) / 2 - top), tag, font=font, fill=INK)
-    canvas.paste(tile, (x0, y0))
-
-
 def redact_image(data, areas):
     """
-    The image with each area ((x0, y0, x1, y1) in pixels, tag or None)
-    filled, and its tag written in it, in the format it was in. Raises
+    The image with each area ((x0, y0, x1, y1) in pixels, and the tag of
+    its value, not drawn) filled black, in the format it was in. Raises
     ValueError if the image cannot be read or written back.
     """
 
@@ -150,15 +110,12 @@ def redact_image(data, areas):
     canvas = image.convert("RGBA" if transparent else "RGB")
     draw = ImageDraw.Draw(canvas)
 
-    for (x0, y0, x1, y1), tag in areas:
+    for (x0, y0, x1, y1), _ in areas:
         box = (
             max(0, int(x0) - PAD), max(0, int(y0) - PAD),
             min(canvas.width, int(x1 + 0.999) + PAD), min(canvas.height, int(y1 + 0.999) + PAD)
         )
         draw.rectangle(box, fill=FILL)
-
-        if tag:
-            write_tag(canvas, box, tag)
 
     options = {"dpi": image.info["dpi"]} if "dpi" in image.info else {}
     output = BytesIO()

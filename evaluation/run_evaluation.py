@@ -82,7 +82,7 @@ from src.pii.document_scanner import SCANNER_VERSION  # noqa: E402
 from src.pii.exposure_report import EXPOSURE_VERSION  # noqa: E402
 from src.pii.redactor import REDACTION_TAG, REDACTOR_VERSION  # noqa: E402
 from src.pii.validator import (  # noqa: E402
-    EXIT_CODES, PASS, VALIDATOR_VERSION, NotApproved, approved_copy
+    EXIT_CODES, FAIL, PASS, VALIDATOR_VERSION, NotApproved, approved_copy, worst
 )
 
 import build_corpus  # noqa: E402
@@ -109,10 +109,14 @@ TIMED_STEPS = {
     "redact": "redact_file",
     "validate": "validate_file",
     "report": "exposure_file",
+    "file_redact": "redact_original",
+    "file_validate": "validate_original",
 }
 
 # Files the pipeline writes to be shared: they must hold no PII value
-SHAREABLE = ("*_validation.json", "*_exposure.json", "exposure_report.md", "exposure_report.csv")
+SHAREABLE = (
+    "*_validation.json", "*_exposure.json", "*_file_redaction.json", "exposure_report.md", "exposure_report.csv"
+)
 
 # Release outcomes: what the gate did, against what the copy holds
 UNSAFE_RELEASE = "UNSAFE release"
@@ -746,16 +750,27 @@ def detected(label):
     return label["detection"] in ("found", "found (approximate)")
 
 
-def expected_exit_code(verdict, released):
+def expected_exit_code(verdict, released, file=None):
     """
-    What main.py exits with: 0 for a released copy, else the verdict's
-    code, and 1 with no verdict or for a PASS copy the gate refused.
+    What main.py exits with: the worse of the sanitized copy's outcome
+    (PASS if released, else its verdict, FAIL with no verdict or for a
+    PASS copy the gate refused) and, for a type with a file writer
+    (file: (verdict, released)), the redacted file's (PASS if released,
+    FAIL if it was not checked, else its verdict; a PASS file the gate
+    refused takes the copy's outcome, or FAIL beside a released copy).
     """
 
-    if released:
-        return EXIT_CODES[PASS]
+    copy = PASS if released else FAIL if verdict in (None, PASS) else verdict
+    outcomes = [copy]
 
-    return 1 if verdict in (None, PASS) else EXIT_CODES[verdict]
+    if file is not None:
+        file_verdict, file_released = file
+        outcomes.append(
+            PASS if file_released else FAIL if file_verdict is None else file_verdict if file_verdict != PASS
+            else copy if copy != PASS else FAIL
+        )
+
+    return EXIT_CODES[worst(outcomes)]
 
 
 def release_outcome(released, holds_pii):
@@ -806,6 +821,16 @@ def score_document(source, corpus, labels, run):
     except NotApproved as reason:
         released, gate_reason = False, str(reason)
 
+    # The redacted file in its own format (steps 6-7), for types with a writer
+    has_writer = document is not None and Path(document["file_name"]).suffix.lower() in pipeline.WRITERS
+    file_verdict = (load(pipeline.file_validation_path(json_path)) or {}).get("verdict")
+
+    try:
+        pipeline.approved_file(json_path)
+        file_released = True
+    except NotApproved:
+        file_released = False
+
     result.update({
         "format": f"{document['source_type']} ({document.get('extraction_method')})" if document else "?",
         "report_status": (report or {}).get("status"),
@@ -818,7 +843,11 @@ def score_document(source, corpus, labels, run):
         "released": released,
         "gate_reason": gate_reason,
         "gate_consistent": released == (verdict == PASS),
-        "exit_code_ok": run["exit_code"] == expected_exit_code(verdict, released),
+        "file_verdict": file_verdict if has_writer else "no writer",
+        "file_released": file_released,
+        "exit_code_ok": run["exit_code"] == expected_exit_code(
+            verdict, released, (file_verdict, file_released) if has_writer else None
+        ),
         "exposure_counts_agree": (
             exposure is not None and report is not None
             and exposure["summary"]["total_findings"] == len(report["findings"])
@@ -996,6 +1025,10 @@ def corpus_metrics(results, snippets):
         },
         "validation": {
             "verdicts": dict(Counter(result["verdict"] for result in results if result.get("verdict"))),
+            "file_verdicts": dict(Counter(
+                result.get("file_verdict") or "not checked" for result in results if result["accepted"]
+            )),
+            "files_released": sum(1 for result in results if result.get("file_released")),
             "outcomes": dict(outcomes),
             "unsafe_releases": outcomes[UNSAFE_RELEASE],
             "over_blocks": outcomes[OVER_BLOCK],
@@ -1368,13 +1401,15 @@ def write_summary(path, metrics, results, previous, previous_name, corpus):
         "## Step 4: validation and release",
         "",
         table(
-            ["Document", "Verdict", *pipeline_checks(results), "Released", "Gate reason"],
+            ["Document", "Verdict", *pipeline_checks(results), "Released", "Gate reason", "File", "File released"],
             [
                 [
                     result["file"], result.get("verdict"),
                     *[result.get("checks", {}).get(check) for check in pipeline_checks(results)],
                     "yes" if result.get("released") else "no",
                     (result.get("gate_reason") or "").split(": see ")[0] or None,
+                    result.get("file_verdict") or "not checked",
+                    "yes" if result.get("file_released") else "no",
                 ]
                 for result in results if result["accepted"]
             ]

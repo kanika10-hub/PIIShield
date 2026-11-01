@@ -109,6 +109,7 @@ PARTS = {
     "footnote": "Footnote",
     "endnote": "Endnote",
     "comment": "Comment",
+    "template": "Slide template",
 }
 
 DETECTOR_LABELS = {"nlp": "NER", "regex": "Regex", "manual": "Manual review"}

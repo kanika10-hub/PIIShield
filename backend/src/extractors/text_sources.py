@@ -149,6 +149,14 @@ def pptx_paragraph_pieces(paragraph):
     return pieces
 
 
+def pptx_comment_pieces(text):
+    """
+    A classic PowerPoint comment's p:text: plain text in one element.
+    """
+
+    return [Piece(text, text.text or "", True)]
+
+
 # --------------------------------------------------
 # BLOCK SOURCES
 # --------------------------------------------------

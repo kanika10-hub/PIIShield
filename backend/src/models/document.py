@@ -28,7 +28,9 @@ Block
     metadata            every block with text has "source" ("native" or
                         "ocr") and "location" ("body", "header",
                         "footer", "text_box", "notes", "footnote",
-                        "endnote", "comment"). Also, by block type:
+                        "endnote", "comment", "template": an image a
+                        PPTX slide layout or master puts on a slide).
+                        Also, by block type:
         table           rows, columns
         table_cell      row, column, row_span, column_span (1-based)
         list_item       level (0-based)
